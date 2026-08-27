@@ -1,20 +1,20 @@
 {
-  "repoUrl": "https://github.com/GDAT-AP6412/2026s1-<REPLACE_ME>",
-  "teamName": "Your Team Name",
+  "repoUrl": "https://github.com/GDAT-AP6412/2026s1-project-2-team-02.git",
+  "teamName": "404NF",
   "teamMembers": [
     {
-      "name": "PENG XUANJING",
-      "github": "leader-github-username",
+      "name": "Peng Xuanjing",
+      "github": "ppxjing",
       "email": "XUANJING001@ntu.edu.sg"
     },
     {
-      "name": "ZHILAN LIU",
-      "github": "second-github-username",
+      "name": "LIU ZHILAN ",
+      "github": "zhilanliu",
       "email": "ZHILAN001@ntu.edu.sg"
     },
     {
       "name": "YANG CHENG",
-      "github": "third-github-username",
+      "github": "YCYCYC111",
       "email": "YANG1146@ntu.edu.sg"
     }
   ]
