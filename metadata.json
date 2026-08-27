@@ -3,19 +3,19 @@
   "teamName": "Your Team Name",
   "teamMembers": [
     {
-      "name": "Team Leader Name",
+      "name": "PENG XUANJING",
       "github": "leader-github-username",
-      "email": "<leader_email>@ntu.edu.sg"
+      "email": "XUANJING001@ntu.edu.sg"
     },
     {
-      "name": "Second Team Member Name",
+      "name": "ZHILAN LIU",
       "github": "second-github-username",
-      "email": "<second_member_email>@ntu.edu.sg"
+      "email": "ZHILAN001@ntu.edu.sg"
     },
     {
-      "name": "Third Team Member Name",
+      "name": "YANG CHENG",
       "github": "third-github-username",
-      "email": "<third_member_email>@ntu.edu.sg"
+      "email": "YANG1146@ntu.edu.sg"
     }
   ]
 }
