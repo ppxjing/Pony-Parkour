@@ -1,0 +1,21 @@
+{
+  "repoUrl": "https://github.com/GDAT-AP6412/2026s1-<REPLACE_ME>",
+  "teamName": "Your Team Name",
+  "teamMembers": [
+    {
+      "name": "Team Leader Name",
+      "github": "leader-github-username",
+      "email": "<leader_email>@ntu.edu.sg"
+    },
+    {
+      "name": "Second Team Member Name",
+      "github": "second-github-username",
+      "email": "<second_member_email>@ntu.edu.sg"
+    },
+    {
+      "name": "Third Team Member Name",
+      "github": "third-github-username",
+      "email": "<third_member_email>@ntu.edu.sg"
+    }
+  ]
+}
