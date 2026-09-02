@@ -17,15 +17,18 @@ Below are examples of markdown features available on GitHub that might be useful
 
 ### Introduction
 
-About game
-This is a competitive running game where you control a character racing against multiple AI-controlled opponents. The track is full of obstacles, and one wrong step will send you right back to the starting line. Outrun the competition. Stay on your feet. Cross the finish line first.
 
-Gameplay
-Control your character using WASD or arrow keys.
-Run through the course and avoid all obstacles.
-Race against several AI-controlled runners — each with its own behavior and speed.
-Touch an obstacle → you are reset to the starting point.
-The first to reach the finish line wins.
+#### About the Game
+
+This is a competitive running game where you control a character racing against multiple AI-controlled opponents. The track is full of obstacles, and one wrong step will send you right back to the starting line. Outrun the competition, stay on your feet, and cross the finish line first.
+
+#### Gameplay
+
+- Control your character using WASD or the arrow keys.
+- Run through the course and avoid all obstacles.
+- Race against several AI-controlled runners, each with its own behavior and speed.
+- Touching an obstacle resets you to the starting point.
+- The first runner to reach the finish line wins.
 
 
 ### Emojis and Icons
