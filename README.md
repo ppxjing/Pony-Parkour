@@ -17,9 +17,16 @@ Below are examples of markdown features available on GitHub that might be useful
 
 ### Introduction
 
-_Exciting title_ is a first-person shooter (FPS) set in... we're not sure yet. It's a bit like _Doom_ meets _Animal Crossing_, but with a twist. The player must...
+About game
+This is a competitive running game where you control a character racing against multiple AI-controlled opponents. The track is full of obstacles, and one wrong step will send you right back to the starting line. Outrun the competition. Stay on your feet. Cross the finish line first.
 
-> "This is a quote from the game designer, explaining why this game is going to be the best thing since sliced bread." - Game Designer
+Gameplay
+Control your character using WASD or arrow keys.
+Run through the course and avoid all obstacles.
+Race against several AI-controlled runners — each with its own behavior and speed.
+Touch an obstacle → you are reset to the starting point.
+The first to reach the finish line wins.
+
 
 ### Emojis and Icons
 
