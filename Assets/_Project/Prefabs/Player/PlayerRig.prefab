@@ -147,6 +147,9 @@ MonoBehaviour:
   maxPitch: 70
   mouseSensitivity: 0.12
   followSharpness: 16
+  rotationSharpness: 12
+  distanceSharpness: 10
+  lockCursor: 1
   collisionRadius: 0.2
   collisionPadding: 0.08
   obstructionMask:

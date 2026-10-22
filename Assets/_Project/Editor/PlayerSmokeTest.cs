@@ -23,6 +23,8 @@ public static class PlayerSmokeTest
     private static GameObject obstruction;
     private static float straightDistance;
     private static Quaternion cameraRotation;
+    private static bool pulseSent;
+    private static float firstTurn;
     public static string Status { get; private set; } = "Not run";
 
     [MenuItem("Tools/Adventure/Run Player Smoke Test (Play Mode)")]
@@ -46,7 +48,15 @@ public static class PlayerSmokeTest
         if (keyboard != null && keyboard.added && InputState.currentUpdateType == InputUpdateType.Dynamic)
         {
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(keys));
-            if (mouse != null) InputSystem.QueueStateEvent(mouse, phase == 15 ? new MouseState { delta = new Vector2(3, 0) }.WithButton(MouseButton.Right) : new MouseState());
+            if (mouse != null)
+            {
+                var state = new MouseState();
+                if (phase == 0 || phase == 18) state = state.WithButton(MouseButton.Left);
+                if ((phase == 15 || phase == 19) && !pulseSent)
+                { state.delta = new Vector2(160, 0); pulseSent = true; }
+                if (phase == 17) state.delta = new Vector2(3, 0);
+                InputSystem.QueueStateEvent(mouse, state);
+            }
         }
     }
     private static void Next()
@@ -79,7 +89,8 @@ public static class PlayerSmokeTest
             Physics.SyncTransforms();
         }
         if (phase == 14) keys = new[] {Key.W};
-        if (phase == 15) cameraRotation = camera.rotation;
+        if (phase >= 15) { cameraRotation = camera.rotation; pulseSent = false; firstTurn = float.NaN; }
+        if (phase == 16) keys = new[] { Key.Escape };
     }
     private static void Tick()
     {
@@ -127,11 +138,19 @@ public static class PlayerSmokeTest
                 UnityEngine.Object.DestroyImmediate(obstruction); obstruction = null;
                 motor.Respawn(); Next(); return;
             }
-            if (phase == 15 && elapsed > 0.5f)
+            if (phase == 15 || phase == 19)
             {
-                Check(Quaternion.Angle(cameraRotation, camera.rotation) > 2f, "Right mouse + delta orbits camera");
+                float angle = Quaternion.Angle(cameraRotation, camera.rotation);
+                if (float.IsNaN(firstTurn) && angle > 0.01f) firstTurn = angle;
+                if (elapsed <= 0.6f) return;
+                Check(angle > 15f && angle < 20f, phase == 15 ? "Mouse delta alone orbits camera (no right button)" : "Click recaptures cursor and restores mouse look");
+                Check(firstTurn > 0 && firstTurn < 19f, "Rotation interpolates instead of snapping: first angle=" + firstTurn.ToString("F2"));
+                if (phase == 15) { Next(); return; }
                 Finish(results.Exists(s => s.StartsWith("FAIL")) ? "FAILED" : "PASSED");
             }
+            if (phase == 16 && elapsed > 0.5f) { Check(Cursor.lockState == CursorLockMode.None && Cursor.visible, "Escape releases cursor"); Next(); return; }
+            if (phase == 17 && elapsed > 0.5f) { Check(Quaternion.Angle(cameraRotation, camera.rotation) < 0.2f, "Released cursor does not rotate camera"); Next(); return; }
+            if (phase == 18 && elapsed > 0.2f) { Check(Cursor.lockState == CursorLockMode.Locked, "Left click locks cursor"); Next(); return; }
         }
         catch (Exception ex) { results.Add("FAIL " + ex); Finish("FAILED"); }
     }

@@ -37,14 +37,22 @@
                     "priority": 0
                 },
                 {
-                    "name": "Orbit",
+                    "name": "ReleaseCursor",
                     "type": "Button",
-                    "id": "008e6ebe-d3c8-46cd-9542-69b288493782",
-                    "expectedControlType": "",
+                    "id": "a5493bc2-d264-483c-b2d6-12eaa2ddc34e",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false,
-                    "priority": 0
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CaptureCursor",
+                    "type": "Button",
+                    "id": "78e72877-6129-499e-93a9-366274bfe875",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -127,12 +135,23 @@
                 },
                 {
                     "name": "",
-                    "id": "25af6634-93e9-4a94-8e65-90adb90a8982",
-                    "path": "<Mouse>/rightButton",
+                    "id": "73930480-a860-4c76-9e54-386f482a5dd2",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Orbit",
+                    "action": "ReleaseCursor",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cddbb666-7bd6-4414-a63b-2ff55e8a9e66",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CaptureCursor",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -2,13 +2,19 @@ Player smoke test: PASSED
 Unity 6000.3.19f1
 PASS Movement W distance=2.53
 PASS Camera follows player
-PASS Movement S distance=2.54
-PASS Movement A distance=2.53
-PASS Movement D distance=2.54
-PASS Movement W+D distance=2.54
+PASS Movement S distance=2.53
+PASS Movement A distance=2.52
+PASS Movement D distance=2.53
+PASS Movement W+D distance=2.53
 PASS Diagonal speed is normalized
-PASS Space jump and no double jump: peak=1.37
+PASS Space jump and no double jump: peak=1.38
 PASS Lands on kitchen floor
 PASS Camera shortens distance at obstruction
 PASS CharacterController blocks movement through wall: distance=1.52
-PASS Right mouse + delta orbits camera
+PASS Mouse delta alone orbits camera (no right button)
+PASS Rotation interpolates instead of snapping: first angle=1.17
+PASS Escape releases cursor
+PASS Released cursor does not rotate camera
+PASS Left click locks cursor
+PASS Click recaptures cursor and restores mouse look
+PASS Rotation interpolates instead of snapping: first angle=1.04

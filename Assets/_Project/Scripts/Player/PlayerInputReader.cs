@@ -8,11 +8,12 @@ namespace Adventure.Player
     {
         [SerializeField] private InputActionAsset actions;
         private InputActionAsset runtimeActions;
-        private InputAction move, jump, look, orbit;
+        private InputAction move, jump, look, releaseCursor, captureCursor;
         public Vector2 Move => move != null && move.enabled ? move.ReadValue<Vector2>() : Vector2.zero;
         public bool JumpPressed => jump != null && jump.enabled && jump.WasPressedThisFrame();
         public Vector2 Look => look != null && look.enabled ? look.ReadValue<Vector2>() : Vector2.zero;
-        public bool OrbitHeld => orbit != null && orbit.enabled && orbit.IsPressed();
+        public bool ReleaseCursorPressed => releaseCursor != null && releaseCursor.enabled && releaseCursor.WasPressedThisFrame();
+        public bool CaptureCursorPressed => captureCursor != null && captureCursor.enabled && captureCursor.WasPressedThisFrame();
 
         private void Awake()
         {
@@ -22,7 +23,8 @@ namespace Adventure.Player
             move = runtimeActions.FindAction("Gameplay/Move", true);
             jump = runtimeActions.FindAction("Gameplay/Jump", true);
             look = runtimeActions.FindAction("Gameplay/Look", true);
-            orbit = runtimeActions.FindAction("Gameplay/Orbit", true);
+            releaseCursor = runtimeActions.FindAction("Gameplay/ReleaseCursor", true);
+            captureCursor = runtimeActions.FindAction("Gameplay/CaptureCursor", true);
         }
         private void OnEnable() { if (runtimeActions != null) runtimeActions.Enable(); }
         private void OnDisable() { if (runtimeActions != null) runtimeActions.Disable(); }

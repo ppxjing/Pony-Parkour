@@ -8,7 +8,7 @@ Unity：6000.3.19f1
 操作
 WASD：相对于摄像头水平方向移动。
 空格：跳跃（需落地；不支持二段跳）。
-按住鼠标右键并移动鼠标：旋转第三人称视角。
+移动鼠标：直接旋转第三人称视角，无需按住右键。进入 Play 自动锁定并隐藏鼠标；Esc 释放，左键点击 Game 重新捕获。
 进入 Play 后先点击 Game 画面让它获得键鼠焦点。
 掉落到世界 Y=-15 以下自动回到本次 Play 的出生位置。
 
@@ -41,7 +41,10 @@ Distance = 4.5：跟随距离。
 Yaw = 0 / Pitch = 18：初始水平/俯仰角。
 Min Pitch = -25 / Max Pitch = 70：俯仰范围。
 Mouse Sensitivity = 0.12：每像素鼠标位移对应的角度。
-Follow Sharpness = 16：目标点跟随速度，越大越紧。
+Follow Sharpness = 16：位置跟随插值速度，越大越紧。
+Rotation Sharpness = 12：视角旋转插值速度，越小越柔和，越大越跟手。
+Distance Sharpness = 10：镜头避障后恢复距离的插值速度；遇到遮挡立即收近，避免插值穿墙。
+Lock Cursor = true：自动捕获鼠标；Esc 释放，左键重新捕获。关闭此项后鼠标不锁定但仍可直接转镜头。
 Collision Radius = 0.2 / Collision Padding = 0.08：镜头避障球半径与安全间距。
 Obstruction Mask = Everything：镜头检查的遮挡层；代码自动排除玩家自身及 Trigger。
 Camera 组件：Field of View=60、Near Clip Plane=0.05。
@@ -51,7 +54,7 @@ CameraTarget 的 Local Position Y=1.4：相机目标高度。
 Unity Input System 1.20.1，Active Input Handling=Both。
 新玩家只使用 Input System；Both 保留旧第三方示例的输入兼容性。
 Assets/_Project/Input/PlayerControls.inputactions
-Gameplay/Move：2DVector，W/S/A/D；Jump：Space；Look：Mouse Delta；Orbit：Right Button。
+Gameplay/Move：2DVector，W/S/A/D；Jump：Space；Look：Mouse Delta；ReleaseCursor：Escape；CaptureCursor：Left Button。
 双击该资源即可修改键位，不需要修改脚本。
 
 资源目录（以下均相对于上述工程根目录）
@@ -59,7 +62,7 @@ Assets/_Project/Scenes/Kitchen_Playground.unity：厨房开发场景。
 Assets/_Project/Prefabs/Player/PlayerRig.prefab：可复用玩家和摄像头组合。
 Assets/_Project/Scripts/Player/PlayerInputReader.cs：输入动作生命周期及读取。
 Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：移动、转身、跳跃、重力和跌落恢复。
-Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：跟随、右键环绕与镜头避障。
+Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：位置跟随、鼠标直控环绕、旋转插值与镜头避障。
 Assets/_Project/Input/PlayerControls.inputactions：输入动作和键位。
 Assets/_Project/Materials/Player/Player_Capsule.mat：蓝色胶囊材质。
 Assets/_Project/Materials/Player/Player_ForwardMarker.mat：朝向标记材质。
@@ -80,14 +83,14 @@ Logs/PlayerValidation/：调试截图，Git 已忽略 Logs。
 2. 应看到地面上的蓝色胶囊，镜头位于其后方；不应有重复 AudioListener 报错。
 3. 分别按 W/S/A/D，再按 W+D：移动方向符合镜头方向，斜向不会更快，松手后减速停止。
 4. 按空格：离地再落地；空中连续按空格不会二段跳；落地后可再次跳。
-5. 按右键拖动：相机绕玩家转动；转动后按 W，玩家向新镜头前方移动。
+5. 不按任何鼠标按钮，只移动鼠标：相机平滑绕玩家转动；转动后按 W，玩家向新镜头前方移动。按 Esc 后鼠标恢复可见且停止转镜头；点击 Game 后继续。
 6. 朝椅腿或墙移动：玩家被实际碰撞体阻挡；靠近墙/家具旋转镜头，镜头应收近。
 7. 停止 Play，修改 Move Speed 或 Jump Height，再 Play，确认手感变化；Play 中参数改变默认不会保留。
 8. 检查 Console，无新增红色错误。退出 Play 后再次进入，输入不应重复响应或失效。
 
 自动验证
 在 Kitchen_Playground 的 Play 模式，运行 Tools > Adventure > Run Player Smoke Test (Play Mode)。
-约 12 秒完成，会模拟键鼠输入、临时创建测试障碍，结束后清理；期间请不要手动操作玩家。
+约 15 秒完成，会模拟键鼠输入、临时创建测试障碍，结束后清理；期间请不要手动操作玩家。
 结果写入 Docs/PLAYER_VALIDATION.txt。执行结束后退出 Play，恢复场景保存时的状态。
 
 范围
