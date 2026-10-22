@@ -1,0 +1,37 @@
+Navigation 环路与跳跃
+
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+场景分组：NavigationLinks
+路线：Navigation1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 1。
+8 条 Link 均为单向，符合箭头顺序；全环仍可从任一区域绕行到其他区域。
+Link_3_to_4_Jump 使用 Jump Area，其余使用 Walkable。Agent Type 均为 Humanoid。
+选中 Link 可修改 Width、Bidirectional、Activated；移动子物体 Start / End 调整端点。
+端点必须留在各自的蓝色 NavMesh 内，修改台面或重新烘焙后应再次检查连接。
+
+AI 使用方式
+场景 AI/NavigationTestAI 是绿色胶囊测试 AI，进入 Play 自动沿环路巡逻。预制体位于 Assets/_prefab/AI/PF_NavigationTestAI.prefab。WASD 玩家保持原样。
+给后续 AI 同一个物体添加 NavMeshAgent 和 Adventure.AI.NavMeshLinkTraversal。
+脚本：Assets/_Project/Scripts/AI/NavMeshLinkTraversal.cs
+Agent Type 选 Humanoid，Area Mask 包含 Walkable 与 Jump。
+跳跃组件启用时接管 OffMeshLink 跨越，禁用时恢复原 Auto Traverse Off Mesh Link 设置。
+组件不负责巡逻或选择目标；由 AI 的行为脚本调用 Agent.SetDestination。
+NavMeshLoopPatrol 已按 1-2-3-4-5-6-7-8-1 顺序配置 8 个目标。Waypoints 列表可拖入各 Link 的 End。Waypoint Pause 为每个目标处等待时间，默认 0.25 秒；Loop 决定是否循环。NavMeshAgent 的 Speed 默认 4，Acceleration 默认 20。独立拖入 AI 预制体时，需要重新绑定场景 Waypoints 列表，并将根物体放在 NavMesh 上。
+
+跳跃组件参数（在 AI 的 Nav Mesh Link Traversal 组件上调整）
+Jump Height：高于两端较高位置的跳跃顶点高度，默认 1 米。
+Gravity：跳跃向下加速度，默认 25 米/秒²。
+起跳竖直速度和落地时间由高度差、Jump Height、Gravity 计算，水平匀速到达终点。
+普通 Walkable 连接使用 Agent.speed 沿连接前进，不触发跳跃。
+动画尚未接入；IsJumping / IsTraversing 可供后续动画系统读取。
+当前实现由导航组件控制位置，不做 Rigidbody 弹道碰撞；规划跳跃时需留出头顶空间。
+不要让动态 Rigidbody、玩家移动脚本或动画根运动同时控制 AI 的根位置。
+禁用跳跃组件会取消进行中的跨越并返回起点，避免停在半空。
+
+验收
+1. Scene 开启 Show NavMesh，展开 NavigationLinks，检查 8 条连接端点。
+2. AI 挂上上述两个组件，设置目标到下一个区域，能连续走过普通连接。
+3. 3->4 离地上升再下降，落在 Navigation4，继续寻路，不能只是水平滑过去。
+4. 调大 Jump Height 应跳得更高，调大 Gravity 应更快完成跳跃。
+5. 暂停 AI（Agent.isStopped）会暂停跨越，恢复后继续；禁用组件后不会继续悬空移动。
+6. 绿色胶囊测试 AI 已保存在场景中。停止 Play 后仍会保留，下一次 Play 从起点重新开始。3->4 端点对准两块伸出的 Cheese 板子。
+
