@@ -26,6 +26,9 @@ namespace Adventure.Player
         [SerializeField] private float respawnBelowY = -15f;
         private CharacterController controller;
         private PlayerRespawn respawn;
+        private SeesawPlatform standingPlatform;
+        private Vector3 supportLocalPoint, supportWorldPoint;
+        public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
         private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
@@ -44,6 +47,7 @@ namespace Adventure.Player
         {
             float dt = Time.deltaTime;
             if (dt <= 0f) return;
+            FollowSupport();
             Vector2 stick = Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
@@ -61,7 +65,13 @@ namespace Adventure.Player
                 jumpRequested = lastGrounded = float.NegativeInfinity;
             }
             verticalVelocity = Mathf.Max(verticalVelocity + gravity * dt, -terminalSpeed);
+            standingPlatform = null;
             var flags = controller.Move((horizontalVelocity + Vector3.up * verticalVelocity) * dt);
+            if (standingPlatform != null)
+            {
+                supportLocalPoint = standingPlatform.transform.InverseTransformPoint(transform.position);
+                supportWorldPoint = transform.position;
+            }
             if ((flags & CollisionFlags.Above) != 0 && verticalVelocity > 0f) verticalVelocity = 0f;
             if (transform.position.y < respawnBelowY)
             {
@@ -69,9 +79,28 @@ namespace Adventure.Player
                 else Respawn();
             }
         }
+        private void FollowSupport()
+        {
+            if (standingPlatform == null) return;
+            if (!standingPlatform.isActiveAndEnabled || verticalVelocity > 0f)
+            { standingPlatform = null; return; }
+            Vector3 point = standingPlatform.transform.TransformPoint(supportLocalPoint);
+            // Carry through the controller so walls/ceilings still block the player.
+            controller.Move(point - supportWorldPoint);
+            supportWorldPoint = point;
+        }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             if (!isActiveAndEnabled) return;
+            if (verticalVelocity <= 0f && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
+            {
+                var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
+                if (platform != null && platform.isActiveAndEnabled && Vector3.Dot(hit.normal, platform.transform.up) > 0.7f)
+                {
+                    standingPlatform = platform;
+                    platform.RegisterSupport(this);
+                }
+            }
             var trampoline = hit.collider.GetComponent<TrampolineSurface>();
             if (trampoline != null) trampoline.TryBounce(this, hit.normal);
         }
@@ -79,13 +108,14 @@ namespace Adventure.Player
         {
             if (!isActiveAndEnabled || controller == null || !controller.enabled || verticalVelocity > 0f || height <= 0f)
                 return false;
+            standingPlatform = null;
             verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * height);
             // Landing consumes buffered jump/coyote time so Space cannot overwrite the launch.
             lastGrounded = jumpRequested = float.NegativeInfinity;
             return true;
         }
         private void OnDisable()
-        { horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
+        { standingPlatform = null; horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
         private void OnValidate()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
@@ -95,6 +125,7 @@ namespace Adventure.Player
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
+            standingPlatform = null;
             bool wasEnabled = controller.enabled;
             controller.enabled = false;
             transform.SetPositionAndRotation(position, rotation);

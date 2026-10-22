@@ -1,0 +1,79 @@
+跷跷板机关使用与验收
+
+工程：D:/6412_Group/2026s1-project-2-team-02
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+预设体：Assets/_prefab/机关/PF_Spinner_1_Seesaw.prefab
+当前保存的场景位置约为 (4.66, 0.61, -17.98)；场景实例覆盖为 Max Angle = 40、Angular Damping = 0.5。下方参数表和验证记录描述预设体默认值与实现时的测试配置。
+
+行为
+中间 FixedAxle 固定，Rotation 下的板面绕中间轴（局部 Z 轴）倾斜。
+玩家站在一侧时，那一侧逐渐下降；越靠近端部，施加的转动作用越强。
+转动有惯性、阻尼和速度上限，不会瞬间跳到目标倾角。
+默认最大倾角为左右各 25 度；玩家离开后缓慢回正。
+玩家会跟随板面位移，仍可 WASD 行走和空格跳跃。
+只有板面上方的站立接触参与受力，侧面、底面和固定轴不会施加偏载。
+跳离、死亡和复活会清除板面跟随；尸体和普通散落物不参与此玩家受力逻辑。
+
+参数在哪里调
+选中场景中的 PF_Spinner_1_Seesaw，展开并选 Rotation。
+在 Inspector 的 Seesaw Platform 组件修改：
+
+Max Angle = 25
+左右两侧的最大倾角，单位度，范围 1～40。应给板面下降留出空间。
+
+Load Acceleration = 120
+一名玩家站在端部时产生的角加速度，单位度/秒²。越大越容易压低、倾斜越快。
+
+Angular Damping = 6
+旋转阻尼（阻力）。越大转得越慢、来回晃动越少。想要更沉重，可改成 10～12。
+
+Return Strength = 2
+回正力度。越大越倾向恢复水平，承重时最终倾斜也会更小。0 关闭自动回正，剩余转速仍会被阻尼逐渐消除。
+
+Max Angular Speed = 35
+最大旋转速度，单位度/秒。用于限制最快速度。
+
+Half Length = 1.8
+从支点到端部的模型局部距离，供受力计算归一化。与当前模型匹配，通常不改。
+
+Center Dead Zone = 0.1
+支点左右不施加转动力的范围（模型局部距离），用于减少中心附近抖动。
+
+只改当前场景实例会保留为实例覆盖；要修改以后新拖入的机关，请打开预设体修改。
+Play 中调参数适合试手感，停止后需要在编辑模式重新设置才能保存。
+整体移动、旋转或缩放请操作预设体根对象；Rotation 是固定转轴位置，通常不移动它。
+保持跷跷板局部 Y 朝上，可绕根对象 Y 调整摆放方向。推荐均匀缩放。
+Rigidbody 为 Kinematic，由脚本控制转动；手感参数在 Seesaw Platform 内修改。
+
+文件管理
+Assets/_prefab/机关/PF_Spinner_1_Seesaw.prefab：可复用跷跷板。
+Assets/_Project/Scripts/Obstacles/SeesawPlatform.cs：受力、惯性、阻尼、限角、回正。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：板面站立检测和随动，跳跃/死亡/复活时脱离。
+Assets/_Project/Meshes/Obstacles/Spinner1_FixedAxle.asset：从原模型分出的固定中轴。
+Assets/_Project/Meshes/Obstacles/Spinner1_SeesawBoard.asset：从原模型分出的旋转板面。
+原始 ThirdParty 资源保持不变。
+
+验收步骤
+1. 打开 Kitchen_Adventure，按 Play。无人站立时，板面保持水平。
+2. 从上方落到一侧，观察该侧逐渐降低，另一侧升起；中间轴的位置始终不变。
+3. 站到另一侧，倾斜方向应改变；靠近中心时作用减弱。
+4. 停在同一端，倾角不应超过 Max Angle，玩家不会持续掉穿板面。
+5. 空格跳起时应脱离跟随，落下后再次施力；WASD 可以正常走离。
+6. 离开机关后，板面缓慢回正。默认阻尼下回正较慢，可等待约 10 秒观察。
+7. 将 Angular Damping 从 6 改为 12，对比压下一侧的速度，应明显变慢。
+8. 将 Max Angle 改为 10，确认限角变小；将 Return Strength 改为 0，确认不再自动回到水平。
+
+验证记录
+Unity 脚本编译通过。
+真实 CharacterController 站立测试：接触后 0.1 秒约 -0.34 度，0.5 秒约 -4.41 度，逐渐达到 -25 度。
+换边后变为正角；离开 9 秒后回到约 0.92 度；支点位移和固定轴旋转误差均为 0。
+输入系统空格测试：上升约 1.37 米，空中脱离跟随，落回重新站立。
+死亡后受力人数变为 0；自动复活后输入和移动恢复。
+Kitchen_Adventure 原位置测试：玩家可正常压低板面并随动。
+
+补充测试：阻尼 12 时接触后 0.5 秒约 -2.71 度；10 度限角正确。
+40 度倾角时板面可站立，端侧碰撞返回 Sides 且未登记站立。
+中轴站立角度保持 0；弹簧床回归测试连续弹起 3 次。
+
+Git
+弹簧床机关已提交：69ff7a5，提交说明“弹簧床机关”。
