@@ -1,0 +1,14 @@
+Player smoke test: PASSED
+Unity 6000.3.19f1
+PASS Movement W distance=2.53
+PASS Camera follows player
+PASS Movement S distance=2.54
+PASS Movement A distance=2.53
+PASS Movement D distance=2.54
+PASS Movement W+D distance=2.54
+PASS Diagonal speed is normalized
+PASS Space jump and no double jump: peak=1.37
+PASS Lands on kitchen floor
+PASS Camera shortens distance at obstruction
+PASS CharacterController blocks movement through wall: distance=1.52
+PASS Right mouse + delta orbits camera

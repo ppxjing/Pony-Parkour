@@ -1,0 +1,96 @@
+厨房第三人称玩家：使用与验收
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+Unity：6000.3.19f1
+开发场景：Assets/_Project/Scenes/Kitchen_Playground.unity
+本场景基于当前 Demo_Kitchen 另存；第三方原场景保持原样。
+
+操作
+WASD：相对于摄像头水平方向移动。
+空格：跳跃（需落地；不支持二段跳）。
+按住鼠标右键并移动鼠标：旋转第三人称视角。
+进入 Play 后先点击 Game 画面让它获得键鼠焦点。
+掉落到世界 Y=-15 以下自动回到本次 Play 的出生位置。
+
+场景结构
+PlayerRig
+  Player：CharacterController、PlayerInputReader、ThirdPersonMotor
+    Visuals
+      CapsulePlaceholder（蓝色胶囊，橙色小球表示朝向）
+    CameraTarget：相机看向的目标点
+  ThirdPersonCamera：Camera、AudioListener、ThirdPersonOrbitCamera
+原 Demo 的 Camera 在开发场景中已停用，只保留一个启用的摄像机和 AudioListener。
+PlayerRig 在开发场景的出生位置为 (-6, -0.28, -24)。
+
+可调参数（在非 Play 状态下修改并保存）
+选择 PlayerRig/Player，Third Person Motor：
+Move Speed = 5：最大移动速度（米/秒）。
+Acceleration = 25：加速和减速速率。
+Turn Speed = 720：模型转身速度（度/秒）。
+Jump Height = 1.4：目标跳跃高度（米），受重力积分和碰撞影响，实测略低。
+Gravity = -25：重力加速度；绝对值越大，下落越快。
+Terminal Speed = 35：最大下落速度。
+Coyote Time = 0.1：离开地面后仍可起跳的宽限时间（秒）。
+Jump Buffer Time = 0.12：落地前预按跳跃的缓存时间（秒）。
+Respawn Below Y = -15：跌落恢复高度。
+CharacterController：Height=1.8、Radius=0.35、Center Y=0.9、Step Offset=0.25、Slope Limit=45、Skin Width=0.035。
+调整体型时同时核对高度、半径、中心、跨阶高度以及 Visuals 外观；不要直接缩放 Player 根节点。
+
+选择 PlayerRig/ThirdPersonCamera，Third Person Orbit Camera：
+Distance = 4.5：跟随距离。
+Yaw = 0 / Pitch = 18：初始水平/俯仰角。
+Min Pitch = -25 / Max Pitch = 70：俯仰范围。
+Mouse Sensitivity = 0.12：每像素鼠标位移对应的角度。
+Follow Sharpness = 16：目标点跟随速度，越大越紧。
+Collision Radius = 0.2 / Collision Padding = 0.08：镜头避障球半径与安全间距。
+Obstruction Mask = Everything：镜头检查的遮挡层；代码自动排除玩家自身及 Trigger。
+Camera 组件：Field of View=60、Near Clip Plane=0.05。
+CameraTarget 的 Local Position Y=1.4：相机目标高度。
+
+输入配置
+Unity Input System 1.20.1，Active Input Handling=Both。
+新玩家只使用 Input System；Both 保留旧第三方示例的输入兼容性。
+Assets/_Project/Input/PlayerControls.inputactions
+Gameplay/Move：2DVector，W/S/A/D；Jump：Space；Look：Mouse Delta；Orbit：Right Button。
+双击该资源即可修改键位，不需要修改脚本。
+
+资源目录（以下均相对于上述工程根目录）
+Assets/_Project/Scenes/Kitchen_Playground.unity：厨房开发场景。
+Assets/_Project/Prefabs/Player/PlayerRig.prefab：可复用玩家和摄像头组合。
+Assets/_Project/Scripts/Player/PlayerInputReader.cs：输入动作生命周期及读取。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：移动、转身、跳跃、重力和跌落恢复。
+Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：跟随、右键环绕与镜头避障。
+Assets/_Project/Input/PlayerControls.inputactions：输入动作和键位。
+Assets/_Project/Materials/Player/Player_Capsule.mat：蓝色胶囊材质。
+Assets/_Project/Materials/Player/Player_ForwardMarker.mat：朝向标记材质。
+Assets/_Project/Editor/PlayerSmokeTest.cs：编辑器运行验证工具，不进入玩家构建。
+Docs/PLAYER_GUIDE.txt：本说明。
+Docs/PLAYER_VALIDATION.txt：最近一次自动运行验证记录。
+Logs/PlayerValidation/：调试截图，Git 已忽略 Logs。
+
+以后更换模型
+1. 打开 PlayerRig.prefab，在 Player/Visuals 下停用或删除 CapsulePlaceholder（会连同朝向标记一起移除）。
+2. 将新模型放到 Visuals 下，脚底对齐 Player 的局部 Y=0、面向局部 +Z，并调整模型子节点的比例。
+3. 保留 Player 上的 CharacterController、输入和移动脚本，以及 Visuals、CameraTarget 和 ThirdPersonCamera。
+4. 根据新模型体型调整 CharacterController 和 CameraTarget 高度。
+5. 动画后续挂到模型子节点。当前没有动画状态机，不应直接启用 Animator Root Motion 与此移动控制器竞争位移。
+
+人工验收
+1. 打开 Kitchen_Playground，确认 Hierarchy 存在 PlayerRig，保存场景后按 Play，点击 Game。
+2. 应看到地面上的蓝色胶囊，镜头位于其后方；不应有重复 AudioListener 报错。
+3. 分别按 W/S/A/D，再按 W+D：移动方向符合镜头方向，斜向不会更快，松手后减速停止。
+4. 按空格：离地再落地；空中连续按空格不会二段跳；落地后可再次跳。
+5. 按右键拖动：相机绕玩家转动；转动后按 W，玩家向新镜头前方移动。
+6. 朝椅腿或墙移动：玩家被实际碰撞体阻挡；靠近墙/家具旋转镜头，镜头应收近。
+7. 停止 Play，修改 Move Speed 或 Jump Height，再 Play，确认手感变化；Play 中参数改变默认不会保留。
+8. 检查 Console，无新增红色错误。退出 Play 后再次进入，输入不应重复响应或失效。
+
+自动验证
+在 Kitchen_Playground 的 Play 模式，运行 Tools > Adventure > Run Player Smoke Test (Play Mode)。
+约 12 秒完成，会模拟键鼠输入、临时创建测试障碍，结束后清理；期间请不要手动操作玩家。
+结果写入 Docs/PLAYER_VALIDATION.txt。执行结束后退出 Play，恢复场景保存时的状态。
+
+范围
+这是胶囊玩家原型：未加入角色动画、冲刺、攀爬或完整关卡目标。
+镜头带基础球形检测，狭窄夹角仍建议人工走查；第三方碰撞体的形状与模型外观不一定完全一致。
+本次未修改 Build Settings，也未构建独立可执行程序。验收时请直接打开开发场景。
