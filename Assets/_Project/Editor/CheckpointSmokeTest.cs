@@ -24,6 +24,8 @@ public static class CheckpointSmokeTest
     private static int phase, originalCount;
     private static float began, deathObserved, revivedAt, delay, protection, jumpPeak;
     private static Vector3 initialPosition, moveStart;
+    private static Vector3 cameraMoveStart;
+    private static float maximumVisualDrift;
     private static Quaternion viewStart;
     private static bool oldBackground, mouseSent;
     public static string Status { get; private set; } = "Not run";
@@ -87,6 +89,8 @@ public static class CheckpointSmokeTest
     private static void Tick()
     {
         if (!EditorApplication.isPlaying || player == null) { Finish("Interrupted"); return; }
+        if (phase >= 14)
+            maximumVisualDrift = Mathf.Max(maximumVisualDrift, player.transform.Find("Visuals").localPosition.magnitude);
         if (Time.time - began > 12f + delay)
         { Check(false, "Timed out in phase " + phase); Finish("FAILED"); return; }
         switch (phase)
@@ -157,10 +161,15 @@ public static class CheckpointSmokeTest
             case 13:
                 if (death.IsDead || player.RespawnCount != 4) return;
                 VerifyRestored(extra.SpawnPosition, "Appended checkpoint after fall");
-                moveStart = player.transform.position; keys = new[] { Key.W }; Next(); break;
+                moveStart = player.transform.position; cameraMoveStart = Camera.main.transform.position;
+                maximumVisualDrift = 0f; keys = new[] { Key.W }; Next(); break;
             case 14:
                 if (Time.time - began < 0.35f) return;
                 Check(Vector3.ProjectOnPlane(player.transform.position - moveStart, Vector3.up).magnitude > 0.6f, "WASD moves player after repeated revives");
+                Vector3 playerTravel = Vector3.ProjectOnPlane(player.transform.position - moveStart, Vector3.up);
+                Vector3 cameraTravel = Vector3.ProjectOnPlane(Camera.main.transform.position - cameraMoveStart, Vector3.up);
+                Check(cameraTravel.magnitude > playerTravel.magnitude * 0.5f && (cameraTravel - playerTravel).magnitude < 0.6f,
+                    "Camera follows movement after respawn: player=" + playerTravel.magnitude.ToString("F3") + " m, camera=" + cameraTravel.magnitude.ToString("F3") + " m");
                 keys = new[] { Key.Space }; moveStart = player.transform.position; jumpPeak = moveStart.y; Next(); break;
             case 15:
                 jumpPeak = Mathf.Max(jumpPeak, player.transform.position.y);
@@ -171,6 +180,7 @@ public static class CheckpointSmokeTest
             case 16:
                 if (Time.time - began < 0.5f) return;
                 Check(Quaternion.Angle(viewStart, Camera.main.transform.rotation) > 2f, "Mouse camera control restored");
+                Check(maximumVisualDrift < 0.05f, "Capsule stays with controller during movement/jump after revival; max drift " + maximumVisualDrift.ToString("F4") + " m");
                 Check(player.RespawnCount == 4, "Four consecutive recovery cycles completed once each");
                 Finish(results.Exists(x => x.StartsWith("FAIL")) ? "FAILED" : "PASSED"); break;
         }

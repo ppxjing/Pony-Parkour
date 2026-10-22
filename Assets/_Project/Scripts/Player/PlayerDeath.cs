@@ -54,6 +54,9 @@ namespace Adventure.Player
                 if (body == null) continue;
                 restPositions[i] = body.transform.localPosition;
                 restRotations[i] = body.transform.localRotation;
+                // While alive, the CharacterController's hierarchy owns the pose.
+                // Rigidbody interpolation would overwrite it with old physics world poses.
+                body.interpolation = RigidbodyInterpolation.None;
                 body.isKinematic = true;
                 body.useGravity = false;
             }
@@ -92,6 +95,7 @@ namespace Adventure.Player
                 if (body == null) continue;
                 body.isKinematic = false;
                 body.useGravity = true;
+                body.interpolation = RigidbodyInterpolation.Interpolate;
                 body.linearVelocity = inheritedVelocity;
                 body.WakeUp();
             }
@@ -119,6 +123,7 @@ namespace Adventure.Player
                     body.linearVelocity = Vector3.zero;
                     body.angularVelocity = Vector3.zero;
                 }
+                body.interpolation = RigidbodyInterpolation.None;
                 body.isKinematic = true;
                 body.useGravity = false;
             }

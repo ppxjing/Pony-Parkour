@@ -15,7 +15,7 @@ PASS: Latest checkpoint B ragdoll deactivated
 PASS: Latest checkpoint B standing pose restored
 PASS: Latest checkpoint B input and controller enabled
 PASS: Latest checkpoint B spawn capsule has no environment overlap
-PASS: Latest checkpoint B waited configured delay: 2.00 seconds
+PASS: Latest checkpoint B waited configured delay: 2.01 seconds
 PASS: SpawnPoint facing restored
 PASS: Revisiting A makes A latest, independent of list order
 PASS: Revisited checkpoint A position restored: (-8.000, -0.280, -23.000)
@@ -23,7 +23,7 @@ PASS: Revisited checkpoint A ragdoll deactivated
 PASS: Revisited checkpoint A standing pose restored
 PASS: Revisited checkpoint A input and controller enabled
 PASS: Revisited checkpoint A spawn capsule has no environment overlap
-PASS: Revisited checkpoint A waited configured delay: 2.01 seconds
+PASS: Revisited checkpoint A waited configured delay: 2.00 seconds
 PASS: Unregistered checkpoint is ignored
 PASS: Appending a third checkpoint to List makes its trigger work
 PASS: Falling below recovery height uses death/respawn flow
@@ -34,6 +34,8 @@ PASS: Appended checkpoint after fall input and controller enabled
 PASS: Appended checkpoint after fall spawn capsule has no environment overlap
 PASS: Appended checkpoint after fall waited configured delay: 2.00 seconds
 PASS: WASD moves player after repeated revives
-PASS: Jump works after revival; rise 1.36 m
+PASS: Camera follows movement after respawn: player=1.303 m, camera=1.022 m
+PASS: Jump works after revival; rise 1.35 m
 PASS: Mouse camera control restored
+PASS: Capsule stays with controller during movement/jump after revival; max drift 0.0000 m
 PASS: Four consecutive recovery cycles completed once each
