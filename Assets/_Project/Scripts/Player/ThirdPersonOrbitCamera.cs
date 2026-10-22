@@ -31,23 +31,24 @@ namespace Adventure.Player
         private Quaternion smoothedRotation;
         private float currentDistance;
         private bool ownsCursor;
+        private bool inputBlocked;
 
         private void OnEnable()
         {
             SnapToTarget();
-            if (Application.isPlaying && lockCursor) CaptureCursor();
+            if (Application.isPlaying && lockCursor && !inputBlocked) CaptureCursor();
         }
         private void LateUpdate()
         {
             if (target == null || input == null) return;
             bool capturedThisFrame = false;
-            if (lockCursor)
+            if (lockCursor && !inputBlocked)
             {
                 if (input.ReleaseCursorPressed) ReleaseCursor();
                 else if (input.CaptureCursorPressed && Cursor.lockState != CursorLockMode.Locked)
                 { CaptureCursor(); capturedThisFrame = true; }
             }
-            if ((!lockCursor || Cursor.lockState == CursorLockMode.Locked) && !capturedThisFrame)
+            if (!inputBlocked && (!lockCursor || Cursor.lockState == CursorLockMode.Locked) && !capturedThisFrame)
             {
                 // Mouse delta is already displacement per frame; do not multiply it by deltaTime.
                 Vector2 delta = input.Look * mouseSensitivity;
@@ -65,6 +66,16 @@ namespace Adventure.Player
             smoothedRotation = Quaternion.Euler(pitch, yaw, 0);
             currentDistance = distance;
             PlaceCamera(true);
+        }
+        public void FollowWithoutInput(Transform newTarget)
+        {
+            target = newTarget;
+            inputBlocked = true;
+            // Keep the current view direction while smoothly following the falling body.
+            Vector3 angles = transform.eulerAngles;
+            yaw = angles.y;
+            pitch = angles.x;
+            ReleaseCursor();
         }
         private void PlaceCamera(bool snap)
         {

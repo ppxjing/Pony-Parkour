@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7415889868494661379}
+  - component: {fileID: 5779297733304397898}
+  - component: {fileID: 6119942410880212781}
   m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
@@ -30,8 +32,59 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8714136730989627342}
+  - {fileID: 5586455264822954077}
   m_Father: {fileID: 2656904648646795946}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &5779297733304397898
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081704382648916476}
+  serializedVersion: 5
+  m_Mass: 70
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 2
+--- !u!136 &6119942410880212781
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081704382648916476}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 0.35
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &2585372941959892822
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,6 +389,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6276911934712786668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5586455264822954077}
+  m_Layer: 0
+  m_Name: RagdollCameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5586455264822954077
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6276911934712786668}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7415889868494661379}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8274271361138656386
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,6 +465,7 @@ GameObject:
   - component: {fileID: 4232023765386194963}
   - component: {fileID: 2133934482379803504}
   - component: {fileID: 8049563543520474345}
+  - component: {fileID: 5530567972413203168}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -467,6 +552,29 @@ MonoBehaviour:
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   respawnBelowY: -15
+--- !u!114 &5530567972413203168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8306381937352787746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9f2ee90589c5f48b60e821adfd0614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Player.PlayerDeath
+  ragdollBodies:
+  - {fileID: 5779297733304397898}
+  ragdollColliders:
+  - {fileID: 6119942410880212781}
+  impulseBody: {fileID: 5779297733304397898}
+  animator: {fileID: 0}
+  orbitCamera: {fileID: 9100001629851568925}
+  ragdollCameraTarget: {fileID: 5586455264822954077}
+  knockbackSpeed: 3
+  upwardSpeed: 1.5
+  tumbleSpeed: 5
 --- !u!1 &8949778908939346767
 GameObject:
   m_ObjectHideFlags: 0

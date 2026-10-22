@@ -1,0 +1,12 @@
+Player death walking: PASSED
+PASS: Walking into ball killed player
+PASS: Actual movement preceded contact
+PASS: Input reader, motor and CharacterController disabled
+PASS: Physical ragdoll and collider activated
+PASS: Repeated lethal contact does not apply another impulse
+PASS: WASD, jump and mouse events ignored after death
+PASS: Disabled motor does not move player root
+PASS: Cursor released; clicking does not relock
+PASS: Mouse does not rotate death camera
+PASS: Capsule tumbles; measured maximum tilt 155.0 degrees
+PASS: Corpse remains above floor

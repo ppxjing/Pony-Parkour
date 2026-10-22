@@ -1,0 +1,56 @@
+玩家触碰机关死亡与胶囊布娃娃
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+先前弹球机关已提交：6af6e27
+提交说明：弹球机关接近地面膨胀和固定高度重力反弹
+
+行为
+玩家主动走到球上，或者球落到不动的玩家身上，都会触发死亡。
+机关的死亡检测范围随球膨胀同步变化，并保留 0.05 局部单位接触余量。
+死亡后关闭 PlayerInputReader、ThirdPersonMotor 和 CharacterController。
+WASD、空格、鼠标视角及点击重新锁定鼠标均失效，鼠标释放并显示。
+摄像头保持死亡瞬间朝向，继续平滑跟随身体。
+胶囊的刚体和 CapsuleCollider 启用，受重力、击退和旋转冲量影响，倒下、翻滚并与地板碰撞。
+重复碰触机关不会再次触发死亡或重复添加死亡冲量。
+死亡持续到退出并重新进入 Play；尚未增加复活按钮或自动重生流程。
+
+当前胶囊体没有人形骨骼，因此当前效果是单刚体的物理倒地。
+后续替换人形模型：为骨骼配置 Rigidbody/Collider/Joint，将骨骼刚体、碰撞体分别填入 PlayerDeath 的 Ragdoll Bodies/Ragdoll Colliders；Impulse Body 指向躯干或骨盆，Animator 指向模型动画组件，Ragdoll Camera Target 指向躯干跟随点。移除胶囊占位刚体/碰撞体，避免重复碰撞。
+
+可调参数
+PlayerRig > Player 的 Player Death 组件：
+Knockback Speed = 3：死亡时远离机关的水平速度增量，m/s。
+Upward Speed = 1.5：死亡时向上的速度增量，m/s。
+Tumble Speed = 5：死亡时翻转角速度增量，rad/s。
+Ragdoll Bodies / Ragdoll Colliders：死亡时启用的物理身体。
+Impulse Body：接受死亡击退和翻转冲量的主体。
+Animator：可选；死亡时关闭，避免动画与物理争抢姿势。
+Orbit Camera / Ragdoll Camera Target：死亡跟随摄像头及目标。
+球的 Lethal Obstacle 组件：Contact Padding = 0.05，死亡接触余量，应保持较小以贴近视觉接触。
+
+文件管理（相对工程根目录）
+Assets/_Project/Scripts/Player/PlayerDeath.cs：死亡状态和布娃娃切换。
+Assets/_Project/Scripts/Obstacles/LethalObstacle.cs：致死接触和膨胀检测范围同步。
+Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：死亡后禁用鼠标控制并跟随身体。
+Assets/_Project/Prefabs/Player/PlayerRig.prefab：接入死亡组件，Visuals 上增加胶囊物理身体和 RagdollCameraTarget。
+Assets/_prefab/机关/PF_Ball_1_Bounce.prefab：增加 LethalObstacle 和 DeathContact 触发器。
+Assets/_Project/Editor/PlayerDeathSmokeTest.cs：编辑器运行验收工具。
+Docs/PLAYER_DEATH_GUIDE.txt：本说明。
+Docs/PLAYER_DEATH_WALK_VALIDATION.txt：主动碰撞测试结果。
+Docs/PLAYER_DEATH_IDLE_VALIDATION.txt：被机关撞到测试结果。
+
+人工验收
+1. 打开 Assets/_Project/Scenes/Kitchen_Playground.unity，点击 Play。
+2. WASD 走向前方偏右的弹球，碰到后胶囊应倒地翻滚，摄像头跟随身体。
+3. 持续按 WASD 和空格、移动鼠标及点击左键：不能再移动、跳跃或旋转视角，鼠标仍显示。
+4. 停止 Play 并重新运行，玩家恢复正常。走到弹球下方停住，等待球落下来，也应死亡。
+5. 选中场景球或 PlayerRig 的对应组件，可调上述参数；在非 Play 状态修改以保存。
+
+自动验收
+在新的 Play 会话中执行 Tools > Adventure > Test Death - Walk Into Ball (Play Mode)。
+退出并重新进入 Play，再执行 Tools > Adventure > Test Death - Ball Hits Idle Player (Play Mode)。
+每项测试约 5–8 秒；工具会临时移动玩家、发送虚拟键鼠事件；主动碰撞测试还会临时固定球。
+测试完成后应退出 Play，恢复场景正常摆放和机关运行。
+Console 输出结果，同时保存到上述两个验证文件。
+
+死亡功能这批改动尚未 commit，原 MCP/ProBuilder 未提交配置仍保留。
