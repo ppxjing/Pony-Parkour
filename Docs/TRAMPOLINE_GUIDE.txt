@@ -1,0 +1,43 @@
+弹簧床机关（PF_FloorPanel_2）
+
+工程：D:/6412_Group/2026s1-project-2-team-02
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+预设体：Assets/_prefab/机关/PF_FloorPanel_2_Trampoline.prefab
+场景摆放：(-8.89, 0.27, -22.82)，保留制作前编辑器中的位置。
+
+行为
+只有从上方落到红色床面，且玩家脚底中心进入有效区域时才弹起。
+两端深色边框保持普通碰撞；侧面、底面、仅胶囊边缘擦到床面不会弹起。
+自动反复弹跳，不需要按空格。弹跳保留 WASD 空中移动。
+沿世界竖直方向弹起，起跳速度由玩家重力和高度计算：sqrt(2 * abs(gravity) * height)。
+若头顶有天花板或其他实体，会提前撞停；高度指无遮挡时相对床面的上升高度。
+
+参数在哪里调
+展开场景实例或打开预设体，选中 BounceSurface，Inspector 的 Trampoline Surface：
+- Bounce Height：默认 4，弹起高度（世界米），可改成 2、6 等。
+- Edge Inset：默认 0.02，红色区域四边向内缩的安全距离（模型局部单位）。越大越靠近中央才能弹；0 表示使用完整红色床面。
+选中 BounceSurface 并开启 Gizmos，可见绿色有效区域轮廓。
+Box Collider 的 Center/Size 已匹配模型，不必用它调整弹跳高度。
+调整整台机关的尺寸请缩放预设体根对象，碰撞区域随模型缩放。
+这是静态水平床面机关；根对象默认 X=-90 度，使模型局部 +Z 朝上。
+
+文件管理
+Assets/_prefab/机关/PF_FloorPanel_2_Trampoline.prefab：可重复拖入场景的机关。
+Assets/_Project/Scripts/Obstacles/TrampolineSurface.cs：床面判定和参数。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：接收床面接触并设置玩家向上速度。
+Assets/_Project/Physics/Obstacles/FloorPanel2_Frame_Collision.asset：只覆盖深色边框的碰撞网格。
+原始 ThirdParty 素材未修改。
+层级：SM_FloorPanel_2 显示模型；BounceSurface 负责红色床面碰撞/弹跳；FrameCollision 负责深色边框碰撞。
+
+验收
+1. 打开 Kitchen_Adventure，按 Play，让玩家跳到红色床面，应立即弹起并在回落后再次弹起。
+2. 在空中按 WASD，应能移动并离开床面。
+3. 落在两端深色边框上，应能站住但不会自动弹起。
+4. 从侧面或底下碰床面，应只发生正常阻挡，不触发弹跳。
+5. 把 Bounce Height 从 4 改为 2，对比最高点；停止 Play 后在编辑模式修改才能永久保存参数。
+
+验证记录
+Unity 编译无错误。隔离场地的真实 CharacterController 碰撞测试：
+4 米设置连续 5 次弹跳，完整高度采样约 3.991～3.998 米。
+2 米设置连续 4 次弹跳，完整高度采样约 1.994～2.009 米。
+两端边框均接地且零弹跳；侧面 Sides、底面 Above，均零弹跳。

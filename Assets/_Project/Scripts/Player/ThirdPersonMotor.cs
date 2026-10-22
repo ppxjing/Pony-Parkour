@@ -1,3 +1,4 @@
+using Adventure.Obstacles;
 using UnityEngine;
 
 namespace Adventure.Player
@@ -28,6 +29,7 @@ namespace Adventure.Player
         private Vector3 horizontalVelocity, spawnPosition;
         private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
+        public Vector3 FootPosition => controller.bounds.center - Vector3.up * controller.bounds.extents.y;
 
         private void Awake()
         {
@@ -66,6 +68,21 @@ namespace Adventure.Player
                 if (respawn != null && respawn.isActiveAndEnabled) respawn.RequestFallRecovery();
                 else Respawn();
             }
+        }
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (!isActiveAndEnabled) return;
+            var trampoline = hit.collider.GetComponent<TrampolineSurface>();
+            if (trampoline != null) trampoline.TryBounce(this, hit.normal);
+        }
+        public bool TryBounce(float height)
+        {
+            if (!isActiveAndEnabled || controller == null || !controller.enabled || verticalVelocity > 0f || height <= 0f)
+                return false;
+            verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * height);
+            // Landing consumes buffered jump/coyote time so Space cannot overwrite the launch.
+            lastGrounded = jumpRequested = float.NegativeInfinity;
+            return true;
         }
         private void OnDisable()
         { horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
