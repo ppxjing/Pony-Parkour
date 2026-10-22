@@ -1,0 +1,56 @@
+旋转锤子机关使用与验收
+
+上一轮玩家预设体与新场景提交：8211cc0（保留机关布置并接入完整第三人称玩家）。
+
+文件管理
+预设体：Assets/_prefab/机关/PF_Spinner_2_RotatingHammer.prefab
+旋转脚本：Assets/_Project/Scripts/Obstacles/RotatingHammer.cs
+锤头致死脚本：Assets/_Project/Scripts/Obstacles/HammerHeadDamage.cs
+锤头碰撞网格：Assets/_Project/Physics/Obstacles/Spinner2_HammerHead_Collision.asset
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+
+实现
+已将当前场景 PF_Spinner_2 Variant 替换为新预设体实例，保留操作前的位置 (-17.42, -0.18, -29.07)、朝向 (270, 0, 0) 和缩放。其它机关布置保留。
+源 ThirdParty 预设体及其模型未修改。
+Rotation 为旋转支点；完整模型和接触区域随其转动。使用运动学 Rigidbody，在 FixedUpdate 中 MoveRotation，并开启插值。
+原资源有两份重复的整模型 MeshCollider，新预设体改为：SafeShaft 中轴实体碰撞、SafeArm 连接杆实体碰撞、HammerHead_DeathTrigger 锤头专属触发器。
+锤头碰撞网格从原模型锤头部分提取，凸包近似，默认放大 2% 避免接触边缘漏判。致死脚本只挂在锤头上，根物体和中轴不挂致死脚本。
+锤头触发器负责死亡判定，不作为实体墙；中轴与连接杆保持普通实体碰撞。
+沿用现有 PlayerDeath / PlayerRespawn：碰锤头后布娃娃倒地、禁用输入、等待后自动复活。新场景没有登记检查点时回初始出生位置。
+
+可调参数及位置
+展开 PF_Spinner_2_RotatingHammer > Rotation，在 Rotating Hammer 组件调整：
+- Degrees Per Second：默认 90，单位度/秒，4 秒一圈；180 为 2 秒一圈；负数反转；0 停转，但锤头仍然致死。
+- Local Axis：默认 (0,0,1)，以支点初始本地坐标为准。本模型的本地 Z 轴经根物体旋转后对应世界竖直方向。一般保持默认，改变根节点 Rotation 可整体改变机关朝向。
+- Start Angle：默认 0 度，相对编辑时姿态的初始相位。多个锤子可设 0、90、180 等错开。
+- Start Delay：默认 0 秒，首次进入运行后等待多久开始旋转。延迟只暂停旋转，锤头仍能致死。
+- 取消勾选 Rotating Hammer：暂停旋转，重新勾选从原进度继续；不会重新计算 Start Angle / Start Delay。
+以上初始角度、启动延迟建议停止 Play 后设置，再运行验收。速度可在 Play 中临时调整，退出 Play 后不保存临时值。
+
+其它调整
+- 根节点 Transform：调整整个机关位置、朝向、大小，建议使用统一的正缩放。
+- Rotation Transform Position：支点位置。仅移动此节点会带着模型一起移动；若要改变模型相对支点距离，应同步调整其模型和碰撞体子节点，避免显示与判定错位。
+- Rotation/HammerHead_DeathTrigger > Transform Scale：默认 (1.02,1.02,1.02)，控制锤头检测范围。不建议大幅扩大，否则中轴附近也可能进入锤头区域。
+- Rotation/SafeShaft、SafeArm > Capsule Collider：Center、Radius、Height 控制普通碰撞范围，保持 Is Trigger 关闭。
+- PlayerRig/Player > Player Respawn：Respawn Delay、Protection Time 控制复活等待与保护；保护期间碰锤头不会立即再次死亡。
+不要在根节点、Rotation、中轴或连接杆上添加 LethalObstacle / HammerHeadDamage，否则可能改变仅锤头致死的规则。
+
+验收步骤
+1. 打开 Kitchen_Adventure，在 Hierarchy 选中 PF_Spinner_2_RotatingHammer，按 F 聚焦观察；Play 后应绕 Rotation 原地持续旋转，中轴不绕圈漂移。默认约 4 秒一圈。
+2. 为单独验收接触区域，停止运行，把 Degrees Per Second 暂改为 0，再 Play。走近中轴和连接杆，应被普通碰撞挡住但保持存活；避免同时接触锤头。
+3. 走向黄色大锤头，应立即进入布娃娃死亡状态，WASD/跳跃/视角输入禁用，默认约 2 秒后复活并恢复控制。
+4. 停止运行恢复速度 90，再 Play，站在锤头扫过的圆周上，锤头主动扫到静止玩家也应致死。
+5. 将速度改为 -90，确认旋转方向反过来；改成 180，确认约 2 秒一圈。
+6. 停止运行设 Start Delay=2、Start Angle=90，重新 Play：初始相位偏转 90 度，约 2 秒后开始转动。验收后按需要恢复默认值。
+7. 从 Project 拖第二个预设体到安全空地，改变位置/初始角度，应独立围绕自己的 Rotation 转动。
+当前实例位于出生点左后方，验收时可停止 Play 将玩家根 PlayerRig 放到机关附近的安全地板上，避开锤头初始位置。
+
+本次已验证
+- Unity 编译成功；Play 测试 Console 无错误或警告。
+- 90 度/秒的物理角度观测与理论角度误差为 0 度；Rotation 支点位移为 0。
+- 玩家控制器与 SafeShaft 实际重叠约 0.06 米，等待后存活，未复活。
+- 玩家控制器与 SafeArm 实际重叠约 0.02 米，等待后存活，未复活。
+- 静止锤头区域触发死亡并完成一次复活，输入恢复。
+- 旋转锤头主动扫过静止玩家触发第二次死亡/复活，输入与移动恢复。
+未构建独立可执行文件；旋转锤子功能已完成并保存。
+补充：SM_Spinner_2 是可见模型，不应为隐藏光照探针连线而删除。光照探针白球/黄色连线仅为编辑器调试显示，已关闭。场景保留用户当前机关布置；启用中的锤子应保留可见模型。
