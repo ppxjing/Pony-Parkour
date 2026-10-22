@@ -1,0 +1,41 @@
+死亡区域预设体
+
+预设体：Assets/_prefab/死亡区域/PF_DeathZone.prefab
+脚本：Assets/_Project/Scripts/Obstacles/DeathZone.cs
+材质：Assets/_Project/Materials/DeathZones/DeathZoneVolume.mat 和 DeathZoneFrame.mat
+
+使用
+将预设体拖到场景需要的位置。
+选根对象 PF_DeathZone，修改 Transform 的 Position、Rotation、Scale。
+默认是以根对象为中心的 1×1×1 区域，Scale=(4,2,3) 就得到宽 4、高 2、深 3 的区域。
+如需偏移局部中心或单独调整触发盒，可修改 Box Collider 的 Center、Size，红色预览会同步。
+保持 Box Collider 的 Is Trigger 开启；Rigidbody 保持 Is Kinematic，Use Gravity 关闭。
+
+显示
+编辑时显示半透明红色面和红色边框。
+进入 Play 后整个 VolumeVisual 子对象会关闭，红色面、边框和脚本 Gizmos 全部隐藏。
+根对象上的触发器继续工作。停止 Play 后自动恢复编辑显示。
+Unity 自带的选中碰撞体线框或 Physics Debugger 是编辑器调试显示，不属于游戏渲染。
+颜色和编辑时透明度可在 DeathZoneVolume 材质的 Albedo 颜色/Alpha 中调整。
+不要将根对象或 Box Collider 关闭来隐藏区域，否则触发也会停止。
+
+死亡与复活
+玩家进入区域，调用现有 PlayerDeath：布娃娃死亡、禁用输入和移动，随后按现有存档点逻辑自动复活。
+沿用 PlayerRespawn 的复活延时和保护时间；区域没有另设一套死亡系统。
+当前默认复活保护时间为 1 秒。保护中不会被区域杀死；若保护结束时仍在区域内，持续触发检测会杀死玩家。
+此区域没有实体阻挡，也不会改变存档点。
+
+验收
+1. 拖入预设体，移动、旋转并非均匀缩放，确认红色区域与需要的范围一致。
+2. 按 Play，红色面和边框应立即消失。
+3. 玩家在区域外保持正常，走入范围后死亡，输入禁用并进入布娃娃效果。
+4. 等待自动复活，确认输入恢复且返回当前记录的复活位置。
+5. 停止 Play，确认红色显示重新出现，Transform 保留编辑前设置。
+
+验证
+使用 Rotation=(10,35,15)、Scale=(4,2,3) 的实例进行真实触发测试。
+Play 中 VolumeVisual 不激活、活动渲染器为 0、Box Collider 仍启用且为 Trigger。
+区域外存活；进入后死亡、输入和移动禁用、布娃娃刚体动态模拟。
+自动复活 1 次后存活，输入和移动恢复；区域内保护结束后可再次触发死亡。
+Unity Console 无脚本错误。
+测试对象为临时对象，未在当前关卡加入固定死亡区域，预设体可按需拖入布置。
