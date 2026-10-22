@@ -27,6 +27,12 @@ namespace Adventure.Player
         private CharacterController controller;
         private PlayerRespawn respawn;
         private SeesawPlatform standingPlatform;
+        private SpinningTurntable standingTurntable;
+        private Vector3 externalHorizontalVelocity;
+        private float turntableRideTime, detachUntil;
+        public SpinningTurntable StandingTurntable => standingTurntable;
+        private Transform SupportTransform => standingPlatform != null ? standingPlatform.transform :
+            standingTurntable != null ? standingTurntable.transform : null;
         private Vector3 supportLocalPoint, supportWorldPoint;
         public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
@@ -47,7 +53,8 @@ namespace Adventure.Player
         {
             float dt = Time.deltaTime;
             if (dt <= 0f) return;
-            FollowSupport();
+            FollowSupport(dt);
+            if (!isActiveAndEnabled) return;
             Vector2 stick = Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
@@ -61,15 +68,27 @@ namespace Adventure.Player
             if (input.JumpPressed) jumpRequested = Time.time;
             if (Time.time - jumpRequested <= jumpBufferTime && Time.time - lastGrounded <= coyoteTime)
             {
+                if (standingTurntable != null)
+                    externalHorizontalVelocity += Vector3.ProjectOnPlane(standingTurntable.GetTangentialVelocity(FootPosition), Vector3.up);
+                ClearSupport();
                 verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * jumpHeight);
                 jumpRequested = lastGrounded = float.NegativeInfinity;
             }
             verticalVelocity = Mathf.Max(verticalVelocity + gravity * dt, -terminalSpeed);
+            externalHorizontalVelocity = Vector3.MoveTowards(externalHorizontalVelocity, Vector3.zero,
+                (controller.isGrounded && verticalVelocity <= 0f ? 25f : 1f) * dt);
+            var previousTurntable = standingTurntable;
             standingPlatform = null;
-            var flags = controller.Move((horizontalVelocity + Vector3.up * verticalVelocity) * dt);
-            if (standingPlatform != null)
+            standingTurntable = null;
+            var flags = controller.Move((horizontalVelocity + externalHorizontalVelocity + Vector3.up * verticalVelocity) * dt);
+            if (!isActiveAndEnabled) return;
+            if (standingTurntable != previousTurntable) turntableRideTime = 0f;
+            if (previousTurntable != null && standingTurntable == null && verticalVelocity <= 0f)
+                externalHorizontalVelocity += Vector3.ProjectOnPlane(previousTurntable.GetTangentialVelocity(FootPosition), Vector3.up);
+            Transform support = SupportTransform;
+            if (support != null)
             {
-                supportLocalPoint = standingPlatform.transform.InverseTransformPoint(transform.position);
+                supportLocalPoint = support.InverseTransformPoint(transform.position);
                 supportWorldPoint = transform.position;
             }
             if ((flags & CollisionFlags.Above) != 0 && verticalVelocity > 0f) verticalVelocity = 0f;
@@ -79,26 +98,54 @@ namespace Adventure.Player
                 else Respawn();
             }
         }
-        private void FollowSupport()
+        private void FollowSupport(float dt)
         {
-            if (standingPlatform == null) return;
-            if (!standingPlatform.isActiveAndEnabled || verticalVelocity > 0f)
-            { standingPlatform = null; return; }
-            Vector3 point = standingPlatform.transform.TransformPoint(supportLocalPoint);
+            Transform support = SupportTransform;
+            if (support == null) return;
+            if (verticalVelocity > 0f || (standingPlatform != null && !standingPlatform.isActiveAndEnabled)
+                || (standingTurntable != null && !standingTurntable.isActiveAndEnabled))
+            { ClearSupport(); return; }
+            Vector3 point = support.TransformPoint(supportLocalPoint);
             // Carry through the controller so walls/ceilings still block the player.
             controller.Move(point - supportWorldPoint);
             supportWorldPoint = point;
+            if (standingTurntable != null)
+            {
+                turntableRideTime += dt;
+                Vector3 launch;
+                if (standingTurntable.TryGetLaunch(FootPosition, turntableRideTime, out launch))
+                {
+                    ClearSupport();
+                    externalHorizontalVelocity = Vector3.ProjectOnPlane(launch, Vector3.up);
+                    verticalVelocity = launch.y;
+                    detachUntil = Time.time + 0.2f;
+                    lastGrounded = jumpRequested = float.NegativeInfinity;
+                }
+            }
+        }
+        private void ClearSupport()
+        {
+            standingPlatform = null;
+            standingTurntable = null;
+            turntableRideTime = 0f;
         }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             if (!isActiveAndEnabled) return;
-            if (verticalVelocity <= 0f && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
+            if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
             {
                 var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
                 if (platform != null && platform.isActiveAndEnabled && Vector3.Dot(hit.normal, platform.transform.up) > 0.7f)
                 {
+                    standingTurntable = null;
                     standingPlatform = platform;
                     platform.RegisterSupport(this);
+                }
+                var turntable = hit.collider.GetComponentInParent<SpinningTurntable>();
+                if (turntable != null && turntable.isActiveAndEnabled && Vector3.Dot(hit.normal, turntable.transform.forward) > 0.7f)
+                {
+                    standingPlatform = null;
+                    standingTurntable = turntable;
                 }
             }
             var trampoline = hit.collider.GetComponent<TrampolineSurface>();
@@ -108,14 +155,14 @@ namespace Adventure.Player
         {
             if (!isActiveAndEnabled || controller == null || !controller.enabled || verticalVelocity > 0f || height <= 0f)
                 return false;
-            standingPlatform = null;
+            ClearSupport();
             verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * height);
             // Landing consumes buffered jump/coyote time so Space cannot overwrite the launch.
             lastGrounded = jumpRequested = float.NegativeInfinity;
             return true;
         }
         private void OnDisable()
-        { standingPlatform = null; horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
+        { ClearSupport(); externalHorizontalVelocity = Vector3.zero; detachUntil = 0f; horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
         private void OnValidate()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
@@ -125,7 +172,9 @@ namespace Adventure.Player
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
-            standingPlatform = null;
+            ClearSupport();
+            externalHorizontalVelocity = Vector3.zero;
+            detachUntil = 0f;
             bool wasEnabled = controller.enabled;
             controller.enabled = false;
             transform.SetPositionAndRotation(position, rotation);
