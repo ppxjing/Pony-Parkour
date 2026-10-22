@@ -65,7 +65,7 @@ namespace Adventure.AI
             }
 
             // A destination reset or a removed link cancels the old traversal.
-            if (!agent.isOnOffMeshLink || !agent.currentOffMeshLinkData.valid)
+            if (!agent.isOnOffMeshLink || !agent.currentOffMeshLinkData.valid || !agent.currentOffMeshLinkData.activated)
             {
                 CancelTraversal();
                 return;
@@ -148,3 +148,4 @@ namespace Adventure.AI
         }
     }
 }
+

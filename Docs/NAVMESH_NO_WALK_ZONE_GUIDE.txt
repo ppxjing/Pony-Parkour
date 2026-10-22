@@ -1,0 +1,42 @@
+NavMesh 禁行区
+
+预制体：Assets/_prefab/导航/PF_NavMeshNoWalkZone.prefab
+脚本目录：Assets/_Project/Scripts/AI/
+
+用法
+把预制体拖到场景，调整 Transform 的 Position / Rotation / Scale。
+紫色半透明框表示禁行体积；体积必须穿过蓝色 NavMesh 所在的表面。
+默认单位体积乘 Transform Scale，预制体默认 Scale=(2,2,2)。
+NavMesh No Walk Zone 的 Rebuild Delay 默认 0.35 秒，连续拖动时合并更新，停止拖动后自动更新受影响的 Surface。
+不需要手动点击 Bake。移动会恢复旧位置并挖掉新位置；禁用或删除会恢复区域。
+右键组件选择 Rebuild Affected NavMeshes 可立即请求更新。
+框仅通过编辑器 Gizmos 绘制，Play 时无渲染体，无实体碰撞体，不阻挡手动控制的玩家。
+
+实现与适用范围
+使用 NavMesh Modifier Volume / Not Walkable，执行受影响 Surface 的异步增量重烘焙。
+支持当前场景中已烘焙的 NavMeshSurface；Surface 的 Include Layers 必须包含禁行区物体所在 Layer。
+当前项目 Surface 使用 Volume 收集方式，可直接拖放。
+如果其他 Surface 使用 Current Object Hierarchy，禁行区需要放在该 Surface 的子层级中。
+编辑模式直接更新并保存已有 NavMeshData，保留资源 GUID；场景中的禁行区物体仍需 Ctrl+S 保存。
+Play 中更新运行时 NavMeshData 副本，停止后恢复编辑时的烘焙资源。
+较大关卡可能有烘焙延迟；这是合并操作后的异步更新，不是每一帧完整 Bake。
+区域相交的 NavMesh Link 会增加 NavMesh Zone Link Guard 并暂时关闭，防止用 Link 穿越禁行区。
+移开所有相交区域后恢复。若要手动关闭带 Guard 的 Link，修改 Guard 的 Requested Active。
+AI 正在跨越被关闭的 Link 时会取消跨越并返回起点。
+
+参数
+Transform Position：位置，确保覆盖导航表面高度。
+Transform Rotation：朝向；支持三个轴的旋转。
+Transform Scale：体积大小；建议使用正数并避免父物体非均匀缩放叠加旋转造成剪切。
+Rebuild Delay：合并连续编辑的延迟，默认 0.35 秒。
+NavMesh Modifier Volume 的 Center / Size：局部中心和尺寸，也会自动检测更新。
+Area 固定 Not Walkable；区域用途通过 NavMesh No Walk Zone 组件统一管理。
+
+验收
+1. 在蓝色 NavMesh 中央放入禁行区，停止拖动后应出现对应形状的空洞。
+2. 移动、旋转或缩放禁行区，旧区域恢复，新区域更新。
+3. 禁用整个物体或 NavMesh No Walk Zone 组件，原区域恢复；重新启用再次挖洞。
+4. 删除后恢复原来的导航区域；多个重叠禁行区中，只删除一个时重叠处仍不可走。
+5. Play 时 AI 能绕行则绕行；封住唯一道路时应无法到达目标，不应穿过禁行区。
+6. 把禁行区放到 Link 上，Link 应关闭；移开后恢复。Jump Link 同样受影响。
+7. Play 内移动禁行区后停止，编辑器烘焙应恢复到进入 Play 前的状态。
