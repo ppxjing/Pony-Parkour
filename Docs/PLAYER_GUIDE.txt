@@ -59,7 +59,7 @@ Gameplay/Move：2DVector，W/S/A/D；Jump：Space；Look：Mouse Delta；Release
 
 资源目录（以下均相对于上述工程根目录）
 Assets/_Project/Scenes/Kitchen_Playground.unity：厨房开发场景。
-Assets/_Project/Prefabs/Player/PlayerRig.prefab：可复用玩家和摄像头组合。
+Assets/_prefab/玩家/PlayerRig.prefab：可复用玩家和摄像头组合。
 Assets/_Project/Scripts/Player/PlayerInputReader.cs：输入动作生命周期及读取。
 Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：移动、转身、跳跃、重力和跌落恢复。
 Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：位置跟随、鼠标直控环绕、旋转插值与镜头避障。

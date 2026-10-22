@@ -1,0 +1,41 @@
+玩家预设体与场景说明
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+检查点显示修复提交：593d3c7（进入Play立即隐藏蓝框，停止运行后恢复显示）。
+
+没有玩家的原因
+检查时 Unity 打开的是 Assets/ThirdParty/Minicar_Env_Pack/Demo/Demo_Kitchen.unity，场景里没有 PlayerRig，也没有任何玩家控制组件，只有资源包演示摄像头。
+此前的完整玩家和复活检查点在 Assets/_Project/Scenes/Kitchen_Playground.unity 中。
+
+当前可玩场景
+Assets/_Project/Scenes/Kitchen_Adventure.unity
+保留了检查时 Demo_Kitchen 场景中尚未保存的机关布置，另存为项目场景；添加 PlayerRig，出生位置 (-6, -0.28, -24)，关闭原演示 Camera，使用玩家自带第三人称摄像头。
+原 Kitchen_Playground 和用户添加的砖块保留，ThirdParty 的原始 Demo 场景文件未覆盖。
+新场景目前没有配置检查点 List，因此死亡回初始出生点；原 Kitchen_Playground 的检查点系统保持原有配置。
+
+玩家预设体
+Assets/_prefab/玩家/PlayerRig.prefab
+将已有的完整 PlayerRig 通过 Unity AssetDatabase 移入统一预设体目录，保留 GUID，原场景引用不变。
+包含：胶囊占位模型、CharacterController、Input System 输入、第三人称移动/跳跃、直接鼠标视角和平滑跟随、死亡胶囊布娃娃、自动复活与输入恢复。
+同步了摄像头编辑预览位置，活着时 Rigidbody 不开启插值。
+
+使用方法
+1. 打开 Kitchen_Adventure，直接点击 Play。WASD 移动、空格跳跃、鼠标转视角；Esc 释放鼠标，单击 Game 重新捕获。
+2. 在其它场景中使用时，把完整 PlayerRig.prefab 拖入 Hierarchy，并将根节点放到安全地板上方。一个单人场景只放一个 PlayerRig。
+3. 预设体自带 Camera 和 AudioListener；关闭场景原有的演示摄像头，避免视角和监听器冲突。
+4. 若该场景有 CheckpointSystem，将 PlayerRig/Player 的 Player Respawn 组件拖到 Checkpoint Registry 的 Player，并将场景检查点实例加入 Checkpoints List。
+5. 模型在 PlayerRig/Player/Visuals/CapsulePlaceholder。替换为正式模型时保留玩家控制根节点，布娃娃骨骼引用需另行配置。
+
+参数位置
+PlayerRig/Player > Third Person Motor：移动速度、加速度、转向速度、跳跃高度、重力。
+PlayerRig/ThirdPersonCamera > Third Person Orbit Camera：距离、俯仰限制、鼠标灵敏度、跟随/旋转/距离平滑参数。
+PlayerRig/Player > Player Respawn：复活等待、保护时间。
+PlayerRig/Player > Player Death：击退、向上冲量、翻滚强度。
+
+运行验证
+新场景仅一个活动摄像头，玩家位于镜头内且正常落地。
+模拟 W：玩家移动 2.451 米，摄像头跟随移动 2.451 米。
+模拟空格：跳跃上升 1.366 米。
+请求死亡：观察到布娃娃死亡状态，自动复活 1 次，存活与输入恢复；模型相对玩家根节点位移为 0。
+Console 无错误或警告。已退出 Play，保留新场景供直接验收。
+玩家预设体整理与新场景已完成运行验证；未构建独立可执行文件。

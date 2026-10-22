@@ -99,7 +99,7 @@ Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：恢复玩家摄像头
 Assets/_Project/Editor/CheckpointRegistryEditor.cs：List 与当前记录的 Inspector。
 Assets/_Project/Editor/CheckpointSmokeTest.cs：运行验收。
 Assets/_Project/Editor/PlayerDeathSmokeTest.cs：死亡专用测试兼容自动复活。
-Assets/_Project/Prefabs/Player/PlayerRig.prefab：已加入 PlayerRespawn。
+Assets/_prefab/玩家/PlayerRig.prefab：已加入 PlayerRespawn。
 Assets/_Project/Scenes/Kitchen_Playground.unity：已放置、登记两个示例点。
 Docs/CHECKPOINT_GUIDE.txt：本说明。
 Docs/CHECKPOINT_VALIDATION.txt：运行测试结果。

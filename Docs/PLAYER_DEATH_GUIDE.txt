@@ -32,7 +32,7 @@ Orbit Camera / Ragdoll Camera Target：死亡跟随摄像头及目标。
 Assets/_Project/Scripts/Player/PlayerDeath.cs：死亡状态和布娃娃切换。
 Assets/_Project/Scripts/Obstacles/LethalObstacle.cs：致死接触和膨胀检测范围同步。
 Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：死亡后禁用鼠标控制并跟随身体。
-Assets/_Project/Prefabs/Player/PlayerRig.prefab：接入死亡组件，Visuals 上增加胶囊物理身体和 RagdollCameraTarget。
+Assets/_prefab/玩家/PlayerRig.prefab：接入死亡组件，Visuals 上增加胶囊物理身体和 RagdollCameraTarget。
 Assets/_prefab/机关/PF_Ball_1_Bounce.prefab：增加 LethalObstacle 和 DeathContact 触发器。
 Assets/_Project/Editor/PlayerDeathSmokeTest.cs：编辑器运行验收工具。
 Docs/PLAYER_DEATH_GUIDE.txt：本说明。
