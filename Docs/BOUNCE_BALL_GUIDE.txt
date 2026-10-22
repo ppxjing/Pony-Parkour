@@ -1,0 +1,77 @@
+弹球机关使用与验收
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+Unity：6000.3.19f1（Unity 6.3）
+
+文件位置（以下相对于工程根目录）
+Assets/_prefab/机关/PF_Ball_1_Bounce.prefab
+  新增的可复用机关预设体，是原 PF_Ball_1 Variant 的派生预设体。
+Assets/_Project/Scripts/Obstacles/InflatingBounceBall.cs
+  重力运动、接近地面膨胀、等高反弹、恢复大小及地板检测。
+Assets/_Project/Editor/BounceBallSmokeTest.cs
+  仅编辑器使用的运行验收工具。
+Assets/_Project/Scenes/Kitchen_Playground.unity
+  已将原来放置的 PF_Ball_1 Variant 连接到新机关预设体。
+  保留场景名称及位置 (-3.91, 1.99, -19.74)。
+Docs/BOUNCE_BALL_GUIDE.txt
+  本说明的工程内副本。
+Docs/BOUNCE_BALL_VALIDATION.txt
+  自动运行验收结果。
+
+原资源保持在 Assets/ThirdParty/FunObstacleCourseVol1/Prefabs/PF_Ball_1 Variant.prefab。
+新预设体禁用继承的两个 MeshCollider，使用单一 SphereCollider，球形碰撞范围随膨胀同步改变。
+Visual 指向 SM_Ball_1，保持原模型和材质引用。
+
+行为
+进入 Play 后，从你放置的高度开始自然下落。
+在距反弹平面最后 0.6 米范围内迅速膨胀到正常大小的 1.5 倍，然后向上反弹。
+上升初期保持大球 0.08 秒，在随后 0.25 秒内恢复正常大小。
+每次球心相对反弹平面上升 3 米。上升减速、顶点速度为零、下降加速。
+使用 v0 = sqrt(2*g*h) 和 y = y0 + v0*t - 0.5*g*t²。
+物理步长内精确计算反弹时刻，剩余时间继续积分，不会因落地采样误差逐次变矮。
+默认地板 Y=-0.33；膨胀半径=1.65；离地间隙=0.03。
+因此球心反弹高度 Y=1.35，球心最高点约 Y=4.35。
+“Bounce Height=3”是球心从反弹点向上的位移，不是球心离地板的总高度。
+第一次下落高度由场景摆放决定，之后每次反弹等高。
+
+可调参数
+在预设体或场景实例根物体的 Inflating Bounce Ball 组件中调整：
+Bounce Height：默认 3，单位米；反弹球心相对反弹平面的上升高度。
+Gravity：默认 9.81，单位 m/s²，正数；越大运动越快，弹高仍由 Bounce Height 决定。
+Inflated Scale：默认 1.5；膨胀倍数，同时影响模型和球形碰撞体，并决定反弹平面高度。
+Inflation Distance：默认 0.6，单位米；下降时从距反弹平面多远开始膨胀。越小越突然。
+Inflated Hold Time：默认 0.08，单位秒；反弹后保持最大尺寸的时间。
+Recovery Time：默认 0.25，单位秒；上升时恢复正常大小的时间。
+Ground Clearance：默认 0.03，单位米；最大尺寸下球底与地板之间的间隙。
+Base Radius：默认 1.1，局部单位；原模型的正常球半径，换模型时才需要同步调整。
+Ground Mask：默认 Everything；搜索地板的物理层。忽略触发器、玩家 CharacterController、带 Rigidbody 的物体和自身。
+Ground Search Distance：默认 50，单位米；从初始球心向下寻找地板的最大距离。
+Visual：SM_Ball_1 子物体引用；缩放此子物体以呈现膨胀。
+
+建议停止 Play 后修改参数，再重新运行，修改才会保存。
+若在 Play 中调了尺寸或地板参数，可在该组件的右键菜单执行 Restart motion and detect ground 重新计算。
+调场景实例只影响该实例；调预设体会影响未覆盖该参数的实例。
+Root Transform 的 Scale 应保持正的等比缩放，例如 (1,1,1)；高度和重力参数使用世界单位。
+推荐 Inflation Distance 小于 Bounce Height，保持时间与恢复时间之和小于上升时间 sqrt(2*h/g)，以保留清晰的恢复阶段。
+
+怎么验收
+1. 打开 Assets/_Project/Scenes/Kitchen_Playground.unity，点击 Play。
+2. 出生点前方偏右可见弹球。观察至少五个周期：下落时越来越快，接近地板突然变大，然后向上弹；上升越来越慢，顶点短暂转向。
+3. 在 Scene 窗口观察地板边缘，最大尺寸时球底不穿地；每次球心最高点保持约 Y=4.35。
+4. 停止 Play，把 Bounce Height 改为 5，再运行：每次球心最高点应约 Y=6.35；再把 Gravity 改为 20，弹高仍为 5，但往返更快。验收后按需要恢复默认值。
+5. 自动验收：Play 模式下选择 Tools > Adventure > Run Bounce Ball Smoke Test (Play Mode)。等待约 15 秒，Console 会输出 PASSED/FAILED，并更新 Docs/BOUNCE_BALL_VALIDATION.txt。
+   工具检查三个物理步长/参数组合：0.02 秒、0.05 秒（3 米、9.81 重力），0.01 秒（2 米、20 重力）。每组测量三次反弹最高点、加速度、离地距离、下落膨胀与上升恢复，共 15 项。
+   工具会暂时修改运行实例的参数及物理步长，结束或退出 Play 时恢复；不修改项目 Time 设置。
+6. 复用：从 Assets/_prefab/机关 拖出 PF_Ball_1_Bounce，放到有 Collider 的静止水平地板上方。球心至少高于“膨胀后的半径+离地间隙”，上方及周围留足完整运动空间。
+
+适用范围
+机关沿固定世界竖直轨迹运动，使用 Kinematic Rigidbody 让碰撞体跟随精确重力曲线，运动不受质量、阻尼或外部冲量改变。
+地板在启动或 Restart 时检测并缓存，适用于静止水平地板。移动平台、斜坡和途中遇到天花板的反弹不在当前机制内。
+当前功能是机关自身运动及实体碰撞，未添加伤害、击飞玩家或音效。
+
+本次验证
+Unity 编译及 Console 无错误/警告。
+15 项运行验证全部通过；默认 3 米弹高实测为 2.9996–2.9999 米。
+较大物理步长 0.05 秒实测 2.9977–2.9998 米；2 米弹高/20 重力实测 1.9998–2.0000 米。
+已检查当前摆放位置的飞行路径，采样点未发现其他碰撞体占用。
+本次未进行独立可执行文件构建，未提交 Git commit。

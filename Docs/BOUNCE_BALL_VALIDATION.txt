@@ -1,0 +1,16 @@
+Bounce ball runtime validation: PASSED
+PASS [dt=0.01999999, g=9.81] 3 measured apex rises: 2.9999, 2.9997, 2.9996 m; target 3 m
+PASS [dt=0.01999999, g=9.81] gravity acceleration maximum error 0.0002 m/s²
+PASS [dt=0.01999999, g=9.81] minimum actual sphere/floor gap 0.0344 m
+PASS [dt=0.01999999, g=9.81] inflates during descent; max scale 1.500
+PASS [dt=0.01999999, g=9.81] returns to normal size during ascent
+PASS [dt=0.05, g=9.81] 3 measured apex rises: 2.9998, 2.9997, 2.9977 m; target 3 m
+PASS [dt=0.05, g=9.81] gravity acceleration maximum error 0.0002 m/s²
+PASS [dt=0.05, g=9.81] minimum actual sphere/floor gap 0.0608 m
+PASS [dt=0.05, g=9.81] inflates during descent; max scale 1.500
+PASS [dt=0.05, g=9.81] returns to normal size during ascent
+PASS [dt=0.009999993, g=20] 3 measured apex rises: 2.0000, 1.9998, 2.0000 m; target 2 m
+PASS [dt=0.009999993, g=20] gravity acceleration maximum error 0.0034 m/s²
+PASS [dt=0.009999993, g=20] minimum actual sphere/floor gap 0.0460 m
+PASS [dt=0.009999993, g=20] inflates during descent; max scale 1.500
+PASS [dt=0.009999993, g=20] returns to normal size during ascent
