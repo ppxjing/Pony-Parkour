@@ -1,0 +1,39 @@
+Checkpoint and respawn runtime validation: PASSED
+PASS: Real ball contact starts death with inputs disabled
+PASS: No-checkpoint fallback position restored: (-6.000, -0.280, -24.000)
+PASS: No-checkpoint fallback ragdoll deactivated
+PASS: No-checkpoint fallback standing pose restored
+PASS: No-checkpoint fallback input and controller enabled
+PASS: No-checkpoint fallback spawn capsule has no environment overlap
+PASS: No-checkpoint fallback waited configured delay: 2.00 seconds
+PASS: Respawn protection rejects immediate lethal contact
+PASS: Entering A records A
+PASS: Entering B after A replaces saved checkpoint with B
+PASS: Dead body touching A does not overwrite B
+PASS: Latest checkpoint B position restored: (-11.000, -0.280, -22.000)
+PASS: Latest checkpoint B ragdoll deactivated
+PASS: Latest checkpoint B standing pose restored
+PASS: Latest checkpoint B input and controller enabled
+PASS: Latest checkpoint B spawn capsule has no environment overlap
+PASS: Latest checkpoint B waited configured delay: 2.00 seconds
+PASS: SpawnPoint facing restored
+PASS: Revisiting A makes A latest, independent of list order
+PASS: Revisited checkpoint A position restored: (-8.000, -0.280, -23.000)
+PASS: Revisited checkpoint A ragdoll deactivated
+PASS: Revisited checkpoint A standing pose restored
+PASS: Revisited checkpoint A input and controller enabled
+PASS: Revisited checkpoint A spawn capsule has no environment overlap
+PASS: Revisited checkpoint A waited configured delay: 2.01 seconds
+PASS: Unregistered checkpoint is ignored
+PASS: Appending a third checkpoint to List makes its trigger work
+PASS: Falling below recovery height uses death/respawn flow
+PASS: Appended checkpoint after fall position restored: (-12.000, -0.280, -26.000)
+PASS: Appended checkpoint after fall ragdoll deactivated
+PASS: Appended checkpoint after fall standing pose restored
+PASS: Appended checkpoint after fall input and controller enabled
+PASS: Appended checkpoint after fall spawn capsule has no environment overlap
+PASS: Appended checkpoint after fall waited configured delay: 2.00 seconds
+PASS: WASD moves player after repeated revives
+PASS: Jump works after revival; rise 1.36 m
+PASS: Mouse camera control restored
+PASS: Four consecutive recovery cycles completed once each

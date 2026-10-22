@@ -32,6 +32,10 @@ namespace Adventure.Player
         private float currentDistance;
         private bool ownsCursor;
         private bool inputBlocked;
+        private Transform livingTarget;
+        private float livingPitch;
+
+        private void Awake() { livingTarget = target; livingPitch = pitch; }
 
         private void OnEnable()
         {
@@ -76,6 +80,15 @@ namespace Adventure.Player
             yaw = angles.y;
             pitch = angles.x;
             ReleaseCursor();
+        }
+        public void RestorePlayerControl()
+        {
+            target = livingTarget;
+            inputBlocked = false;
+            yaw = playerRoot != null ? playerRoot.eulerAngles.y : yaw;
+            pitch = Mathf.Clamp(livingPitch, minPitch, maxPitch);
+            SnapToTarget();
+            if (lockCursor) CaptureCursor();
         }
         private void PlaceCamera(bool snap)
         {

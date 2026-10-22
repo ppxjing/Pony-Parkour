@@ -1,0 +1,105 @@
+复活存档点与自动复活
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+场景：Assets/_Project/Scenes/Kitchen_Playground.unity
+先前死亡功能已单独提交：ae2c1a6（碰到机关死亡、胶囊布娃娃效果和禁用输入）。
+
+现有行为
+进入已登记的检查点区域后，记录该点的 SpawnPoint 世界位置与水平朝向。
+使用最近一次实际进入的检查点，不按 List 索引或关卡编号排序。
+例如 A → B → A，最近记录最终为 A。
+死亡后先播放胶囊物理倒地，默认 2 秒后在记录位置复活。
+没有进入任何点时，回到本次运行的初始出生位置。
+复活会清空刚体线速度/角速度，恢复站立姿势、角色碰撞、WASD、跳跃和鼠标视角。
+摄像头切回玩家目标，位置直接恢复到复活点附近，后续继续平滑跟随。
+复活后默认 1 秒不受致死机关影响，避免接触边缘立即再次死亡。
+掉到 Third Person Motor 的 Respawn Below Y 以下也使用同一复活流程。
+尸体进入检查点不会覆盖记录；没有登记到 List 的区域不会记录。
+记录仅属于本次运行，不写入磁盘；退出 Play 或重载场景后回到初始状态。
+
+场景中的位置
+CheckpointSystem：集中管理检查点 List。
+  Checkpoint_A：位置 (-8, -0.33, -23)，在初始玩家左前方，复活朝向 +Z。
+  Checkpoint_B：位置 (-11, -0.33, -22)，在 A 更左前方，复活朝向 +X。
+PlayerRig/Player：Player Respawn 组件控制复活等待时间和保护时间。
+
+怎么新增并登记一个检查点
+1. 从 Project 的 Assets/_prefab/复活存档点/PF_RespawnCheckpoint.prefab 拖一份到 Scene。
+2. 放置在有地板碰撞体的安全位置，建议归到 CheckpointSystem 下，改名便于区分。
+3. 选中场景 CheckpointSystem，在 Inspector 的 Checkpoint Registry 中找到 Checkpoints List。
+4. 点击 List 的 +，将刚放到场景里的检查点实例拖入新元素。也可把场景实例拖到 List 标题追加。
+   要拖 Hierarchy 中的实例，不是 Project 中的 prefab 资源。List 可持续扩充；空项不会参与记录。
+5. 调整其 SpawnPoint，让绿色标记位于地面上方约 0.05 米，周围至少留出玩家胶囊站立空间，并远离机关。
+6. 保存场景。运行时选中 CheckpointSystem，可以看到“最近进入的检查点”“已记录的复活位置”“复活次数”。
+
+哪些参数可调、在哪调
+位置：PlayerRig/Player > Player Respawn
+  Respawn Delay：默认 2 秒，从死亡开始到复活的等待时间。使用游戏时间，Time Scale=0 时暂停。
+  Protection Time：默认 1 秒，复活后免受致死机关影响的时间；0 表示不保护。
+
+位置：场景 CheckpointSystem > Checkpoint Registry
+  Player：当前玩家的 PlayerRespawn 引用，已配置。
+  Checkpoints：可继续拖入检查点的 List。元素顺序不影响“最近进入”的判定。
+  下方运行状态字段为只读，用于观察当前记录。
+
+位置：选中的 Checkpoint_A / Checkpoint_B / 新检查点实例
+  Transform Position：移动整个检查区域和 SpawnPoint。
+  Transform Scale：在 Scene 按 R，拖缩放轴或输入 X/Y/Z，整体改变区域大小。建议使用正数。
+  Box Collider Center / Size：单独改变触发框中心与尺寸，不移动 SpawnPoint；默认 Center=(0,1,0)，Size=(2,2,2)。
+  Box Collider > Edit Collider：直接在 Scene 拖动框体六个面的手柄；透明框同步变化。
+  Is Trigger：必须保持开启，框是检测区域，不是实体墙。
+  Respawn Checkpoint > Spawn Point / Volume Visual：已绑定预设体内部引用，通常无需修改。
+
+位置：检查点下的 SpawnPoint 子物体
+  Transform Position：真正的复活脚底位置，和触发区域中心独立。
+  Transform Rotation Y：复活时玩家和摄像头的朝向；绿色箭头指向前方。
+  建议 SpawnPoint 位于区域内的安全地板上，避免墙、桌腿、机关和悬空。
+
+位置：Assets/_Project/Materials/Checkpoints
+  CheckpointVolume.mat：透明面的颜色与 Albedo Alpha（默认 0.10）。
+  CheckpointFrame.mat：框线颜色与发光颜色。
+
+位置：PlayerRig/Player > Third Person Motor
+  Respawn Below Y：默认 -15，玩家低于此世界高度时死亡并回最近检查点。
+
+调整实例只影响该实例；修改 prefab 资源会影响未覆盖对应参数的所有实例。
+停止 Play 后修改并保存，避免退出运行时丢失参数修改。
+检查点记录在进入区域时采样；若运行期间移动 SpawnPoint，需要退出区域后再次进入才更新记录。
+避免不同检查点区域重叠，以保持触发先后清晰。玩家已经位于某区域中时不会每帧反复覆盖其它点。
+
+人工验收
+1. 打开 Kitchen_Playground，点击 Play，不进入任何框，走向弹球死亡：约 2 秒后回初始出生点，能再次移动、跳跃和转动视角。
+2. 重新运行，先走进左前方 A，再碰球：应在 A 的 SpawnPoint 复活。
+3. 再走进更左前方 B，碰球死亡：应在 B 复活，并面向 SpawnPoint 的绿色箭头方向。
+4. 从 B 返回 A，再死亡：应回 A，证明使用的是最近进入顺序，而非 List 中最后一项。
+5. 在运行中选中 CheckpointSystem，核对最近检查点引用、记录位置和复活次数。
+6. 停止运行，复制或拖入第三个 prefab 实例，把它拖入 List，调整安全落点和框大小；进入第三个框后死亡，应回第三个点。
+7. 将 Respawn Delay 改为 4，重新运行，确认倒地保留约 4 秒后复活；验收后可恢复 2。
+8. 连续死亡复活多次，胶囊应每次站直，不保留翻滚速度；输入和摄像头应恢复，场景不应不断新增尸体。
+
+自动验收
+新的 Play 会话中，菜单 Tools > Adventure > Run Checkpoint Respawn Test (Play Mode)。
+约 20 秒，Console 输出 PASSED/FAILED，并保存 Docs/CHECKPOINT_VALIDATION.txt。
+测试临时移动玩家，模拟键鼠操作和落坑，在运行时添加/移除第三个检查点，并验证四次完整复活。
+涵盖：初始点兜底、A/B 覆盖和回访、尸体不记录、未登记点不生效、List 扩充、复活等待、保护期、落点无环境穿插、站立姿势恢复、移动/跳跃/鼠标恢复。
+测试完成后退出 Play，回到正常场景。
+旧的死亡专用测试会临时关闭自动复活，结束时恢复，便于单独观察倒地效果。
+
+文件管理（相对工程根目录）
+Assets/_prefab/复活存档点/PF_RespawnCheckpoint.prefab：透明框检查点预设体。
+Assets/_Project/Materials/Checkpoints/：透明面与框线材质。
+Assets/_Project/Scripts/Checkpoints/RespawnCheckpoint.cs：区域触发、SpawnPoint 与 Scene 框显示。
+Assets/_Project/Scripts/Checkpoints/CheckpointRegistry.cs：场景检查点 List。
+Assets/_Project/Scripts/Player/PlayerRespawn.cs：最近点记录、等待和复活调度。
+Assets/_Project/Scripts/Player/PlayerDeath.cs：恢复布娃娃、角色控制器与生命状态。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：移动状态重置、落坑恢复。
+Assets/_Project/Scripts/Player/ThirdPersonOrbitCamera.cs：恢复玩家摄像头及输入。
+Assets/_Project/Editor/CheckpointRegistryEditor.cs：List 与当前记录的 Inspector。
+Assets/_Project/Editor/CheckpointSmokeTest.cs：运行验收。
+Assets/_Project/Editor/PlayerDeathSmokeTest.cs：死亡专用测试兼容自动复活。
+Assets/_Project/Prefabs/Player/PlayerRig.prefab：已加入 PlayerRespawn。
+Assets/_Project/Scenes/Kitchen_Playground.unity：已放置、登记两个示例点。
+Docs/CHECKPOINT_GUIDE.txt：本说明。
+Docs/CHECKPOINT_VALIDATION.txt：运行测试结果。
+
+本次复活功能已保存，尚未 commit；先前死亡功能已提交 ae2c1a6。未进行独立可执行文件构建。

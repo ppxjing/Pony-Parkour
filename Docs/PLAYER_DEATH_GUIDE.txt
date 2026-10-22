@@ -12,7 +12,7 @@ WASD、空格、鼠标视角及点击重新锁定鼠标均失效，鼠标释放�
 摄像头保持死亡瞬间朝向，继续平滑跟随身体。
 胶囊的刚体和 CapsuleCollider 启用，受重力、击退和旋转冲量影响，倒下、翻滚并与地板碰撞。
 重复碰触机关不会再次触发死亡或重复添加死亡冲量。
-死亡持续到退出并重新进入 Play；尚未增加复活按钮或自动重生流程。
+现已接入检查点自动复活：默认死亡 2 秒后回最近检查点，详细设置见 Docs/CHECKPOINT_GUIDE.txt。
 
 当前胶囊体没有人形骨骼，因此当前效果是单刚体的物理倒地。
 后续替换人形模型：为骨骼配置 Rigidbody/Collider/Joint，将骨骼刚体、碰撞体分别填入 PlayerDeath 的 Ragdoll Bodies/Ragdoll Colliders；Impulse Body 指向躯干或骨盆，Animator 指向模型动画组件，Ragdoll Camera Target 指向躯干跟随点。移除胶囊占位刚体/碰撞体，避免重复碰撞。
@@ -49,8 +49,8 @@ Docs/PLAYER_DEATH_IDLE_VALIDATION.txt：被机关撞到测试结果。
 自动验收
 在新的 Play 会话中执行 Tools > Adventure > Test Death - Walk Into Ball (Play Mode)。
 退出并重新进入 Play，再执行 Tools > Adventure > Test Death - Ball Hits Idle Player (Play Mode)。
-每项测试约 5–8 秒；工具会临时移动玩家、发送虚拟键鼠事件；主动碰撞测试还会临时固定球。
+每项测试约 5–8 秒；工具会临时禁用自动复活、移动玩家并发送虚拟键鼠事件；主动碰撞测试还会临时固定球。
 测试完成后应退出 Play，恢复场景正常摆放和机关运行。
 Console 输出结果，同时保存到上述两个验证文件。
 
-死亡功能这批改动尚未 commit，原 MCP/ProBuilder 未提交配置仍保留。
+死亡功能已提交 ae2c1a6；后续复活功能另行管理，原 MCP/ProBuilder 未提交配置仍保留。

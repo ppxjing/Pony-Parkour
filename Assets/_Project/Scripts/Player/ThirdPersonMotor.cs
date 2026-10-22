@@ -24,6 +24,7 @@ namespace Adventure.Player
         [Header("Prototype recovery")]
         [SerializeField] private float respawnBelowY = -15f;
         private CharacterController controller;
+        private PlayerRespawn respawn;
         private Vector3 horizontalVelocity, spawnPosition;
         private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
@@ -31,6 +32,7 @@ namespace Adventure.Player
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            respawn = GetComponent<PlayerRespawn>();
             if (input == null) input = GetComponent<PlayerInputReader>();
             spawnPosition = transform.position;
             if (cameraTransform == null || visuals == null)
@@ -59,7 +61,11 @@ namespace Adventure.Player
             verticalVelocity = Mathf.Max(verticalVelocity + gravity * dt, -terminalSpeed);
             var flags = controller.Move((horizontalVelocity + Vector3.up * verticalVelocity) * dt);
             if ((flags & CollisionFlags.Above) != 0 && verticalVelocity > 0f) verticalVelocity = 0f;
-            if (transform.position.y < respawnBelowY) Respawn();
+            if (transform.position.y < respawnBelowY)
+            {
+                if (respawn != null && respawn.isActiveAndEnabled) respawn.RequestFallRecovery();
+                else Respawn();
+            }
         }
         private void OnDisable()
         { horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
@@ -67,9 +73,15 @@ namespace Adventure.Player
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
         {
+            if (respawn != null && respawn.isActiveAndEnabled) { respawn.RespawnNow(); return; }
+            TeleportAndReset(spawnPosition, transform.rotation);
+        }
+        public void TeleportAndReset(Vector3 position, Quaternion rotation)
+        {
+            bool wasEnabled = controller.enabled;
             controller.enabled = false;
-            transform.position = spawnPosition;
-            controller.enabled = true;
+            transform.SetPositionAndRotation(position, rotation);
+            controller.enabled = wasEnabled;
             horizontalVelocity = Vector3.zero;
             verticalVelocity = 0f;
             lastGrounded = jumpRequested = float.NegativeInfinity;

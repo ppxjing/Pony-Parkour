@@ -11,6 +11,8 @@ using UnityEngine.InputSystem.LowLevel;
 public static class PlayerDeathSmokeTest
 {
     private static PlayerDeath death;
+    private static PlayerRespawn respawn;
+    private static bool respawnWasEnabled;
     private static PlayerInputReader input;
     private static ThirdPersonMotor motor;
     private static CharacterController controller;
@@ -34,6 +36,9 @@ public static class PlayerDeathSmokeTest
         if (!EditorApplication.isPlaying || Status == "Running") throw new InvalidOperationException("Enter a fresh Play session first.");
         death = UnityEngine.Object.FindFirstObjectByType<PlayerDeath>();
         if (death == null || death.IsDead) throw new InvalidOperationException("A living player is required; restart Play Mode.");
+        respawn = death.GetComponent<PlayerRespawn>();
+        respawnWasEnabled = respawn != null && respawn.enabled;
+        if (respawn != null) respawn.enabled = false;
         ball = UnityEngine.Object.FindFirstObjectByType<InflatingBounceBall>();
         input = death.GetComponent<PlayerInputReader>(); motor = death.GetComponent<ThirdPersonMotor>();
         controller = death.GetComponent<CharacterController>(); corpse = death.transform.Find("Visuals").GetComponent<Rigidbody>();
@@ -118,6 +123,7 @@ public static class PlayerDeathSmokeTest
         if (keyboard != null && keyboard.added) InputSystem.RemoveDevice(keyboard);
         if (mouse != null && mouse.added) InputSystem.RemoveDevice(mouse);
         keyboard = null; mouse = null; Application.runInBackground = oldBackground;
+        if (respawn != null) respawn.enabled = respawnWasEnabled;
         Status = status;
         string report = "Player death " + (stationary ? "stationary" : "walking") + ": " + status + "\n" + string.Join("\n", results);
         Directory.CreateDirectory("Docs"); File.WriteAllText("Docs/PLAYER_DEATH_" + (stationary ? "IDLE" : "WALK") + "_VALIDATION.txt", report);
