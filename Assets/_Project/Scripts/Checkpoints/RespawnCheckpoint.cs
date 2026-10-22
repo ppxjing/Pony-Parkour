@@ -16,12 +16,16 @@ namespace Adventure.Checkpoints
         public Quaternion SpawnRotation => Quaternion.Euler(0f, spawnPoint != null ? spawnPoint.eulerAngles.y : transform.eulerAngles.y, 0f);
 
         private void Awake() { volume = GetComponent<BoxCollider>(); SyncVisual(); }
+        private void OnEnable() { SyncVisual(); }
         private void Update() { if (!Application.isPlaying) SyncVisual(); }
         private void Reset() { GetComponent<BoxCollider>().isTrigger = true; }
         private void SyncVisual()
         {
             if (volume == null) volume = GetComponent<BoxCollider>();
             if (volumeVisual == null || volume == null) return;
+            // The volume is an editing aid; keep only the trigger active during gameplay.
+            bool showVisual = !Application.isPlaying;
+            if (volumeVisual.gameObject.activeSelf != showVisual) volumeVisual.gameObject.SetActive(showVisual);
             if (volumeVisual.localPosition != volume.center) volumeVisual.localPosition = volume.center;
             if (volumeVisual.localScale != volume.size) volumeVisual.localScale = volume.size;
         }
@@ -33,6 +37,7 @@ namespace Adventure.Checkpoints
         }
         private void OnDrawGizmos()
         {
+            if (Application.isPlaying) return;
             // Collider handles can repaint Scene view without scheduling an ExecuteAlways Update.
             if (!Application.isPlaying) SyncVisual();
             var box = GetComponent<BoxCollider>();
