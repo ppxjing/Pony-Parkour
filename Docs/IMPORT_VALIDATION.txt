@@ -1,0 +1,4 @@
+Unity: 6000.3.19f1
+Converted obstacle materials: 25
+Invalid material shaders: 0
+Scenes: 16
