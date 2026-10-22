@@ -1,0 +1,60 @@
+间歇旋转板机关使用与验收
+
+工程：D:\6412_Group\2026s1-project-2-team-02
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+预设体：Assets/_prefab/机关/PF_Flipper_1_IntervalFlip.prefab
+脚本：Assets/_Project/Scripts/Obstacles/FlippingPlatform.cs
+碰撞网格：Assets/_Project/Physics/Obstacles/Flipper1_Board_Collision.asset
+
+当前行为
+围绕模型短边处 Rotation 的本地 X 轴旋转。
+Motion Mode 下拉菜单提供“单方向旋转”和“来回交替”两项。单向模式持续同向；交替模式按同样角度正反往返。Reverse Direction 布尔参数保留，用于控制首次方向。
+Flip Angle 控制每次转动角度，默认 180 度，可以改成 45、90、180、360 等正数。
+预设体默认：启动等待 2 秒，0.8 秒内转动 180 度，停住 2 秒，然后继续沿同一方向转动。当前场景保留用户设置：Flip Angle=90、Reverse Direction=false。
+保留先快后慢的减速曲线和末端停止。角度通过完整运动过程累计，360 度代表转完整一圈。
+普通实体碰撞，不添加致死效果。停止时可站立，转动时允许滑落，不包含玩家自动吸附/绑定平台功能。
+持续同向旋转会扫过轴的上下两侧，摆放时给板面留出旋转空间。
+
+参数位置
+Hierarchy 展开 PF_Flipper_1_IntervalFlip，选中 Rotation，在 Inspector 的 Flipping Platform 中调节。
+Flip Angle：默认 180 度，每次旋转量，最小 0.1 度；只填正数，方向由布尔参数控制。
+Motion Mode：单方向旋转 / 来回交替。默认单方向旋转。
+Reverse Direction：false 首次绕本地轴正向旋转，true 首次反向；交替模式随后按相反方向依次往返。
+Flip Duration：默认 0.8 秒，一次旋转时长，最小 0.05 秒。固定时长下增大 Flip Angle 会提高转速。
+Pause Duration：默认 2 秒，每次转完后的静止时间；每轮总时长为 Flip Duration + Pause Duration。
+Start Delay：默认 2 秒，首次转动前的等待时间。
+Ease Out Power：默认 3，范围 1.1~5，越大开头越快、后段减速越明显。
+Start Angle：默认 0 度，运行初始角度，和每次旋转量 Flip Angle 不同。
+Local Axis：默认 (1,0,0)，一般保持默认；整体方向用最外层根节点的 Rotation 调整。
+组件勾选框：暂停/继续当前旋转进度。
+不再使用额外的 Alternate Direction 布尔值，由 Motion Mode 下拉菜单选择运动方式。
+
+修改生效时间
+建议停止 Play 后设置并保存。Motion Mode、Flip Angle、Reverse Direction、Flip Duration、Ease Out Power 在每次旋转开始时取值；运行中改动从下一次转动生效，避免当前动作突然跳变。
+Pause Duration 在本次转完后取值。Start Delay / Start Angle 重新进入 Play 生效。
+所有时间采用游戏时间，Time Scale=0 时暂停。
+
+层级
+Rotation：运动学 Rigidbody 和旋转脚本；模型和碰撞体共用此支点。
+Rotation/SM_Flipper_1：可见模型，请保留。
+Rotation/BoardCollision：板面实体碰撞。
+Rotation/HingeCollision：横轴实体碰撞。
+移动整个机关请操作最外层根节点，不要只移动模型；建议统一正缩放。
+
+验收
+1. 选择 Motion Mode=单方向旋转，设置 Flip Angle=90、Reverse Direction=false，Play 后观察连续三次：沿同一方向累计到 90、180、270 度；每次先快后慢并停顿。
+2. 停止运行，勾选 Reverse Direction，再 Play：应始终反向转动，相对于初始姿态累计 -90、-180、-270 度。
+3. 设置 Flip Angle=180，连续观察两次；第一次半圈停住，第二次继续同向完成另一半圈，不反向折返。
+4. 改 Flip Duration=1.6、Pause Duration=3，确认转动更慢、停顿更久。
+5. 可设 Flip Angle=360，观察每次完整转一圈再停；初始和最终朝向相同不代表没有旋转。
+6. 选择 Motion Mode=来回交替、Flip Angle=90、Reverse Direction=false，连续观察应为正转90度、反转90度、正转90度、反转90度，端点为90、0、90、0；勾选 Reverse Direction 后第一次反向，其后交替。
+7. 停止的板面上可站立且不死亡；转动时允许滑落。
+
+验证记录
+本次验证“单向/交替”分别组合 Reverse Direction=false/true，共4组，每组连续4次90度旋转。
+单向：端点分别为90、180、270、360度，以及-90、-180、-270、-360度。
+交替：端点分别为90、0、90、0度，以及-90、0、-90、0度。
+各组均无错误方向样本，各次停止姿态相对目标的角度误差为0度。Console无错误或警告。
+测试临时对象已清理，已退出Play。场景保留用户的90度、反向关闭，运动模式默认单向。
+前次已验证减速曲线、支点不漂移、板面站立碰撞，本次保留这些逻辑。
+旋转板功能已完成并通过运行验证；未构建独立可执行文件。
