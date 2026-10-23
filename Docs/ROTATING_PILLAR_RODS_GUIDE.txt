@@ -1,0 +1,46 @@
+上下独立旋转棍机关
+
+预制体：Assets/_prefab/机关/PF_Pillar_111_RotatingRods.prefab
+脚本：Assets/_Project/Scripts/Obstacles/RotatingPillarRod.cs
+Inspector：Assets/_Project/Editor/RotatingPillarRodEditor.cs
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+场景对象：PF_Pillar_111
+
+层级与使用
+PF_Pillar_111
+  FixedColumn：黄色立柱，固定不转。
+  UpperRotation：上方绿色棍的轴心与旋转组件。
+    RodModel：上方绿色棍外观和胶囊碰撞体。
+  LowerRotation：下方绿色棍的轴心与旋转组件。
+    RodModel：下方绿色棍外观和胶囊碰撞体。
+上下轴心分别在黄色立柱中心线的两个高度上，围绕各自本地 Y 轴旋转。
+已保持原装配的模型位置、朝向、尺寸。第三方源资源不变，新机关使用独立预制体。
+重复碰撞体已整理：固定立柱保留一个贴合模型的 MeshCollider，上下棍各一个 CapsuleCollider，随各自动力学轴心运动，没有覆盖整圈的阻挡体。
+
+可调参数
+选中 UpperRotation 或 LowerRotation，在 Rotating Pillar Rod 组件中独立设置。
+Motion Mode：连续旋转 / 指定角度往复。
+Angular Speed：度/秒，非负。上棍默认 60，下棍默认 90；0 表示停止在当前角度。
+Reverse Direction：反向开关。上棍默认关闭，下棍默认开启。以正本地 Y 轴为准；正向从上方俯视为顺时针，反向相反。往复模式决定第一段往哪边转，返回时自动反向。
+Start Angle：相对于编辑态摆放姿态的起始偏角，单位度，默认 0。进入 Play 生效。上棍和下棍保留各自原始朝向，0 不代表两根棍同向。
+Rotation Angle：仅在指定角度往复模式显示，单程角度，默认 90，范围 0～360。0 为保持起始角度。
+例：Start Angle=30、Rotation Angle=90、Reverse Direction 关闭，则相对初始摆放在 30° 与 120° 间往复；打开反向则在 30° 与 -60° 间往复。
+连续模式始终转完整一圈，角度参数使用 Start Angle 调初始朝向，不显示 Rotation Angle。
+选中上下两根轴心可以批量修改；修改单根时不影响另一根。
+运行时可在 Inspector 看当前偏角。暂停游戏时旋转停止，禁用某根 Rotating Pillar Rod 组件只暂停该根，启用继续。
+
+摆放
+将预制体拖入场景，根对象 Transform 调整整个机关的位置、朝向、大小。
+如需改变上下高度，只调对应 Rotation 的本地 Y，保持两个轴心的 X/Z 与立柱中心对齐。
+建议整个预制体等比例缩放，避免旋转层级出现剪切变形。棍子尺寸在 RodModel 调整，Collider 随模型缩放。
+不要给 FixedColumn 挂旋转组件，也不要给整个根对象加动态 Rigidbody。
+修改 Start Angle 建议停止 Play 后设置；Play 中临时调整不自动保存。
+旋转模式改变会保留当前运行相位；重新开始 Play 可从设定起始角度验收。
+
+验收
+1. 选中 PF_Pillar_111，按 Play，黄色立柱固定，上下绿色棍围绕立柱中心线分别转动。
+2. 默认上棍 60 度/秒，下棍反向 90 度/秒。单独修改上棍转速或反转开关，下棍保持原设置。
+3. 上棍 Start Angle 设为 90，下棍保持 0；重新 Play 后上棍起始朝向偏转 90 度，下棍初始朝向不变。
+4. 上棍选择指定角度往复，Rotation Angle=90；下棍设为 180 并反转。观察各自到对应角度后返回，不会继续整圈转动。
+5. 单独将一根 Angular Speed 改为 0 或禁用组件，该根停止，另一根继续；Rotation Angle=0 时往复模式保持起始角度。
+6. 停止 Play，两根棍恢复编辑态的装配姿态；运行时轴心、黄色立柱的位置不发生漂移。
