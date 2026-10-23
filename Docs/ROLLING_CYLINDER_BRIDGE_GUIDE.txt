@@ -1,0 +1,46 @@
+滚筒桥机关
+
+预制体：Assets/_prefab/机关/PF_Pillar_1_RollingBridge.prefab
+模型来源：Assets/ThirdParty/FunObstacleCourseVol1/Prefabs/PF_Pillar_1 Variant.prefab（原始第三方资源未改动）。
+旋转脚本：Assets/_Project/Scripts/Obstacles/RollingCylinderBridge.cs
+玩家接入：Assets/_Project/Scripts/Player/ThirdPersonMotor.cs
+碰撞网格：Assets/_Project/Meshes/Obstacles/Pillar1_RollerCollision.asset
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+
+层级
+PF_Pillar_1_RollingBridge：用于摆放和缩放。
+  Rotation：滚筒轴心，沿本地 Z 轴旋转；Rolling Cylinder Bridge、运动学 Rigidbody、单个凸圆柱 MeshCollider 都在此处。
+    Model：来自原 PF_Pillar_1 Variant 的外观和材质。
+原资源的两个重叠碰撞体已在新预制体中移除，使用贴合滚筒主体的简化圆柱碰撞体。没有添加致死组件。
+场景中的原 PF_Pillar_1 Variant 已替换为新机关。原位置旁 PF_WallPillar_1 Variant 的碰撞体会托住玩家，因此新机关向世界 X 负方向平移 0.35 米，其他机关保持不变。
+
+使用与参数
+从 Project 拖入预制体即可使用；玩家需要本工程 ThirdPersonMotor。
+选中场景实例下的 Rotation，在 Rolling Cylinder Bridge 组件调整：
+Angular Speed：角速度，默认 360 度/秒，正负号决定方向；0 为停止。
+Grip Acceleration：抓地阈值，默认 4 米/秒²。角速度换算为弧度后，其平方乘玩家脚底到轴的距离超过此阈值，才允许自动甩出。值越小越容易甩出；很大时不自动甩出，但仍可能被滚动带下去。
+Ejection Delay：连续站立后允许甩出的延迟，默认 0.08 秒。过长时可能先从曲面滑落，而不是等到计时结束再甩出。
+Tangential Multiplier：自动甩出时继承切线速度的倍率，默认 2，越大横向甩得越远。
+Outward Speed：远离轴心的额外推开速度，默认 1 米/秒。滚筒顶部这个方向接近向上。
+Upward Speed：额外世界向上速度，默认 4 米/秒，与切线速度、径向速度合成后，交由玩家原重力下落。
+
+在根对象 Transform 调整位置、方向、大小：
+根对象本地 Z 是桥的长度方向。Z Scale 调长度，X/Y Scale 一起等比例调整粗细；保持 X=Y，避免圆形截面被拉成椭圆或产生非均匀缩放问题。
+不要直接移动 Model 或 Rotation 去改轴心；保持内部引用和 Rigidbody/Collider 的设置。
+为滚筒周围留出玩家胶囊宽度和甩出空间；墙、其他机关碰撞体仍会阻挡玩家。
+
+行为
+只有实际踩在上方弧形表面才会被带动；碰侧面、平端面不会触发自动甩出。
+玩家保持直立，通过 CharacterController 移动；跳离或滑离时继承横向切线惯性，起跳、死亡、复活和传送会清理站立引用。
+高转速超过抓地阈值且达到延迟后，自动甩出；玩家可以继续控制空中移动。碰到致死机关或死亡区域仍按原死亡逻辑处理。
+这是与 CharacterController 配合的游戏运动逻辑，阈值控制抓地能力，不是完整的刚体摩擦仿真。
+
+验收
+1. 进入 Kitchen_Adventure，找到 PF_Pillar_1_RollingBridge，按 Play。外观绕滚筒长轴连续旋转，位置固定，不绕外部点公转。
+2. 让蓝色玩家跳到滚筒中段顶部，或从无遮挡一侧走上去；玩家先被带向一侧，再被抛出并受重力落下。要确保脚踩的是滚筒，而非旁边墙柱。
+3. 停止 Play，将 Angular Speed 改为 -360，再运行，旋转与甩出方向相反。恢复 360。
+4. Angular Speed 设为 0，应停止旋转，站上去不会自动甩出。
+5. 提高 Tangential Multiplier 应增加横向抛出速度；提高 Upward Speed 应明显抛得更高。
+6. Grip Acceleration 设为 1000，应不再自动甩出，但滚筒仍会带动玩家。恢复默认 4；Ejection Delay 设得太长可能先滑落。
+7. 侧面、端面接触不会直接弹飞；从滚筒跳离后仍能正常跳跃、下落、死亡复活。
+8. 停止运行后，旋转回到编辑态初始姿态。运行时调整参数不会自动保存，正式调整请在停止 Play 后进行。

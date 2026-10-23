@@ -28,11 +28,15 @@ namespace Adventure.Player
         private PlayerRespawn respawn;
         private SeesawPlatform standingPlatform;
         private SpinningTurntable standingTurntable;
+        private RollingCylinderBridge standingRoller;
+        private float rollerRideTime;
+        public RollingCylinderBridge StandingRoller => standingRoller;
         private Vector3 externalHorizontalVelocity;
         private float turntableRideTime, detachUntil;
         public SpinningTurntable StandingTurntable => standingTurntable;
         private Transform SupportTransform => standingPlatform != null ? standingPlatform.transform :
-            standingTurntable != null ? standingTurntable.transform : null;
+            standingTurntable != null ? standingTurntable.transform :
+            standingRoller != null ? standingRoller.transform : null;
         private Vector3 supportLocalPoint, supportWorldPoint;
         public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
@@ -70,6 +74,8 @@ namespace Adventure.Player
             {
                 if (standingTurntable != null)
                     externalHorizontalVelocity += Vector3.ProjectOnPlane(standingTurntable.GetTangentialVelocity(FootPosition), Vector3.up);
+                if (standingRoller != null)
+                    externalHorizontalVelocity += Vector3.ProjectOnPlane(standingRoller.GetTangentialVelocity(FootPosition), Vector3.up);
                 ClearSupport();
                 verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * jumpHeight);
                 jumpRequested = lastGrounded = float.NegativeInfinity;
@@ -78,18 +84,24 @@ namespace Adventure.Player
             externalHorizontalVelocity = Vector3.MoveTowards(externalHorizontalVelocity, Vector3.zero,
                 (controller.isGrounded && verticalVelocity <= 0f ? 25f : 1f) * dt);
             var previousTurntable = standingTurntable;
+            var previousRoller = standingRoller;
             standingPlatform = null;
             standingTurntable = null;
+            standingRoller = null;
             var flags = controller.Move((horizontalVelocity + externalHorizontalVelocity + Vector3.up * verticalVelocity) * dt);
             if (!isActiveAndEnabled) return;
             if (standingTurntable != previousTurntable) turntableRideTime = 0f;
             if (previousTurntable != null && standingTurntable == null && verticalVelocity <= 0f)
                 externalHorizontalVelocity += Vector3.ProjectOnPlane(previousTurntable.GetTangentialVelocity(FootPosition), Vector3.up);
+            if (standingRoller != previousRoller) rollerRideTime = 0f;
+            if (previousRoller != null && standingRoller == null && verticalVelocity <= 0f)
+                externalHorizontalVelocity += Vector3.ProjectOnPlane(previousRoller.GetTangentialVelocity(FootPosition), Vector3.up);
             Transform support = SupportTransform;
             if (support != null)
             {
-                supportLocalPoint = support.InverseTransformPoint(transform.position);
-                supportWorldPoint = transform.position;
+                // Roll the contact at the feet around the cylinder, keeping the capsule upright.
+                supportWorldPoint = standingRoller != null ? FootPosition : transform.position;
+                supportLocalPoint = support.InverseTransformPoint(supportWorldPoint);
             }
             if ((flags & CollisionFlags.Above) != 0 && verticalVelocity > 0f) verticalVelocity = 0f;
             if (transform.position.y < respawnBelowY)
@@ -103,7 +115,8 @@ namespace Adventure.Player
             Transform support = SupportTransform;
             if (support == null) return;
             if (verticalVelocity > 0f || (standingPlatform != null && !standingPlatform.isActiveAndEnabled)
-                || (standingTurntable != null && !standingTurntable.isActiveAndEnabled))
+                || (standingTurntable != null && !standingTurntable.isActiveAndEnabled)
+                || (standingRoller != null && !standingRoller.isActiveAndEnabled))
             { ClearSupport(); return; }
             Vector3 point = support.TransformPoint(supportLocalPoint);
             // Carry through the controller so walls/ceilings still block the player.
@@ -115,19 +128,32 @@ namespace Adventure.Player
                 Vector3 launch;
                 if (standingTurntable.TryGetLaunch(FootPosition, turntableRideTime, out launch))
                 {
-                    ClearSupport();
-                    externalHorizontalVelocity = Vector3.ProjectOnPlane(launch, Vector3.up);
-                    verticalVelocity = launch.y;
-                    detachUntil = Time.time + 0.2f;
-                    lastGrounded = jumpRequested = float.NegativeInfinity;
+                    LaunchFromSupport(launch);
                 }
             }
+            if (standingRoller != null)
+            {
+                rollerRideTime += dt;
+                Vector3 launch;
+                if (standingRoller.TryGetLaunch(FootPosition, rollerRideTime, out launch))
+                    LaunchFromSupport(launch);
+            }
+        }
+        private void LaunchFromSupport(Vector3 launch)
+        {
+            ClearSupport();
+            externalHorizontalVelocity = Vector3.ProjectOnPlane(launch, Vector3.up);
+            verticalVelocity = launch.y;
+            detachUntil = Time.time + 0.2f;
+            lastGrounded = jumpRequested = float.NegativeInfinity;
         }
         private void ClearSupport()
         {
             standingPlatform = null;
             standingTurntable = null;
             turntableRideTime = 0f;
+            standingRoller = null;
+            rollerRideTime = 0f;
         }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
@@ -138,6 +164,7 @@ namespace Adventure.Player
                 if (platform != null && platform.isActiveAndEnabled && Vector3.Dot(hit.normal, platform.transform.up) > 0.7f)
                 {
                     standingTurntable = null;
+                    standingRoller = null;
                     standingPlatform = platform;
                     platform.RegisterSupport(this);
                 }
@@ -145,7 +172,15 @@ namespace Adventure.Player
                 if (turntable != null && turntable.isActiveAndEnabled && Vector3.Dot(hit.normal, turntable.transform.forward) > 0.7f)
                 {
                     standingPlatform = null;
+                    standingRoller = null;
                     standingTurntable = turntable;
+                }
+                var roller = hit.collider.GetComponentInParent<RollingCylinderBridge>();
+                if (roller != null && roller.IsStandingSurface(hit.point, hit.normal))
+                {
+                    standingPlatform = null;
+                    standingTurntable = null;
+                    standingRoller = roller;
                 }
             }
             var trampoline = hit.collider.GetComponent<TrampolineSurface>();
