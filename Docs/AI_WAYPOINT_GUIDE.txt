@@ -1,0 +1,43 @@
+AI 必经途经点
+
+预制体：Assets/_prefab/AI/PF_AIPatrolWaypoint.prefab
+运行脚本：Assets/_Project/Scripts/AI/AIPatrolWaypoint.cs
+巡逻脚本：Assets/_Project/Scripts/AI/NavMeshLoopPatrol.cs
+Inspector：Assets/_Project/Editor/AIPatrolWaypointEditor.cs
+示例场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+示例对象：AI/Waypoints/AI_Waypoint_01，已经放入 NavigationTestAI 的 Waypoints 第 0 项，后面保留原来 8 个 Link End。
+
+使用
+1. 把预制体拖入场景，移动 Transform Position 到蓝色 NavMesh 表面。
+2. 选中要巡逻的 AI，把 Hierarchy 中的途经点实例拖入 Nav Mesh Loop Patrol 的 Waypoints 列表，调整顺序。不要拖 Project 中的预制体资产。
+3. AI 按列表从上到下依次经过；可以混用多个途经点与原有 Link End。Loop 开启时循环。
+4. 仅拖进场景不会自动影响所有 AI，需要登记到对应 AI 的列表。每个 AI 可以有不同路线。
+5. 点本身没有碰撞体，不挡玩家，不修改 NavMesh；编辑模式 Scene 开启 Gizmos 后显示黄色圆环、竖杆和文字。Play 时完全隐藏。
+
+途经点的 AI Patrol Waypoint 组件
+Wait Duration：到达后停留秒数，默认 2。0 为不等待。每个点独立配置，覆盖 AI 的 Waypoint Pause。
+Arrival Distance：到达判定距离，默认 0.15 米。越小越接近点中心；不受 Transform Scale 影响。
+Nav Mesh Sample Distance：找附近可走 NavMesh 的容差，默认 0.3 米。AI 实际目的地是该范围内的 NavMesh 点。保持较小，以免吸附到另一层或禁行区外。放点尽量贴住表面。
+Transform Position：目的地位置。Rotation / Scale 不改变判定距离，也不改变 AI 面朝方向。
+
+AI 的 Nav Mesh Loop Patrol 组件
+Waypoints：必经点列表及顺序，可以继续往里拖场景实例。
+Waypoint Pause：没有 AI Patrol Waypoint 组件的普通 Transform / Link End 的等待秒数，默认 0.25。
+Loop：开启循环；关闭后走完列表，在最后一个点等完后停止。
+运行时可查看当前目标索引（从 0 开始）、正在停留、剩余停留秒数、完成圈数、已结束。
+移动速度仍在 Nav Mesh Agent 的 Speed / Acceleration 调整。
+停留使用游戏时间，Time.timeScale 为 0 时停止倒计时。
+参数在开始前往该点时读取。建议停止 Play 后调整，保存场景，避免运行时改动丢失。
+
+不可达处理
+缺失引用、禁用的途经点、离开 NavMesh 或路径不完整时，不跳过该点；停止前进并每秒重试，在 Console 提示一次。修复位置/引用/导航连通性后继续。
+途经点不能代替 NavMesh Link，跨断层仍需要原有 Link 与跳跃组件。
+
+验收
+1. 打开 Kitchen_Adventure，选中 NavigationTestAI，进入 Play。AI 先经过 AI_Waypoint_01，停约 2 秒，再继续原环路。
+2. 在 Inspector 看“正在停留”为 true，剩余秒数递减；等待期间位置保持不变，到 0 后前往下一点。
+3. 停止 Play，把 Wait Duration 改为 5，再运行应停约 5 秒；设为 0 则直接继续。
+4. 再拖一个预制体到可达表面，插入 Waypoints 期望的位置。AI 必须先走完前面的目标再经过它，按各点各自的时间停留。
+5. 关闭 Loop，走完最后一点且停留结束后停止；开启 Loop 可多圈巡逻，每圈都停留。
+6. 把当前必经点移到 NavMesh 外，AI 不会跳到下一目标；移回可达位置后重试恢复。
+7. 检查原 3→4 跳跃仍正常，编辑模式标记可见、Play 中标记不可见。

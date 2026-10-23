@@ -15,7 +15,7 @@ AI 使用方式
 Agent Type 选 Humanoid，Area Mask 包含 Walkable 与 Jump。
 跳跃组件启用时接管 OffMeshLink 跨越，禁用时恢复原 Auto Traverse Off Mesh Link 设置。
 组件不负责巡逻或选择目标；由 AI 的行为脚本调用 Agent.SetDestination。
-NavMeshLoopPatrol 已按 1-2-3-4-5-6-7-8-1 顺序配置 8 个目标。Waypoints 列表可拖入各 Link 的 End。Waypoint Pause 为每个目标处等待时间，默认 0.25 秒；Loop 决定是否循环。NavMeshAgent 的 Speed 默认 4，Acceleration 默认 20。独立拖入 AI 预制体时，需要重新绑定场景 Waypoints 列表，并将根物体放在 NavMesh 上。
+NavMeshLoopPatrol 保留原来 1-2-3-4-5-6-7-8-1 的 8 个 Link End，并在第 0 项插入 AI_Waypoint_01，当前示例共 9 个目标。Waypoints 列表可拖入场景途经点或各 Link 的 End。Waypoint Pause 为普通 Transform 目标处等待时间，默认 0.25 秒；带 AIPatrolWaypoint 的点使用自己的 Wait Duration（默认 2 秒）。Loop 决定是否循环。详见 Docs/AI_WAYPOINT_GUIDE.txt。NavMeshAgent 的 Speed 默认 4，Acceleration 默认 20。独立拖入 AI 预制体时，需要重新绑定场景 Waypoints 列表，并将根物体放在 NavMesh 上。
 
 跳跃组件参数（在 AI 的 Nav Mesh Link Traversal 组件上调整）
 Jump Height：高于两端较高位置的跳跃顶点高度，默认 1 米。
