@@ -31,12 +31,13 @@ public sealed class MainMenuController : MonoBehaviour
 
     public void Play()
     {
-        StoryDialoguePage.Show(() => LoadScene("Kitchen_Adventure"));
+        CharacterSelectionPage.Show(() =>
+            StoryDialoguePage.Show(() => LoadScene("Kitchen_Adventure")));
     }
 
     public void OpenLevels()
     {
-        LoadScene("StartScene");
+        CharacterSelectionPage.Show(() => LoadScene("StartScene"));
     }
 
     public void OpenSettings()
