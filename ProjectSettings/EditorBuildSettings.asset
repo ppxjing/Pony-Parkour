@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Kitchen_Playground.unity
     guid: d999194013d202c48898b02c00b0a000
+  - enabled: 1
+    path: Assets/_Project/Scenes/Beach.unity
+    guid: d76c1bdb4e2323a46869fa5f3b457e43
+  - enabled: 1
+    path: Assets/_Project/Scenes/Bedroom.unity
+    guid: e56cdedcae0b7094985f06f96f49ea05
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
   m_UseUCBPForAssetBundles: 0

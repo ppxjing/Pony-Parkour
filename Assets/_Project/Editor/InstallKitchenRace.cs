@@ -11,6 +11,28 @@ public static class InstallKitchenRace
 {
     private const string ScenePath = "Assets/_Project/Scenes/Kitchen_Adventure.unity";
 
+    [MenuItem("Tools/Adventure/Repair AI Animal Models")]
+    public static void RepairAnimalModels()
+    {
+        Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        KitchenRaceManager manager = Object.FindFirstObjectByType<KitchenRaceManager>();
+        if (manager == null) manager = new GameObject("Kitchen Race Manager").AddComponent<KitchenRaceManager>();
+
+        string[] modelPaths =
+        {
+            "Assets/_Project/Resources/RacerModels/elephant/elephant.fbx",
+            "Assets/_Project/Resources/RacerModels/giraff/giraff.fbx",
+            "Assets/_Project/Resources/RacerModels/rabbit/r.fbx"
+        };
+        if (System.Array.Exists(modelPaths, path => AssetDatabase.LoadAssetAtPath<GameObject>(path) == null))
+            throw new System.InvalidOperationException("One or more AI animal FBX assets could not be loaded.");
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("Repaired AI models: Elephant, Giraff, Rabbit.");
+    }
+
     [MenuItem("Tools/Adventure/Install Four Runner Race")]
     public static void Run()
     {

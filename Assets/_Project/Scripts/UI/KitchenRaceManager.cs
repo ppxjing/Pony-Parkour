@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 [DefaultExecutionOrder(-500)]
 public sealed class KitchenRaceManager : MonoBehaviour
@@ -29,8 +31,8 @@ public sealed class KitchenRaceManager : MonoBehaviour
             this.speedMultiplier = speedMultiplier;
             this.startLane = startLane;
             modelPosition = new Vector3(-0.1f, 0.3f, 0.01f);
-            modelRotation = new Vector3(0f, 0f, 0f);
-            modelScale = 0.7f;
+            modelRotation = new Vector3(-90f, -90f, 0f);
+            modelScale = 0.6f;
         }
     }
 
@@ -79,13 +81,17 @@ public sealed class KitchenRaceManager : MonoBehaviour
         if (route.Count == 0) route.AddRange(source.Waypoints);
         opponents.Clear();
 
-        MeshRenderer toySource = player == null ? null : player.GetComponentsInChildren<MeshRenderer>(true)
-            .FirstOrDefault(renderer => renderer.gameObject.name == "default");
         RacerSetup[] setups =
         {
-            new RacerSetup("AI Red", new Color(0.92f, 0.16f, 0.10f), 1f, 0f),
-            new RacerSetup("AI Blue", new Color(0.08f, 0.45f, 1f), 0.94f, 1.15f),
-            new RacerSetup("AI Green", new Color(0.12f, 0.78f, 0.26f), 1.06f, 1f)
+            new RacerSetup("Elephant", Color.white, 1f, 0f),
+            new RacerSetup("Giraff", Color.white, 0.94f, 1.15f),
+            new RacerSetup("Rabbit", Color.white, 1.06f, 1f)
+        };
+        string[] modelPaths =
+        {
+            "RacerModels/elephant/elephant",
+            "RacerModels/giraff/giraff",
+            "RacerModels/rabbit/r"
         };
         NavMeshAgent sourceAgent = source.GetComponent<NavMeshAgent>();
         float baseSpeed = sourceAgent.speed;
@@ -110,7 +116,9 @@ public sealed class KitchenRaceManager : MonoBehaviour
             agent.speed = baseSpeed * setup.speedMultiplier;
             agent.avoidancePriority = 40 + i * 10;
             NavMeshLoopPatrol patrol = racer.GetComponent<NavMeshLoopPatrol>();
-            InstallToyVisual(racer, toySource, setup);
+            GameObject model = Resources.Load<GameObject>(modelPaths[i]);
+            if (model == null) Debug.LogError("Could not load AI racer model: " + modelPaths[i]);
+            InstallRacerVisual(racer, model, setup);
             opponents.Add(patrol);
         }
 
@@ -120,32 +128,40 @@ public sealed class KitchenRaceManager : MonoBehaviour
             racer.BeginRaceAtWaypoint(route.Count > 1 ? 1 : 0);
     }
 
-    private static void InstallToyVisual(GameObject racer, MeshRenderer toySource, RacerSetup setup)
+    private static void InstallRacerVisual(GameObject racer, GameObject modelPrefab, RacerSetup setup)
     {
-        if (toySource == null) return;
+        if (modelPrefab == null) return;
         Transform oldModel = racer.transform.Find("Model");
         if (oldModel != null) Destroy(oldModel.gameObject);
 
-        Transform existing = racer.transform.Find("Toy Visual");
-        GameObject visual;
-        if (existing == null)
-        {
-            visual = Instantiate(toySource.gameObject, racer.transform);
-            visual.name = "Toy Visual";
-            visual.transform.localPosition = setup.modelPosition;
-            visual.transform.localScale = toySource.transform.localScale * setup.modelScale;
-            visual.transform.localRotation = Quaternion.Euler(setup.modelRotation);
-        }
-        else visual = existing.gameObject;
+        Transform existing = racer.transform.Find("Race Visual");
+        if (existing != null) Destroy(existing.gameObject);
 
-        foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true))
+        GameObject visual = Instantiate(modelPrefab, racer.transform);
+        visual.name = "Race Visual";
+        visual.transform.localPosition = Vector3.zero;
+        visual.transform.localRotation = Quaternion.Euler(setup.modelRotation);
+        visual.transform.localScale = Vector3.one;
+
+        // The imported animals have different source dimensions. Normalize them to
+        // the same racing height and place their feet on the NavMesh agent's floor.
+        Renderer[] renderers = visual.GetComponentsInChildren<Renderer>(true);
+        if (renderers.Length > 0)
         {
-            Material material = new Material(renderer.sharedMaterial);
-            material.name = racer.name + " Toy Material";
-            if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", setup.color);
-            if (material.HasProperty("_Color")) material.SetColor("_Color", setup.color);
-            renderer.material = material;
+            Bounds bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
+            float scale = bounds.size.y > 0.001f ? 1.65f / bounds.size.y : 1f;
+            visual.transform.localScale = Vector3.one * scale * setup.modelScale;
+
+            bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
+            Vector3 center = racer.transform.InverseTransformPoint(bounds.center);
+            Vector3 bottom = racer.transform.InverseTransformPoint(new Vector3(bounds.center.x, bounds.min.y, bounds.center.z));
+            visual.transform.localPosition = setup.modelPosition + new Vector3(-center.x, -bottom.y, -center.z);
         }
+
+        foreach (Collider childCollider in visual.GetComponentsInChildren<Collider>(true)) childCollider.enabled = false;
+        foreach (Rigidbody childBody in visual.GetComponentsInChildren<Rigidbody>(true)) childBody.isKinematic = true;
     }
 
     private void Update()
@@ -334,5 +350,144 @@ public sealed class KitchenRaceManager : MonoBehaviour
         public readonly float progress;
         public readonly bool isPlayer;
         public ResultEntry(string name, float progress, bool isPlayer) { this.name = name; this.progress = progress; this.isPlayer = isPlayer; }
+    }
+}
+
+public sealed class GamePauseMenu : MonoBehaviour
+{
+    private GameObject pausePanel;
+    private float previousTimeScale = 1f;
+    private bool paused;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void RegisterForScenes()
+    {
+        SceneManager.sceneLoaded -= CreateForGameplayScene;
+        SceneManager.sceneLoaded += CreateForGameplayScene;
+    }
+
+    private static void CreateForGameplayScene(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MainMenuScene" || scene.name == "StartScene") return;
+        if (FindFirstObjectByType<GamePauseMenu>() != null) return;
+        new GameObject("Game Pause Menu").AddComponent<GamePauseMenu>().Build();
+    }
+
+    private void Build()
+    {
+        EnsureEventSystem();
+        Canvas canvas = NewPauseCanvas();
+
+        Button settings = NewButton(canvas.transform, "Settings Button", "⚙  SETTINGS", new Vector2(0.84f, 0.88f), new Vector2(0.98f, 0.97f), 27);
+        settings.onClick.AddListener(Open);
+
+        pausePanel = new GameObject("Pause Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        pausePanel.transform.SetParent(canvas.transform, false);
+        RectTransform full = pausePanel.GetComponent<RectTransform>();
+        full.anchorMin = Vector2.zero; full.anchorMax = Vector2.one;
+        full.offsetMin = full.offsetMax = Vector2.zero;
+        pausePanel.GetComponent<Image>().color = new Color(0.035f, 0.012f, 0.005f, 0.84f);
+
+        GameObject board = new GameObject("Settings Board", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        board.transform.SetParent(pausePanel.transform, false);
+        RectTransform boardRect = board.GetComponent<RectTransform>();
+        boardRect.anchorMin = boardRect.anchorMax = new Vector2(0.5f, 0.5f);
+        boardRect.sizeDelta = new Vector2(620f, 520f);
+        board.GetComponent<Image>().color = new Color(0.91f, 0.56f, 0.18f, 0.99f);
+
+        Text title = PauseText(board.transform, "PAUSED", new Vector2(0.08f, 0.69f), new Vector2(0.92f, 0.93f), 56);
+        title.color = new Color(0.22f, 0.065f, 0.012f);
+
+        Button resume = NewButton(board.transform, "Resume", "▶  RESUME", new Vector2(0.18f, 0.40f), new Vector2(0.82f, 0.59f), 32);
+        resume.onClick.AddListener(Resume);
+        Button mainMenu = NewButton(board.transform, "Main Menu", "⌂  MAIN MENU", new Vector2(0.18f, 0.15f), new Vector2(0.82f, 0.34f), 30);
+        mainMenu.onClick.AddListener(ReturnToMainMenu);
+
+        pausePanel.SetActive(false);
+    }
+
+    private void Open()
+    {
+        if (paused) return;
+        paused = true;
+        previousTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
+        pausePanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void Resume()
+    {
+        if (!paused) return;
+        paused = false;
+        pausePanel.SetActive(false);
+        Time.timeScale = previousTimeScale;
+        if (SceneManager.GetActiveScene().name == "Kitchen_Adventure")
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
+    private void ReturnToMainMenu()
+    {
+        paused = false;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
+    private void OnDestroy()
+    {
+        if (paused) Time.timeScale = 1f;
+    }
+
+    private static void EnsureEventSystem()
+    {
+        if (FindFirstObjectByType<EventSystem>() != null) return;
+        new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+    }
+
+    private static Canvas NewPauseCanvas()
+    {
+        GameObject go = new GameObject("Pause UI", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        Canvas canvas = go.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 30000;
+        CanvasScaler scaler = go.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+        return canvas;
+    }
+
+    private static Button NewButton(Transform parent, string name, string label, Vector2 min, Vector2 max, int size)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = min; rect.anchorMax = max; rect.offsetMin = rect.offsetMax = Vector2.zero;
+        Image image = go.GetComponent<Image>(); image.color = new Color(0.18f, 0.48f, 0.33f, 0.98f);
+        Button button = go.GetComponent<Button>(); button.targetGraphic = image;
+        ColorBlock colors = button.colors;
+        colors.highlightedColor = new Color(0.28f, 0.70f, 0.48f, 1f);
+        colors.pressedColor = new Color(0.11f, 0.30f, 0.20f, 1f);
+        button.colors = colors;
+        Text text = PauseText(go.transform, label, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f), size);
+        text.color = Color.white;
+        return button;
+    }
+
+    private static Text PauseText(Transform parent, string value, Vector2 min, Vector2 max, int size)
+    {
+        GameObject go = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        go.transform.SetParent(parent, false);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = min; rect.anchorMax = max; rect.offsetMin = rect.offsetMax = Vector2.zero;
+        Text text = go.GetComponent<Text>();
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.fontSize = size; text.fontStyle = FontStyle.Bold; text.alignment = TextAnchor.MiddleCenter;
+        text.text = value; text.raycastTarget = false;
+        return text;
     }
 }
