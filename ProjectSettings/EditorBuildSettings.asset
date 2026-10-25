@@ -6,7 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Project/Scenes/MainMenuScene.unity
+    guid: 3107022f8e1d44941810dab7da99cd1f
+  - enabled: 1
     path: Assets/_Project/Scenes/StartScene.unity
     guid: 06cbe14e58ef1404d920a5b1f51db1ff
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/_Project/Scenes/Kitchen_Adventure.unity
+    guid: 47d6736ec9fbc4d4e98d65b513b36682
+  - enabled: 1
+    path: Assets/_Project/Scenes/Kitchen_Playground.unity
+    guid: d999194013d202c48898b02c00b0a000
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
   m_UseUCBPForAssetBundles: 0

@@ -30,9 +30,29 @@ namespace Adventure.AI
 
         public int CurrentWaypointIndex { get; private set; }
         public int CompletedLoops { get; private set; }
+        public IReadOnlyList<Transform> Waypoints => waypoints;
         public bool IsWaiting { get; private set; }
         public bool IsFinished => finished;
         public float RemainingWaitTime => Mathf.Max(0f, waitRemaining);
+
+        public void BeginRaceAtWaypoint(int waypointIndex)
+        {
+            if (waypoints.Count == 0) return;
+            CurrentWaypointIndex = Mathf.Clamp(waypointIndex, 0, waypoints.Count - 1);
+            hasDestination = false;
+            finished = false;
+            reportedFailure = false;
+            IsWaiting = false;
+            waitRemaining = 0f;
+            retryRemaining = 0f;
+            if (agent == null) agent = GetComponent<NavMeshAgent>();
+            if (agent.isActiveAndEnabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+                agent.isStopped = false;
+            }
+        }
 
         private void Awake()
         {
