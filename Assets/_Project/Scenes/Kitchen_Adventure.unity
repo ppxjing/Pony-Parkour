@@ -8073,10 +8073,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaceStartCountdown
   countdownSeconds: 3
   goDisplaySeconds: 0.65
-  threeSprite: {fileID: 21300000, guid: 31f239c10f6c4b03a6cd54b6f00c0003, type: 3}
-  twoSprite: {fileID: 21300000, guid: 31f239c10f6c4b03a6cd54b6f00c0002, type: 3}
-  oneSprite: {fileID: 21300000, guid: 31f239c10f6c4b03a6cd54b6f00c0001, type: 3}
-  goSprite: {fileID: 21300000, guid: 31f239c10f6c4b03a6cd54b6f00c0000, type: 3}
+  threeSprite: {fileID: -3743386368093323336, guid: 887c9e1e052fc434c99f6c3313bbcc06, type: 3}
+  twoSprite: {fileID: -6980943534028861127, guid: 772c708e62ca755499cfd6f75240f3cb, type: 3}
+  oneSprite: {fileID: 8635346329343802769, guid: 4c719929d5d069142bb537bff83113b3, type: 3}
+  goSprite: {fileID: 1749169695673691964, guid: 4d559f916fd15354c89691de7292205e, type: 3}
 --- !u!4 &646620419
 Transform:
   m_ObjectHideFlags: 0
