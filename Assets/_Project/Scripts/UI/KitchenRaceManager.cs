@@ -56,7 +56,7 @@ public sealed class KitchenRaceManager : MonoBehaviour
 
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name != "Kitchen_Adventure") return;
+        if (scene.name != "Kitchen_Adventure" && scene.name != "Beach") return;
         if (FindFirstObjectByType<KitchenRaceManager>() == null)
             new GameObject("Kitchen Race Manager").AddComponent<KitchenRaceManager>();
     }
@@ -423,7 +423,8 @@ public sealed class GamePauseMenu : MonoBehaviour
         paused = false;
         pausePanel.SetActive(false);
         Time.timeScale = previousTimeScale;
-        if (SceneManager.GetActiveScene().name == "Kitchen_Adventure")
+        if (SceneManager.GetActiveScene().name == "Kitchen_Adventure" ||
+            SceneManager.GetActiveScene().name == "Beach")
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
