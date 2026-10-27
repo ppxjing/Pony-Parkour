@@ -46,7 +46,18 @@ namespace Adventure.Player
         public void RespawnNow()
         {
             if (!isActiveAndEnabled) return;
-            death.Revive(savedPosition, savedRotation, protectionTime);
+            Vector3 position = savedPosition;
+            Quaternion rotation = savedRotation;
+            if (CurrentCheckpoint == null)
+            {
+                var race = FindFirstObjectByType<KitchenRaceManager>();
+                if (race != null && race.TryGetPlayerRespawnPose(out Vector3 racePosition, out Quaternion raceRotation))
+                {
+                    position = racePosition;
+                    rotation = raceRotation;
+                }
+            }
+            death.Revive(position, rotation, protectionTime);
             RespawnCount++;
         }
     }

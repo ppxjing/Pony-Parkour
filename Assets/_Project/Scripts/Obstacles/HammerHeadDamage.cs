@@ -21,7 +21,7 @@ private void Touch(Collider other)
         {
             if (!isActiveAndEnabled) return;
             ThirdPersonMotor player = other.GetComponentInParent<ThirdPersonMotor>();
-            if (player != null) player.RespawnFromObstacle();
+            if (player != null) player.RespawnFromObstacle(transform.position);
         }
     }
 }

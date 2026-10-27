@@ -301,31 +301,48 @@ private void ResetStuckWatchdog()
             return recovered;
         }
 
-        private bool RespawnAtLastCheckpoint()
+        public bool TryGetLastCheckpointPose(out Vector3 position, out Quaternion rotation)
         {
-            if (agent == null || !agent.isActiveAndEnabled || waypoints.Count == 0) return false;
-
+            position = transform.position;
+            rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+            if (agent == null || waypoints.Count == 0) return false;
             int checkpointIndex = Mathf.Clamp(lastCompletedWaypointIndex, 0, waypoints.Count - 1);
             Transform checkpoint = waypoints[checkpointIndex];
             if (checkpoint == null) return false;
-
             var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
             if (!NavMesh.SamplePosition(checkpoint.position, out NavMeshHit hit, 4f, filter)) return false;
+            position = hit.position;
+            Transform next = waypoints[Mathf.Clamp(CurrentWaypointIndex, 0, waypoints.Count - 1)];
+            if (next != null)
+            {
+                Vector3 forward = Vector3.ProjectOnPlane(next.position - position, Vector3.up);
+                if (forward.sqrMagnitude > 0.001f) rotation = Quaternion.LookRotation(forward, Vector3.up);
+            }
+            return true;
+        }
+
+        public void ResumeAfterDeath()
+        {
+            IsWaiting = false;
+            waitRemaining = 0f;
+            reportedFailure = false;
+            // RacerCollisionBody owns the configurable death protection period.
+            obstacleRespawnCooldownUntil = Time.time;
+            ResumeAfterImpact();
+        }
+
+        private bool RespawnAtLastCheckpoint()
+        {
+            if (agent == null || !agent.isActiveAndEnabled ||
+                !TryGetLastCheckpointPose(out Vector3 position, out Quaternion rotation)) return false;
 
             if (agent.isOnNavMesh)
             {
                 agent.isStopped = true;
                 agent.ResetPath();
             }
-            if (!agent.Warp(hit.position) || !agent.isOnNavMesh) return false;
-
-            int nextIndex = Mathf.Clamp(CurrentWaypointIndex, 0, waypoints.Count - 1);
-            Transform next = waypoints[nextIndex];
-            if (next != null)
-            {
-                Vector3 forward = Vector3.ProjectOnPlane(next.position - hit.position, Vector3.up);
-                if (forward.sqrMagnitude > 0.001f) transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
-            }
+            if (!agent.Warp(position) || !agent.isOnNavMesh) return false;
+            transform.rotation = rotation;
 
             hasDestination = false;
             IsWaiting = false;
@@ -344,26 +361,36 @@ private static bool IsGameplayObstacle(Collider other)
         {
             return other.GetComponentInParent<InflatingBounceBall>() != null ||
                    other.GetComponentInParent<RotatingPillarRod>() != null ||
-                   other.GetComponentInParent<HammerHeadDamage>() != null;
+                   other.GetComponentInParent<HammerHeadDamage>() != null ||
+                   (other.GetComponentInParent<DeathZone>() is DeathZone zone && zone.isActiveAndEnabled);
         }
 
 
 private void OnTriggerStay(Collider other)
         {
-            if (IsGameplayObstacle(other)) ApplyObstacleHit();
+            if (IsGameplayObstacle(other)) ApplyObstacleHit(other.transform.position);
         }
 
 
 private void OnTriggerEnter(Collider other)
         {
-            if (IsGameplayObstacle(other)) ApplyObstacleHit();
+            if (IsGameplayObstacle(other)) ApplyObstacleHit(other.transform.position);
         }
 
 
 public void ApplyObstacleHit(float stunDuration = 1.25f)
         {
+            ApplyObstacleHit(transform.position);
+        }
+
+        public void ApplyObstacleHit(Vector3 sourcePosition)
+        {
             if (finished || Time.time < obstacleRespawnCooldownUntil) return;
-            RespawnAtLastCheckpoint();
+            var collisionBody = GetComponent<RacerCollisionBody>();
+            if (collisionBody != null && collisionBody.isActiveAndEnabled)
+                collisionBody.RequestDeath(sourcePosition);
+            else
+                RespawnAtLastCheckpoint();
         }
 }
 }
