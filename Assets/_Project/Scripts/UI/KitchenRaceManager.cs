@@ -248,7 +248,16 @@ private bool HasReachedWaypoint(Transform waypoint)
 
 public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
     {
-        if (finished || motor == null || route.Count == 0) return false;
+        if (motor == null || !TryGetPlayerRespawnPose(out Vector3 position, out Quaternion rotation)) return false;
+        motor.TeleportAndReset(position, rotation);
+        return true;
+    }
+
+    public bool TryGetPlayerRespawnPose(out Vector3 position, out Quaternion rotation)
+    {
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+        if (finished || route.Count == 0) return false;
 
         int checkpointIndex = (playerNextWaypoint - 1 + route.Count) % route.Count;
         Transform checkpoint = route[checkpointIndex];
@@ -259,11 +268,11 @@ public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
         Vector3 forward = next != null
             ? Vector3.ProjectOnPlane(next.position - checkpoint.position, Vector3.up)
             : checkpoint.forward;
-        Quaternion rotation = forward.sqrMagnitude > 0.001f
+        rotation = forward.sqrMagnitude > 0.001f
             ? Quaternion.LookRotation(forward, Vector3.up)
             : checkpoint.rotation;
 
-        motor.TeleportAndReset(checkpoint.position, rotation);
+        position = checkpoint.position;
         return true;
     }
 

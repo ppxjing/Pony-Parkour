@@ -77,7 +77,7 @@ namespace Adventure.Player
 private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             var hazard = hit.collider.GetComponentInParent<LethalObstacle>();
-            if (hazard != null && hazard.isActiveAndEnabled) motor.RespawnFromObstacle();
+            if (hazard != null && hazard.isActiveAndEnabled) motor.RespawnFromObstacle(hit.point);
         }
 
         private void LateUpdate()

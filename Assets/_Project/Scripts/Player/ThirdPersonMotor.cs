@@ -167,7 +167,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
             if (racer != null) racer.TryCollideWithPlayer(this);
             
             var rotatingRod = hit.collider.GetComponentInParent<RotatingPillarRod>();
-            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) RespawnFromObstacle();
+            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) RespawnFromObstacle(hit.point);
 
             
 if (!isActiveAndEnabled) return;
@@ -247,9 +247,19 @@ private void OnDisable()
 
         public void RespawnFromObstacle()
         {
+            RespawnFromObstacle(transform.position);
+        }
+
+        public void RespawnFromObstacle(Vector3 sourcePosition)
+        {
             if (!isActiveAndEnabled || Time.time < obstacleRespawnCooldownUntil) return;
             obstacleRespawnCooldownUntil = Time.time + 0.35f;
-            Respawn();
+            // Lethal contact must enter the death state before delayed respawn.
+            var death = GetComponent<PlayerDeath>();
+            if (death != null && death.isActiveAndEnabled)
+                death.RequestDeath(sourcePosition);
+            else
+                Respawn();
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {

@@ -1,0 +1,29 @@
+机关命中恢复布娃娃死亡流程
+
+原因
+HammerHeadDamage、LethalObstacle、滚筒棍接触最终调用 ThirdPersonMotor.RespawnFromObstacle。
+该方法此前直接 Respawn，跳过 PlayerDeath.RequestDeath，因此玩家瞬移复活，刚体一直保持 Kinematic，输入也未进入死亡禁用状态。
+
+修复
+机关统一请求 PlayerDeath 死亡，传入命中位置确定击退方向。
+PlayerDeath 在 LateUpdate 切换到动态布娃娃、重力和翻滚，禁用移动与输入，摄像机跟随倒下的 Visuals。
+PlayerRespawn 等待 Respawn Delay 后恢复玩家。优先最近激活的复活存档点，否则使用比赛最近途经点，无比赛时使用原来的出生位置。
+KitchenRaceManager 增加只查询复活姿态的方法，避免死亡过程中提前传送玩家。
+
+可调参数
+PlayerRig/Player 的 Player Death：Knockback Speed（水平击退）、Upward Speed（向上速度）、Tumble Speed（翻滚力度）。
+同一物体的 Player Respawn：Respawn Delay（默认 2 秒）、Protection Time（默认 1 秒）。
+继续使用现有胶囊刚体带动整个角色模型翻倒；此次没有新增骨骼关节布娃娃。
+
+验证
+修复前复现锤头命中：位置立即变化，IsDead=false，刚体保持 Kinematic，输入/移动保持启用。
+修复后 Play：锤头触发后约 0.45 秒，IsDead=true，输入/移动/CharacterController 禁用，刚体动态且有重力，翻滚角约 124.6 度，摄像机跟随布娃娃。
+约 2.00 秒后复活一次，输入/移动/CharacterController 恢复，刚体回到 Kinematic、Interpolation=None，模型局部位置复位，摄像机恢复玩家目标。
+弹球实际物理碰撞触发死亡；复活保护期重复命中被忽略；激活最后一个检查点后复活回该点，位置误差小于 0.001 米。
+编译通过，Console 无新增相关错误。测试在 Kitchen_Adventure 中进行，测试运行已停止。
+
+手动验收
+1. 打开 Kitchen_Adventure，Play，等待倒计时结束。
+2. 玩家触碰锤头、弹球或绿色旋转棍，应被打倒翻滚，无法 WASD/跳跃，约 2 秒后复活。
+3. 经过复活存档点后再触碰机关，应回到最近激活点；未激活点时回到比赛最近途经点。
+4. 复活后再次移动并转动鼠标，模型和摄像机应正常跟随；保护期内不应立即再次死亡。
