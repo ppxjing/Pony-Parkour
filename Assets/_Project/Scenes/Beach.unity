@@ -4437,6 +4437,79 @@ Transform:
   - {fileID: 1488307394}
   m_Father: {fileID: 1515145456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &573527705
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1453615683}
+    m_Modifications:
+    - target: {fileID: 4362686773263288999, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_Name
+      value: Beach Respawn 02 - Sand Balls
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -29.67
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.501927
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.86491
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+--- !u!114 &573527706 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 573527705}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!4 &573527707 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 573527705}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &592970406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4717,6 +4790,79 @@ PhysicsMaterial:
   m_Bounciness: 0
   m_FrictionCombine: 0
   m_BounceCombine: 0
+--- !u!1001 &634922753
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1453615683}
+    m_Modifications:
+    - target: {fileID: 4362686773263288999, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_Name
+      value: Beach Respawn 04 - Rotating Pillars
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -26.91
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.2800001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -25.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.84668285
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5320979
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+--- !u!114 &634922754 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 634922753}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!4 &634922755 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 634922753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &637576702
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6296,6 +6442,79 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4611770999579746, guid: f5fb91f57cf7e5c4595042b120a38c8d, type: 3}
   m_PrefabInstance: {fileID: 826247035}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &841003819
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1453615683}
+    m_Modifications:
+    - target: {fileID: 4362686773263288999, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_Name
+      value: Beach Respawn 01 - Upper Balls
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.58
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.82
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -11.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.092117995
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9957481
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+--- !u!114 &841003820 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 841003819}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!4 &841003821 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 841003819}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &841657234
 GameObject:
@@ -9940,6 +10159,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4572517624913876, guid: ce92b4f48eae6eb4797972f3ced47abd, type: 3}
   m_PrefabInstance: {fileID: 1215548521}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1227568777
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1453615683}
+    m_Modifications:
+    - target: {fileID: 4362686773263288999, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_Name
+      value: Beach Respawn 05 - Final Hammer
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -9.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.4639442
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.94374543
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.3306729
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+--- !u!114 &1227568778 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 1227568777}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!4 &1227568779 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 1227568777}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1235298639
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11875,6 +12167,62 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4123813724132838, guid: 262a8758a3ab2d849b60ba7b39c87b77, type: 3}
   m_PrefabInstance: {fileID: 1447186912}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1453615681
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1453615683}
+  - component: {fileID: 1453615682}
+  m_Layer: 0
+  m_Name: Beach Respawn Checkpoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1453615682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453615681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 676e8ca61ba98b744a7f2f7a1d474d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.CheckpointRegistry
+  player: {fileID: 1771322944}
+  checkpoints:
+  - {fileID: 841003820}
+  - {fileID: 573527706}
+  - {fileID: 1782995299}
+  - {fileID: 634922754}
+  - {fileID: 1227568778}
+--- !u!4 &1453615683
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453615681}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 841003821}
+  - {fileID: 573527707}
+  - {fileID: 1782995300}
+  - {fileID: 634922755}
+  - {fileID: 1227568779}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1462529092
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14372,6 +14720,17 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1771322944 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1791303114866757440, guid: 1dea77dbdf82fdc4c8f3c03772f30c78, type: 3}
+  m_PrefabInstance: {fileID: 1771322940}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cc32af74f115d646b5331076ce03642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Player.PlayerRespawn
 --- !u!1001 &1771895163
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14491,6 +14850,79 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4836717857793706, guid: 8970228edd1589c478982b0a022ede1e, type: 3}
   m_PrefabInstance: {fileID: 1775519992}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1782995298
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1453615683}
+    m_Modifications:
+    - target: {fileID: 4362686773263288999, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_Name
+      value: Beach Respawn 03 - Hammer
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -22.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.216321
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -35.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.97617745
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.21697392
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+--- !u!114 &1782995299 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 1782995298}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!4 &1782995300 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4807577070142057452, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
+  m_PrefabInstance: {fileID: 1782995298}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1789836005
 PrefabInstance:
@@ -18199,3 +18631,4 @@ SceneRoots:
   - {fileID: 1515145456}
   - {fileID: 1160709499}
   - {fileID: 1947431991}
+  - {fileID: 1453615683}

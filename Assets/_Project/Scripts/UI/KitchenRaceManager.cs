@@ -40,7 +40,9 @@ public sealed class KitchenRaceManager : MonoBehaviour
     [SerializeField] private List<NavMeshLoopPatrol> opponents = new List<NavMeshLoopPatrol>();
     [SerializeField] private List<Transform> route = new List<Transform>();
     [SerializeField, Min(1)] private int targetLaps = 2;
-    [SerializeField, Min(0.5f)] private float checkpointRadius = 2.5f;
+    [SerializeField, Range(1f, 2f)] private float npcSpeedScale = 1.2f;
+    
+[SerializeField, Min(0.5f)] private float checkpointRadius = 2.5f;
 
     private int playerNextWaypoint = 1;
     private int playerLaps;
@@ -99,7 +101,9 @@ private void Start()
             "RacerModels/rabbit/r"
         };
         NavMeshAgent sourceAgent = source.GetComponent<NavMeshAgent>();
-        float baseSpeed = sourceAgent.speed;
+        float baseAcceleration = sourceAgent.acceleration;
+        
+float baseSpeed = sourceAgent.speed;
         Vector3 raceForward = route.Count > 1
             ? Vector3.ProjectOnPlane(route[1].position - route[0].position, Vector3.up).normalized
             : source.transform.forward;
@@ -120,7 +124,8 @@ private void Start()
             if (NavMesh.SamplePosition(desired, out NavMeshHit hit, 3f, filter))
                 agent.Warp(hit.position);
             racer.transform.rotation = Quaternion.LookRotation(raceForward, Vector3.up);
-            agent.speed = baseSpeed * setup.speedMultiplier;
+            agent.speed = baseSpeed * setup.speedMultiplier * npcSpeedScale;
+            agent.acceleration = baseAcceleration * npcSpeedScale;
             agent.avoidancePriority = 40 + i * 10;
             NavMeshLoopPatrol patrol = racer.GetComponent<NavMeshLoopPatrol>();
             GameObject model = Resources.Load<GameObject>(modelPaths[i]);
