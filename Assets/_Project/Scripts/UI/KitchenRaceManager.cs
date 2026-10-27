@@ -69,7 +69,7 @@ private Text lapText;
 private void Start()
     {
         AutoConfigureIfNeeded();
-        if (SceneManager.GetActiveScene().name == "Beach") targetLaps = 2;
+        targetLaps = 2;
         CreateLapDisplay();
         CreateRouteMarker();
         UpdateLapText();
@@ -235,13 +235,34 @@ private bool HasReachedWaypoint(Transform waypoint)
         bool isBeach = SceneManager.GetActiveScene().name == "Beach";
         float radius = isBeach
             ? Mathf.Max(checkpointRadius, 4.5f)
-            : Mathf.Max(checkpointRadius, 3f);
+            : Mathf.Max(checkpointRadius, 4.25f);
         float horizontalDistanceSquared = difference.x * difference.x + difference.z * difference.z;
         float verticalTolerance = isBeach ? float.PositiveInfinity : 3f;
         return horizontalDistanceSquared <= radius * radius &&
                Mathf.Abs(difference.y) <= verticalTolerance;
     }
 
+
+public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
+    {
+        if (finished || motor == null || route.Count == 0) return false;
+
+        int checkpointIndex = (playerNextWaypoint - 1 + route.Count) % route.Count;
+        Transform checkpoint = route[checkpointIndex];
+        if (checkpoint == null) return false;
+
+        int nextIndex = (checkpointIndex + 1) % route.Count;
+        Transform next = route[nextIndex];
+        Vector3 forward = next != null
+            ? Vector3.ProjectOnPlane(next.position - checkpoint.position, Vector3.up)
+            : checkpoint.forward;
+        Quaternion rotation = forward.sqrMagnitude > 0.001f
+            ? Quaternion.LookRotation(forward, Vector3.up)
+            : checkpoint.rotation;
+
+        motor.TeleportAndReset(checkpoint.position, rotation);
+        return true;
+    }
 
 private void FinishRace()
     {
@@ -497,13 +518,13 @@ private void ShowResults(List<ResultEntry> results)
         string currentScene = SceneManager.GetActiveScene().name;
         string nextLabel = currentScene == "Beach" ? "NEXT: KITCHEN" : "FINISH";
 
-        Button replayButton = NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-300f, -330f));
+        Button replayButton = NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-330f, -440f));
         replayButton.onClick.AddListener(ReplayCurrentLevel);
 
-        Button menuButton = NewResultButton(board.transform, "Main Menu Button", "MAIN MENU", new Vector2(0f, -330f));
+        Button menuButton = NewResultButton(board.transform, "Main Menu Button", "MAIN MENU", new Vector2(0f, -440f));
         menuButton.onClick.AddListener(ReturnToMainMenu);
 
-        Button nextButton = NewResultButton(board.transform, "Next Level Button", nextLabel, new Vector2(300f, -330f));
+        Button nextButton = NewResultButton(board.transform, "Next Level Button", nextLabel, new Vector2(330f, -440f));
         nextButton.onClick.AddListener(LoadNextLevel);
     }
 
@@ -513,9 +534,12 @@ private void LoadNextLevel()
         string currentScene = SceneManager.GetActiveScene().name;
 
         if (currentScene == "Beach")
-            SceneManager.LoadScene("Kitchen_Adventure");
-        else
-            SceneManager.LoadScene("MainMenuScene");
+        {
+            BeachToKitchenStoryPage.Show(() => SceneManager.LoadScene("Kitchen_Adventure"));
+            return;
+        }
+
+        SceneManager.LoadScene("MainMenuScene");
     }
 
 private void ReplayCurrentLevel()
@@ -538,20 +562,28 @@ private static Button NewResultButton(Transform parent, string name, string labe
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.anchoredPosition = position;
-        rect.sizeDelta = new Vector2(260f, 70f);
+        rect.sizeDelta = new Vector2(280f, 78f);
 
         Image image = go.GetComponent<Image>();
-        image.color = new Color(0.18f, 0.48f, 0.33f, 0.98f);
+        image.color = new Color(0.96f, 0.77f, 0.48f, 1f);
+
+        Outline outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.30f, 0.105f, 0.025f, 0.95f);
+        outline.effectDistance = new Vector2(5f, -5f);
+        outline.useGraphicAlpha = true;
 
         Button button = go.GetComponent<Button>();
         button.targetGraphic = image;
         ColorBlock colors = button.colors;
-        colors.highlightedColor = new Color(0.28f, 0.70f, 0.48f, 1f);
-        colors.pressedColor = new Color(0.11f, 0.30f, 0.20f, 1f);
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.90f, 0.55f, 1f);
+        colors.pressedColor = new Color(0.84f, 0.57f, 0.27f, 1f);
+        colors.selectedColor = colors.highlightedColor;
         button.colors = colors;
 
-        Text text = NewText(go.transform, 28, TextAnchor.MiddleCenter);
+        Text text = NewText(go.transform, 27, TextAnchor.MiddleCenter);
         text.text = label;
+        text.color = new Color(0.25f, 0.075f, 0.02f, 1f);
         text.raycastTarget = false;
         return button;
     }
@@ -733,14 +765,26 @@ public sealed class GamePauseMenu : MonoBehaviour
         go.transform.SetParent(parent, false);
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchorMin = min; rect.anchorMax = max; rect.offsetMin = rect.offsetMax = Vector2.zero;
-        Image image = go.GetComponent<Image>(); image.color = new Color(0.18f, 0.48f, 0.33f, 0.98f);
-        Button button = go.GetComponent<Button>(); button.targetGraphic = image;
+
+        Image image = go.GetComponent<Image>();
+        image.color = new Color(0.96f, 0.77f, 0.48f, 1f);
+
+        Outline outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.30f, 0.105f, 0.025f, 0.95f);
+        outline.effectDistance = new Vector2(4f, -4f);
+        outline.useGraphicAlpha = true;
+
+        Button button = go.GetComponent<Button>();
+        button.targetGraphic = image;
         ColorBlock colors = button.colors;
-        colors.highlightedColor = new Color(0.28f, 0.70f, 0.48f, 1f);
-        colors.pressedColor = new Color(0.11f, 0.30f, 0.20f, 1f);
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.90f, 0.55f, 1f);
+        colors.pressedColor = new Color(0.84f, 0.57f, 0.27f, 1f);
+        colors.selectedColor = colors.highlightedColor;
         button.colors = colors;
+
         Text text = PauseText(go.transform, label, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f), size);
-        text.color = Color.white;
+        text.color = new Color(0.25f, 0.075f, 0.02f, 1f);
         return button;
     }
 

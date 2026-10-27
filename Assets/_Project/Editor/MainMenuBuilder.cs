@@ -77,25 +77,29 @@ public static class MainMenuBuilder
         UnityEventTools.AddPersistentListener(quit.onClick, controller.Quit);
 
         GameObject levelsPanel = CreatePanel(root.transform, "LevelsPanel", "CHOOSE A LEVEL");
-        Button adventure = CreateTextButton("Adventure", levelsPanel.transform, "KITCHEN ADVENTURE", new Vector2(520, 95), new Color(0.12f, 0.55f, 0.72f, 1f));
+        Transform levelsCard = levelsPanel.transform.Find("WoodenCard");
+        
+Button adventure = CreateTextButton("Adventure", levelsCard, "KITCHEN ADVENTURE", new Vector2(520, 95), new Color(0.12f, 0.55f, 0.72f, 1f));
         SetRect(adventure.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, 60), new Vector2(520, 95));
-        Button playground = CreateTextButton("Playground", levelsPanel.transform, "KITCHEN PLAYGROUND", new Vector2(520, 95), new Color(0.35f, 0.68f, 0.32f, 1f));
+        Button playground = CreateTextButton("Playground", levelsCard, "KITCHEN PLAYGROUND", new Vector2(520, 95), new Color(0.35f, 0.68f, 0.32f, 1f));
         SetRect(playground.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -60), new Vector2(520, 95));
-        Button closeLevels = CreateTextButton("Back", levelsPanel.transform, "BACK", new Vector2(220, 65), Brown);
-        SetRect(closeLevels.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0, 70), new Vector2(220, 65));
+        Button closeLevels = CreateTextButton("Back", levelsCard, "BACK", new Vector2(220, 65), Brown);
+        SetRect(closeLevels.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(220, 65));
         UnityEventTools.AddPersistentListener(adventure.onClick, controller.LoadAdventure);
         UnityEventTools.AddPersistentListener(playground.onClick, controller.LoadPlayground);
         UnityEventTools.AddPersistentListener(closeLevels.onClick, controller.ClosePanels);
 
         GameObject settingsPanel = CreatePanel(root.transform, "SettingsPanel", "SETTINGS");
-        Text volumeLabel = CreateText("VolumeLabel", settingsPanel.transform, "MASTER VOLUME", 30, Brown);
-        SetRect(volumeLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(-170, 85), new Vector2(280, 55));
-        Slider slider = CreateSlider(settingsPanel.transform);
-        SetRect(slider.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(125, 85), new Vector2(300, 36));
-        Toggle toggle = CreateToggle(settingsPanel.transform);
-        SetRect(toggle.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -15), new Vector2(420, 60));
-        Button closeSettings = CreateTextButton("Back", settingsPanel.transform, "BACK", new Vector2(220, 65), Brown);
-        SetRect(closeSettings.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0, 70), new Vector2(220, 65));
+        Transform settingsCard = settingsPanel.transform.Find("WoodenCard");
+        
+Text volumeLabel = CreateText("VolumeLabel", settingsCard, "MASTER VOLUME", 30, Brown);
+        SetRect(volumeLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(-185, 70), new Vector2(260, 55));
+        Slider slider = CreateSlider(settingsCard);
+        SetRect(slider.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(170, 70), new Vector2(300, 36));
+        Toggle toggle = CreateToggle(settingsCard);
+        SetRect(toggle.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -35), new Vector2(420, 60));
+        Button closeSettings = CreateTextButton("Back", settingsCard, "BACK", new Vector2(220, 65), Brown);
+        SetRect(closeSettings.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(220, 65));
         UnityEventTools.AddPersistentListener(closeSettings.onClick, controller.ClosePanels);
 
         SerializedObject so = new SerializedObject(controller);
@@ -196,8 +200,12 @@ public static class MainMenuBuilder
         Stretch(bg.rectTransform);
         bg.color = new Color(0.36f, 0.16f, 0.055f, 1f);
         Image fill = CreateImage("Fill", go.transform, null);
-        SetRect(fill.rectTransform, new Vector2(0f, 0.5f), Vector2.zero, new Vector2(250, 20));
-        fill.rectTransform.pivot = new Vector2(0, 0.5f);
+        RectTransform fillRect = fill.rectTransform;
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = new Vector2(6f, 6f);
+        fillRect.offsetMax = new Vector2(-6f, -6f);
+        fillRect.pivot = new Vector2(0f, 0.5f);
         fill.color = new Color(0.18f, 0.65f, 0.75f, 1f);
         Image handle = CreateImage("Handle", go.transform, null);
         SetRect(handle.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(34, 46));

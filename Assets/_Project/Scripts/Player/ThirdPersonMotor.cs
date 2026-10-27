@@ -41,8 +41,8 @@ namespace Adventure.Player
         public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
         
-        private float obstacleStunnedUntil;
-        public bool IsObstacleStunned => Time.time < obstacleStunnedUntil;
+        private float obstacleRespawnCooldownUntil;
+        public bool IsObstacleStunned => false;
 private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
         public Vector3 FootPosition => controller.bounds.center - Vector3.up * controller.bounds.extents.y;
@@ -62,8 +62,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
             if (dt <= 0f) return;
             FollowSupport(dt);
             if (!isActiveAndEnabled) return;
-            bool isObstacleStunned = IsObstacleStunned;
-            Vector2 stick = isObstacleStunned ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
+            Vector2 stick = Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
             Vector3 desired = (forward * stick.y + right * stick.x) * moveSpeed;
@@ -73,7 +72,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
 
             if (controller.isGrounded && verticalVelocity <= 0f)
             { lastGrounded = Time.time; verticalVelocity = -2f; }
-            if (!isObstacleStunned && input.JumpPressed) jumpRequested = Time.time;
+            if (input.JumpPressed) jumpRequested = Time.time;
             if (Time.time - jumpRequested <= jumpBufferTime && Time.time - lastGrounded <= coyoteTime)
             {
                 if (standingTurntable != null)
@@ -163,7 +162,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
         {
             
             var rotatingRod = hit.collider.GetComponentInParent<RotatingPillarRod>();
-            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) ApplyObstacleStun();
+            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) RespawnFromObstacle();
 
             
 if (!isActiveAndEnabled) return;
@@ -210,7 +209,7 @@ private void OnDisable()
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;
             detachUntil = 0f;
-            obstacleStunnedUntil = 0f;
+            obstacleRespawnCooldownUntil = 0f;
             horizontalVelocity = Vector3.zero;
             verticalVelocity = 0f;
             lastGrounded = jumpRequested = float.NegativeInfinity;
@@ -219,8 +218,17 @@ private void OnDisable()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
         {
+            KitchenRaceManager race = FindFirstObjectByType<KitchenRaceManager>();
+            if (race != null && race.RespawnPlayerAtLastCheckpoint(this)) return;
             if (respawn != null && respawn.isActiveAndEnabled) { respawn.RespawnNow(); return; }
             TeleportAndReset(spawnPosition, transform.rotation);
+        }
+
+        public void RespawnFromObstacle()
+        {
+            if (!isActiveAndEnabled || Time.time < obstacleRespawnCooldownUntil) return;
+            obstacleRespawnCooldownUntil = Time.time + 0.35f;
+            Respawn();
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
@@ -239,12 +247,7 @@ private void OnDisable()
 
 public void ApplyObstacleStun(float duration = 1.25f)
         {
-            if (!isActiveAndEnabled || duration <= 0f) return;
-            obstacleStunnedUntil = Mathf.Max(obstacleStunnedUntil, Time.time + duration);
-            horizontalVelocity = Vector3.zero;
-            externalHorizontalVelocity = Vector3.zero;
-            jumpRequested = float.NegativeInfinity;
-            ClearSupport();
+            RespawnFromObstacle();
         }
 }
 }

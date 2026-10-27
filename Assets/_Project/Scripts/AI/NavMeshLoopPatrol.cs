@@ -29,7 +29,13 @@ namespace Adventure.AI
         private Transform currentTarget;
         private Vector3 targetPosition;
         
-        private float obstacleStunRemaining;
+        private float obstacleRespawnCooldownUntil;
+        private int lastCompletedWaypointIndex;
+        [SerializeField, Min(1f)] private float stuckTimeout = 5f;
+        [SerializeField, Min(0.1f)] private float stuckMovementThreshold = 0.75f;
+        private Vector3 watchdogPosition;
+        private float watchdogLastProgressTime;
+        private int watchdogWaypointIndex;
 private Vector3 destination;
 
         public int CurrentWaypointIndex { get; private set; }
@@ -38,20 +44,23 @@ private Vector3 destination;
         public bool IsWaiting { get; private set; }
         public bool IsFinished => finished;
         
-        public bool IsObstacleStunned => obstacleStunRemaining > 0f;
+        public bool IsObstacleStunned => false;
 public float RemainingWaitTime => Mathf.Max(0f, waitRemaining);
 
         public void BeginRaceAtWaypoint(int waypointIndex)
         {
             if (waypoints.Count == 0) return;
             CurrentWaypointIndex = Mathf.Clamp(waypointIndex, 0, waypoints.Count - 1);
+            lastCompletedWaypointIndex = (CurrentWaypointIndex - 1 + waypoints.Count) % waypoints.Count;
             hasDestination = false;
             finished = false;
             reportedFailure = false;
             IsWaiting = false;
             waitRemaining = 0f;
             retryRemaining = 0f;
-            if (agent == null) agent = GetComponent<NavMeshAgent>();
+            ResetStuckWatchdog();
+            
+if (agent == null) agent = GetComponent<NavMeshAgent>();
             if (agent.isActiveAndEnabled && agent.isOnNavMesh)
             {
                 agent.ResetPath();
@@ -76,9 +85,12 @@ public float RemainingWaitTime => Mathf.Max(0f, waitRemaining);
             IsWaiting = false;
             waitRemaining = 0f;
             
-            obstacleStunRemaining = 0f;
+            obstacleRespawnCooldownUntil = 0f;
+            lastCompletedWaypointIndex = 0;
 retryRemaining = 0f;
-            originalStoppingDistance = agent.stoppingDistance;
+            ResetStuckWatchdog();
+            
+originalStoppingDistance = agent.stoppingDistance;
             if (agent.isActiveAndEnabled && agent.isOnNavMesh)
                 agent.isStopped = false;
         }
@@ -87,21 +99,18 @@ retryRemaining = 0f;
         {
             
 
-            if (obstacleStunRemaining > 0f)
+            if (finished || !agent.isActiveAndEnabled) return;
+
+            if (!agent.isOnNavMesh)
             {
-                obstacleStunRemaining = Mathf.Max(0f, obstacleStunRemaining - Time.deltaTime);
-                if (obstacleStunRemaining <= 0f)
-                {
-                    agent.isStopped = false;
-                    hasDestination = false;
-                }
+                if (Time.time - watchdogLastProgressTime >= 1f)
+                    RespawnAtLastCheckpoint();
                 return;
             }
-if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
-                return;
 
             if (IsWaiting)
             {
+                ResetStuckWatchdog();
                 // This component owns the stop during the dwell; don't let isStopped freeze its timer.
                 waitRemaining = Mathf.Max(0f, waitRemaining - Time.deltaTime);
                 if (waitRemaining <= 0f)
@@ -109,8 +118,13 @@ if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
                 return;
             }
 
-            if (agent.isStopped || traversal.IsTraversing || agent.isOnOffMeshLink)
+            if (agent.isStopped)
+            {
+                ResetStuckWatchdog();
                 return;
+            }
+            if (RecoverIfStuck()) return;
+            if (traversal.IsTraversing || agent.isOnOffMeshLink) return;
             if (retryRemaining > 0f)
             {
                 retryRemaining -= Time.deltaTime;
@@ -210,6 +224,9 @@ if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
             IsWaiting = false;
             waitRemaining = 0f;
             agent.stoppingDistance = originalStoppingDistance;
+            ResetStuckWatchdog();
+            
+lastCompletedWaypointIndex = CurrentWaypointIndex;
             CurrentWaypointIndex++;
             if (CurrentWaypointIndex >= waypoints.Count)
             {
@@ -245,6 +262,70 @@ if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
         }
     
 
+private void ResetStuckWatchdog()
+        {
+            watchdogPosition = transform.position;
+            watchdogLastProgressTime = Time.time;
+            watchdogWaypointIndex = CurrentWaypointIndex;
+        }
+
+        private bool RecoverIfStuck()
+        {
+            if (watchdogWaypointIndex != CurrentWaypointIndex ||
+                (transform.position - watchdogPosition).sqrMagnitude >= stuckMovementThreshold * stuckMovementThreshold)
+            {
+                ResetStuckWatchdog();
+                return false;
+            }
+
+            if (Time.time - watchdogLastProgressTime < stuckTimeout) return false;
+            bool recovered = RespawnAtLastCheckpoint();
+            if (recovered)
+                Debug.LogWarning(name + " was stuck and returned to its last checkpoint.", this);
+            else
+                watchdogLastProgressTime = Time.time;
+            return recovered;
+        }
+
+        private bool RespawnAtLastCheckpoint()
+        {
+            if (agent == null || !agent.isActiveAndEnabled || waypoints.Count == 0) return false;
+
+            int checkpointIndex = Mathf.Clamp(lastCompletedWaypointIndex, 0, waypoints.Count - 1);
+            Transform checkpoint = waypoints[checkpointIndex];
+            if (checkpoint == null) return false;
+
+            var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+            if (!NavMesh.SamplePosition(checkpoint.position, out NavMeshHit hit, 4f, filter)) return false;
+
+            if (agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.ResetPath();
+            }
+            if (!agent.Warp(hit.position) || !agent.isOnNavMesh) return false;
+
+            int nextIndex = Mathf.Clamp(CurrentWaypointIndex, 0, waypoints.Count - 1);
+            Transform next = waypoints[nextIndex];
+            if (next != null)
+            {
+                Vector3 forward = Vector3.ProjectOnPlane(next.position - hit.position, Vector3.up);
+                if (forward.sqrMagnitude > 0.001f) transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+            }
+
+            hasDestination = false;
+            IsWaiting = false;
+            waitRemaining = 0f;
+            retryRemaining = 0f;
+            currentTarget = null;
+            obstacleRespawnCooldownUntil = Time.time + 0.5f;
+            agent.velocity = Vector3.zero;
+            agent.isStopped = false;
+            ResetStuckWatchdog();
+            return true;
+        }
+
+
 private static bool IsGameplayObstacle(Collider other)
         {
             return other.GetComponentInParent<InflatingBounceBall>() != null ||
@@ -267,15 +348,8 @@ private void OnTriggerEnter(Collider other)
 
 public void ApplyObstacleHit(float stunDuration = 1.25f)
         {
-            if (finished || agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
-
-            obstacleStunRemaining = Mathf.Max(obstacleStunRemaining, Mathf.Max(0.1f, stunDuration));
-            hasDestination = false;
-            IsWaiting = false;
-            waitRemaining = 0f;
-            agent.isStopped = true;
-            agent.ResetPath();
-            agent.velocity = Vector3.zero;
+            if (finished || Time.time < obstacleRespawnCooldownUntil) return;
+            RespawnAtLastCheckpoint();
         }
 }
 }
