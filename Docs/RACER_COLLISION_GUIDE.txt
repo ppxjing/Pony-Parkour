@@ -1,0 +1,39 @@
+玩家与 AI 双向碰撞
+
+设置位置
+Assets/_prefab/AI/PF_NavigationTestAI.prefab 根物体的 Racer Collision Body 组件。
+KitchenRaceManager 创建的 Elephant、Giraff、Rabbit 共用此预制体配置。
+玩家继续使用 CharacterController；AI 日常用 NavMeshAgent，被撞飞期间切换为动态 Rigidbody，落地后恢复巡逻。
+
+可调参数（速度单位：米/秒，时间单位：秒）
+Minimum Closing Speed = 0.75：相向接近速度达到此值才击飞，贴住或一起同向走不会反复弹跳。
+Impact Multiplier = 1.1：接近速度转换为水平击飞速度的倍率。
+Minimum Launch Speed = 3 / Maximum Launch Speed = 8：水平击飞速度上下限。
+Upward Speed = 3.5：向上初速度，越大弹得越高。
+Collision Cooldown = 0.8：碰撞保护时间，玩家与 AI 都有保护；AI 落地恢复后也重新计时。
+Player Control Lock Time = 0.2：受撞后短暂屏蔽移动和跳跃输入的时间，之后恢复操控。
+Gravity = 25：AI 飞行重力加速度；玩家仍使用 Third Person Motor 的 Gravity（默认 -25）。
+Maximum Flight Time = 3：AI 超过此飞行时间仍未回到可行走区域，恢复到击飞前最后有效 NavMesh 位置。
+Landing Sample Distance = 0.6：落地时寻找附近 NavMesh 的范围；还会检查高度，避免吸到其他楼层。
+Contact Padding = 0.12：接触检测余量，避免 AI 主动靠近时先挤开 CharacterController 而漏判。
+Contact Sensor：内部触发器引用，保留自动配置。
+
+尺寸与文件
+AI 根节点胶囊为实体碰撞（Is Trigger 关闭），尺寸按 NavMeshAgent 的世界尺寸换算，继续保持 0.7 缩放。
+Racer Contact Sensor 子物体是接触触发器，不显示模型，不负责阻挡。
+新脚本：Assets/_Project/Scripts/AI/RacerCollisionBody.cs
+改动：ThirdPersonMotor、NavMeshLoopPatrol、NavMeshLinkTraversal、KitchenRaceManager 和 AI 预制体。
+
+验收
+1. Kitchen_Adventure 按 Play，倒计时结束后，用 WASD 跑向 AI；接触后双方沿相反方向弹开，有向上抛起和重力下落。
+2. 玩家停在 AI 路线上不动；AI 撞上来后，也能把玩家撞开。
+3. 不移动地贴住 AI 或碰撞后仍接触，不应在冷却期内连续击飞。
+4. AI 落回 NavMesh 后继续去原来的必经点，不清空圈数和途经点进度。
+5. AI 被撞出赛道后，最多约 3 秒恢复到击飞前有效位置，再继续巡逻。
+6. 玩家受撞短暂停顿后可继续 WASD/空格，掉落或碰到危险机关时继续走原有死亡/复活逻辑。
+
+已验证
+Play 下玩家撞 AI：水平初速度 5.5、向上 3.5，双方方向相反，接触只触发一次。
+Play 下 AI 撞静止玩家：水平约 4.6，双方成功击飞，AI 恢复 NavMesh。
+Play 下碰撞冷却拒绝重复触发；AI 落地后成功到达原目标（误差约 0.12 米）。
+Play 下三个敌人胶囊均为实体碰撞，世界高度约 0.7；击飞离开赛道后恢复 NavMesh 并继续途经点进度。

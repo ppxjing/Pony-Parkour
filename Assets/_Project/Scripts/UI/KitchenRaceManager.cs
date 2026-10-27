@@ -175,18 +175,9 @@ private void Start()
 
 private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
     {
-        CapsuleCollider hitbox = racer.GetComponent<CapsuleCollider>();
-        if (hitbox == null) hitbox = racer.AddComponent<CapsuleCollider>();
-
-        hitbox.isTrigger = true;
-        // Agent dimensions are world-space; Collider dimensions are local-space.
-        // Convert once so the root scale does not shrink the hitbox twice.
-        Vector3 bodyScale = racer.transform.lossyScale;
-        float radialScale = Mathf.Max(0.001f, Mathf.Max(Mathf.Abs(bodyScale.x), Mathf.Abs(bodyScale.z)));
-        float heightScale = Mathf.Max(0.001f, Mathf.Abs(bodyScale.y));
-        hitbox.radius = Mathf.Max(0.25f, agent.radius / radialScale);
-        hitbox.height = Mathf.Max(hitbox.radius * 2f, agent.height / heightScale);
-        hitbox.center = Vector3.up * (hitbox.height * 0.5f);
+        RacerCollisionBody collisionBody = racer.GetComponent<RacerCollisionBody>();
+        if (collisionBody == null) collisionBody = racer.AddComponent<RacerCollisionBody>();
+        collisionBody.ConfigureCollision();
     }
 
 

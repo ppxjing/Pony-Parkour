@@ -181,6 +181,20 @@ originalStoppingDistance = agent.stoppingDistance;
                 AdvanceWaypoint();
         }
 
+        public void ResumeAfterImpact()
+        {
+            // Keep waypoint order, completed laps and an unfinished waypoint pause.
+            hasDestination = false;
+            currentTarget = null;
+            retryRemaining = 0f;
+            ResetStuckWatchdog();
+            if (agent.isActiveAndEnabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+                agent.isStopped = finished || IsWaiting;
+            }
+        }
         private void BeginDestination(Transform target)
         {
             var settings = target.GetComponent<AIPatrolWaypoint>();
