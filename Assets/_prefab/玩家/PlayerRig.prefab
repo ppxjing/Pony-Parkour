@@ -193,7 +193,7 @@ MonoBehaviour:
   target: {fileID: 5070714077711095432}
   playerRoot: {fileID: 2656904648646795946}
   input: {fileID: 2133934482379803504}
-  distance: 4.5
+  distance: 1.25
   yaw: 0
   pitch: 18
   minPitch: -25
