@@ -1,0 +1,38 @@
+AI 机关布娃娃死亡
+
+行为
+Elephant、Giraff、Rabbit 触碰锤头、弹球、旋转棍或死亡区域时进入死亡状态。
+NavMeshAgent 暂停，胶囊刚体解除旋转约束，整个模型受击、翻滚并在重力下倒下。
+默认 2 秒后在最近完成的巡逻途经点恢复直立；原来的目标索引和圈数保持不变，重新寻路。
+复活后默认 1 秒机关保护。玩家与 AI 互相碰撞仍使用原来的非致死击飞；击飞中碰到致死机关可转入死亡。
+沿用玩家目前的胶囊布娃娃方式，并非逐骨骼关节布娃娃。
+
+设置位置
+Assets/_prefab/AI/PF_NavigationTestAI.prefab
+根物体 -> Racer Collision Body -> AI death ragdoll
+Death Respawn Delay = 2：死亡后等待多久复活（秒）。
+Death Protection Time = 1：复活后机关保护时间（秒）。
+Death Knockback Speed = 3：死亡水平击退初速度。
+Death Upward Speed = 1.5：死亡向上初速度。
+Death Tumble Speed = 5：死亡翻滚角速度。
+重力沿用同组件 AI flight and recovery 下的 Gravity（默认 25）。
+修改预制体后，比赛创建的三个 AI 会继承配置，无需逐个设置。
+
+实现位置
+Assets/_Project/Scripts/AI/RacerCollisionBody.cs：统一管理普通击飞、死亡物理、延迟复活和保护，避免两个组件同时控制刚体。
+Assets/_Project/Scripts/AI/NavMeshLoopPatrol.cs：机关触发入口、最近途经点姿态、恢复巡逻。
+Assets/_prefab/AI/PF_NavigationTestAI.prefab：新增死亡参数。
+没有创建第二个 AI 预制体，也没有重建场景或导航数据。
+
+验收
+1. Kitchen_Adventure 按 Play，等待倒计时，观察 AI 碰到锤头或弹球后整个模型倒下翻滚，而不是立即传送。
+2. 约 2 秒后 AI 在最近完成的途经点站直并继续走原来的路线，圈数和必经点进度不重置。
+3. 玩家撞 AI 仍是普通击飞；把 AI 撞向机关时，AI 应转为死亡翻滚再复活。
+4. 死亡区域也会使 AI 倒下；复活保护期间重复接触不会连续重复死亡。
+
+已验证
+Unity 编译无新增相关错误。
+三种 AI 锤头触发测试：死亡时关闭 Agent，刚体动态、解除旋转约束，约 0.45 秒翻转 96～112 度。
+三种 AI 延迟复活：恢复 NavMesh、直立、Kinematic，原目标和圈数不变，复活坐标与最近途经点一致；保护期拒绝重复死亡。
+已验证弹球和死亡区域的真实物理碰撞，以及普通玩家击飞转入机关死亡后再次复活。
+已观察到三个 AI 在复活后恢复导航运动。

@@ -166,6 +166,11 @@ MonoBehaviour:
   landingSampleDistance: 0.6
   contactPadding: 0.12
   contactSensor: {fileID: 4308181811970878982}
+  deathRespawnDelay: 2
+  deathProtectionTime: 1
+  deathKnockbackSpeed: 3
+  deathUpwardSpeed: 1.5
+  deathTumbleSpeed: 5
 --- !u!1 &9039277032905167438
 GameObject:
   m_ObjectHideFlags: 0

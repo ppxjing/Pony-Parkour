@@ -24,6 +24,13 @@ namespace Adventure.AI
         [SerializeField, Min(0.02f)] private float contactPadding = 0.12f;
         [SerializeField] private CapsuleCollider contactSensor;
 
+        [Header("AI death ragdoll")]
+        [SerializeField, Min(0f)] private float deathRespawnDelay = 2f;
+        [SerializeField, Min(0f)] private float deathProtectionTime = 1f;
+        [SerializeField, Min(0f)] private float deathKnockbackSpeed = 3f;
+        [SerializeField, Min(0f)] private float deathUpwardSpeed = 1.5f;
+        [SerializeField, Min(0f)] private float deathTumbleSpeed = 5f;
+
         private NavMeshAgent agent;
         private NavMeshLoopPatrol patrol;
         private NavMeshLinkTraversal traversal;
@@ -31,6 +38,13 @@ namespace Adventure.AI
         private CapsuleCollider capsule;
         private float nextImpactTime, launchTime, groundContactTime = float.NegativeInfinity;
         private Vector3 lastSafePosition;
+        private Quaternion lastSafeRotation;
+        private float protectedUntil, nextDeathRecoveryAttempt;
+        private Animator[] deathAnimators;
+        private bool[] animatorWasEnabled;
+        public bool IsDead { get; private set; }
+        public int DeathCount { get; private set; }
+        public int DeathRespawnCount { get; private set; }
         public bool IsKnockedBack { get; private set; }
         public int ImpactCount { get; private set; }
 
@@ -47,6 +61,7 @@ namespace Adventure.AI
             body.interpolation = RigidbodyInterpolation.None;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             lastSafePosition = transform.position;
+            lastSafeRotation = transform.rotation;
             ConfigureCollision();
         }
 
@@ -87,7 +102,7 @@ namespace Adventure.AI
 
         public bool TryCollideWithPlayer(ThirdPersonMotor player)
         {
-            if (!isActiveAndEnabled || IsKnockedBack || Time.time < nextImpactTime ||
+            if (!isActiveAndEnabled || IsDead || IsKnockedBack || Time.time < nextImpactTime ||
                 player == null || !player.CanReceiveRacerImpact || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
                 return false;
             Vector3 direction = Vector3.ProjectOnPlane(transform.position - player.transform.position, Vector3.up);
@@ -115,12 +130,59 @@ namespace Adventure.AI
             return true;
         }
 
+        public bool RequestDeath(Vector3 sourcePosition)
+        {
+            if (!isActiveAndEnabled || IsDead || Time.time < protectedUntil ||
+                (patrol != null && patrol.IsFinished)) return false;
+            Vector3 inheritedVelocity = IsKnockedBack ? body.linearVelocity :
+                (agent.isActiveAndEnabled && agent.isOnNavMesh ? agent.velocity : Vector3.zero);
+            if (traversal != null) traversal.SuspendForImpact();
+            agent.enabled = false;
+            IsKnockedBack = false;
+            IsDead = true;
+            DeathCount++;
+            nextDeathRecoveryAttempt = Time.time + deathRespawnDelay;
+            // Models are installed after Awake, so capture their animation state on death.
+            deathAnimators = GetComponentsInChildren<Animator>(true);
+            animatorWasEnabled = new bool[deathAnimators.Length];
+            for (int i = 0; i < deathAnimators.Length; i++)
+            {
+                animatorWasEnabled[i] = deathAnimators[i].enabled;
+                deathAnimators[i].enabled = false;
+            }
+            Vector3 away = Vector3.ProjectOnPlane(body.worldCenterOfMass - sourcePosition, Vector3.up);
+            if (away.sqrMagnitude < 0.001f) away = -transform.forward;
+            away.Normalize();
+            body.position = transform.position;
+            body.rotation = transform.rotation;
+            body.constraints = RigidbodyConstraints.None;
+            body.isKinematic = false;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            body.linearVelocity = inheritedVelocity + away * deathKnockbackSpeed + Vector3.up * deathUpwardSpeed;
+            body.angularVelocity = Vector3.Cross(Vector3.up, away) * deathTumbleSpeed;
+            body.WakeUp();
+            return true;
+        }
+
         private void FixedUpdate()
         {
+            if (IsDead)
+            {
+                body.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                if (Time.time >= nextDeathRecoveryAttempt)
+                {
+                    nextDeathRecoveryAttempt = Time.time + 0.5f;
+                    TryRespawnFromDeath();
+                }
+                return;
+            }
             if (!IsKnockedBack)
             {
                 if (agent.isActiveAndEnabled && agent.isOnNavMesh && !agent.isOnOffMeshLink)
+                {
                     lastSafePosition = transform.position;
+                    lastSafeRotation = transform.rotation;
+                }
                 return;
             }
             body.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
@@ -132,6 +194,48 @@ namespace Adventure.AI
                 // Falling off the track must not strand an agent outside the NavMesh.
                 TryResumeAt(lastSafePosition, 2f, false);
             }
+        }
+
+        private bool TryRespawnFromDeath()
+        {
+            Vector3 position = lastSafePosition;
+            Quaternion rotation = lastSafeRotation;
+            if (patrol == null || !patrol.TryGetLastCheckpointPose(out position, out rotation))
+            {
+                var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+                if (!NavMesh.SamplePosition(lastSafePosition, out NavMeshHit hit, 2f, filter)) return false;
+                position = hit.position;
+                rotation = lastSafeRotation;
+            }
+            StopPhysics();
+            transform.SetPositionAndRotation(position + Vector3.up * agent.baseOffset, rotation);
+            body.position = transform.position;
+            body.rotation = rotation;
+            agent.enabled = true;
+            if (!agent.Warp(position) || !agent.isOnNavMesh)
+            {
+                agent.enabled = false;
+                IsDead = true;
+                body.constraints = RigidbodyConstraints.None;
+                body.isKinematic = false;
+                body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                return false;
+            }
+            RestoreAnimators();
+            protectedUntil = Time.time + deathProtectionTime;
+            nextImpactTime = Time.time + collisionCooldown;
+            DeathRespawnCount++;
+            if (patrol != null) patrol.ResumeAfterDeath();
+            return true;
+        }
+
+        private void RestoreAnimators()
+        {
+            if (deathAnimators == null) return;
+            for (int i = 0; i < deathAnimators.Length; i++)
+                if (deathAnimators[i] != null) deathAnimators[i].enabled = animatorWasEnabled[i];
+            deathAnimators = null;
+            animatorWasEnabled = null;
         }
 
         private void OnCollisionEnter(Collision collision) { RecordGround(collision); }
@@ -169,15 +273,20 @@ namespace Adventure.AI
             body.isKinematic = true;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             IsKnockedBack = false;
+            IsDead = false;
+            body.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
         private void OnDisable()
         {
-            if (!IsKnockedBack || body == null || agent == null) return;
+            if ((!IsKnockedBack && !IsDead) || body == null || agent == null) return;
             StopPhysics();
-            transform.position = lastSafePosition;
+            transform.SetPositionAndRotation(lastSafePosition, lastSafeRotation);
             body.position = transform.position;
+            body.rotation = transform.rotation;
+            RestoreAnimators();
             agent.enabled = true;
+            protectedUntil = Time.time + deathProtectionTime;
             nextImpactTime = Time.time + collisionCooldown;
         }
     }
