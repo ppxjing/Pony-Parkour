@@ -128,13 +128,14 @@ public static class LevelSelectBuilder
         rect.offsetMax = Vector2.zero;
     }
 
-    private static void SetBuildScenes()
+private static void SetBuildScenes()
     {
-        string[] paths = {
+        string[] paths =
+        {
             "Assets/_Project/Scenes/MainMenuScene.unity",
             "Assets/_Project/Scenes/StartScene.unity",
-            "Assets/_Project/Scenes/Kitchen_Adventure.unity",
-            "Assets/_Project/Scenes/Kitchen_Playground.unity"
+            "Assets/_Project/Scenes/Beach.unity",
+            "Assets/_Project/Scenes/Kitchen_Adventure.unity"
         };
         EditorBuildSettings.scenes = Array.ConvertAll(paths, p => new EditorBuildSettingsScene(p, true));
     }

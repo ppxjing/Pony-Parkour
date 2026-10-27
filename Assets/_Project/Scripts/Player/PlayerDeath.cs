@@ -74,10 +74,10 @@ namespace Adventure.Player
             motor.enabled = false;
         }
 
-        private void OnControllerColliderHit(ControllerColliderHit hit)
+private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             var hazard = hit.collider.GetComponentInParent<LethalObstacle>();
-            if (hazard != null && hazard.isActiveAndEnabled) RequestDeath(hazard.transform.position);
+            if (hazard != null && hazard.isActiveAndEnabled) motor.ApplyObstacleStun();
         }
 
         private void LateUpdate()

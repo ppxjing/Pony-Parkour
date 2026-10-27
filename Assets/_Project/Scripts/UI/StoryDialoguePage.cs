@@ -29,7 +29,7 @@ public sealed class StoryDialoguePage : MonoBehaviour
         page.DisplayCurrentLine();
     }
 
-    private void Build()
+private void Build()
     {
         gameObject.AddComponent<RectTransform>();
         Canvas canvas = gameObject.AddComponent<Canvas>();
@@ -43,6 +43,7 @@ public sealed class StoryDialoguePage : MonoBehaviour
 
         Image shade = Panel("Warm Bedroom Shade", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
             new Color(0.075f, 0.025f, 0.012f, 0.88f));
+        shade.raycastTarget = true;
 
         // The full-screen button makes mouse/touch anywhere advance the story.
         Button advance = shade.gameObject.AddComponent<Button>();
@@ -57,23 +58,23 @@ public sealed class StoryDialoguePage : MonoBehaviour
         direction.text = "A warm beam of golden light slips into the quiet toy room.\nThe star on Woody's body begins to glow, and the little wooden horse gently stirs.";
         direction.color = new Color(1f, 0.91f, 0.75f);
 
-        Image dialoguePanel = Panel("Wooden Dialogue Panel", transform, new Vector2(0.10f, 0.10f), new Vector2(0.90f, 0.46f),
-            new Vector2(0f, 0f), new Vector2(0f, 0f), new Color(0.96f, 0.69f, 0.30f, 0.98f));
+        Image dialoguePanel = Panel("Wooden Dialogue Panel", transform, new Vector2(0.12f, 0.09f), new Vector2(0.88f, 0.46f),
+            Vector2.zero, Vector2.zero, new Color(0.96f, 0.69f, 0.30f, 0.98f));
 
-        Image inner = Panel("Dialogue Inset", dialoguePanel.transform, new Vector2(0.025f, 0.07f), new Vector2(0.975f, 0.88f),
+        Image inner = Panel("Dialogue Inset", dialoguePanel.transform, new Vector2(0.035f, 0.21f), new Vector2(0.965f, 0.78f),
             Vector2.zero, Vector2.zero, new Color(0.20f, 0.075f, 0.025f, 0.96f));
 
-        speakerText = Label("Speaker", dialoguePanel.transform, new Vector2(0.06f, 0.79f), new Vector2(0.36f, 0.98f), 31, TextAnchor.MiddleLeft);
+        speakerText = Label("Speaker", dialoguePanel.transform, new Vector2(0.055f, 0.79f), new Vector2(0.45f, 0.95f), 29, TextAnchor.MiddleLeft);
         speakerText.color = new Color(0.25f, 0.08f, 0.02f);
 
-        dialogueText = Label("Dialogue", inner.transform, new Vector2(0.06f, 0.17f), new Vector2(0.94f, 0.88f), 39, TextAnchor.MiddleLeft);
+        dialogueText = Label("Dialogue", inner.transform, new Vector2(0.055f, 0.10f), new Vector2(0.945f, 0.90f), 36, TextAnchor.MiddleLeft);
         dialogueText.color = Color.white;
 
-        Text hint = Label("Continue Hint", dialoguePanel.transform, new Vector2(0.55f, 0.01f), new Vector2(0.94f, 0.15f), 22, TextAnchor.MiddleRight);
+        Text hint = Label("Continue Hint", dialoguePanel.transform, new Vector2(0.48f, 0.035f), new Vector2(0.94f, 0.18f), 20, TextAnchor.MiddleRight);
         hint.text = "CLICK ANYWHERE TO CONTINUE  ▶";
         hint.color = new Color(0.27f, 0.09f, 0.02f);
 
-        progressText = Label("Progress", dialoguePanel.transform, new Vector2(0.06f, 0.01f), new Vector2(0.25f, 0.15f), 21, TextAnchor.MiddleLeft);
+        progressText = Label("Progress", dialoguePanel.transform, new Vector2(0.06f, 0.035f), new Vector2(0.25f, 0.18f), 20, TextAnchor.MiddleLeft);
         progressText.color = new Color(0.27f, 0.09f, 0.02f);
     }
 
@@ -100,24 +101,29 @@ public sealed class StoryDialoguePage : MonoBehaviour
             : new Color(0.02f, 0.37f, 0.75f);
     }
 
-    private static Image Panel(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+private static Image Panel(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
         Vector2 offsetMin, Vector2 offsetMax, Color color)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         go.transform.SetParent(parent, false);
         RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = anchorMin; rect.anchorMax = anchorMax;
-        rect.offsetMin = offsetMin; rect.offsetMax = offsetMax;
-        Image image = go.GetComponent<Image>(); image.color = color;
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = offsetMin;
+        rect.offsetMax = offsetMax;
+        Image image = go.GetComponent<Image>();
+        image.color = color;
+        image.raycastTarget = false;
         return image;
     }
 
-    private static Text Label(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, int size, TextAnchor alignment)
+private static Text Label(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, int size, TextAnchor alignment)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
         go.transform.SetParent(parent, false);
         RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = anchorMin; rect.anchorMax = anchorMax;
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
         rect.offsetMin = rect.offsetMax = Vector2.zero;
         Text text = go.GetComponent<Text>();
         text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -125,7 +131,8 @@ public sealed class StoryDialoguePage : MonoBehaviour
         text.fontStyle = FontStyle.Bold;
         text.alignment = alignment;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
-        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+        text.raycastTarget = false;
         return text;
     }
 }

@@ -45,7 +45,12 @@ public sealed class KitchenRaceManager : MonoBehaviour
     private int playerNextWaypoint = 1;
     private int playerLaps;
     private bool finished;
-    private Text lapText;
+    
+    private Text routeText;
+    
+    private float routeMarkerRevealTime;
+private GameObject routeMarker;
+private Text lapText;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterSceneLoader()
@@ -61,20 +66,20 @@ public sealed class KitchenRaceManager : MonoBehaviour
             new GameObject("Kitchen Race Manager").AddComponent<KitchenRaceManager>();
     }
 
-    private void Start()
+private void Start()
     {
         AutoConfigureIfNeeded();
+        if (SceneManager.GetActiveScene().name == "Beach") targetLaps = 2;
         CreateLapDisplay();
+        CreateRouteMarker();
         UpdateLapText();
+        UpdateRouteGuidance();
     }
 
     private void AutoConfigureIfNeeded()
     {
-        if (player == null)
-        {
-            ThirdPersonMotor motor = FindFirstObjectByType<ThirdPersonMotor>();
-            if (motor != null) player = motor.transform;
-        }
+        ThirdPersonMotor playerMotor = FindFirstObjectByType<ThirdPersonMotor>();
+        if (playerMotor != null) player = playerMotor.transform;
 
         NavMeshLoopPatrol source = FindFirstObjectByType<NavMeshLoopPatrol>();
         if (source == null) return;
@@ -107,7 +112,9 @@ public sealed class KitchenRaceManager : MonoBehaviour
             RacerSetup setup = setups[i];
             GameObject racer = i == 0 ? source.gameObject : Instantiate(source.gameObject, gridCenter, Quaternion.LookRotation(raceForward));
             racer.name = setup.name;
+            
             NavMeshAgent agent = racer.GetComponent<NavMeshAgent>();
+            EnsureAIObstacleHitbox(racer, agent);
             var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
             Vector3 desired = gridCenter + raceRight * setup.startLane;
             if (NavMesh.SamplePosition(desired, out NavMeshHit hit, 3f, filter))
@@ -164,34 +171,79 @@ public sealed class KitchenRaceManager : MonoBehaviour
         foreach (Rigidbody childBody in visual.GetComponentsInChildren<Rigidbody>(true)) childBody.isKinematic = true;
     }
 
-    private void Update()
+private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
+    {
+        CapsuleCollider hitbox = racer.GetComponent<CapsuleCollider>();
+        if (hitbox == null) hitbox = racer.AddComponent<CapsuleCollider>();
+
+        hitbox.isTrigger = true;
+        hitbox.radius = Mathf.Max(0.25f, agent.radius);
+        hitbox.height = Mathf.Max(hitbox.radius * 2f, agent.height);
+        hitbox.center = Vector3.up * (hitbox.height * 0.5f);
+    }
+
+
+private void Update()
     {
         if (finished || player == null || route.Count < 2) return;
+        AnimateRouteMarker();
+
         Transform next = route[Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1)];
-        if (next == null || Vector3.Distance(player.position, next.position) > checkpointRadius) return;
+        if (next == null || !HasReachedWaypoint(next)) return;
+
+        if (routeMarker != null)
+        {
+            routeMarker.SetActive(false);
+            routeMarkerRevealTime = Time.time + 0.3f;
+        }
 
         playerNextWaypoint++;
-        if (playerNextWaypoint < route.Count) return;
+        if (playerNextWaypoint < route.Count)
+        {
+            UpdateRouteGuidance();
+            return;
+        }
+
         playerNextWaypoint = 0;
         playerLaps++;
         UpdateLapText();
+        UpdateRouteGuidance();
         if (playerLaps >= targetLaps)
         {
             FinishRace();
             return;
         }
+
         // Require crossing the start waypoint before beginning the next lap.
         playerNextWaypoint = 0;
     }
 
-    private void LateUpdate()
+private void LateUpdate()
     {
         if (finished || playerNextWaypoint != 0 || route.Count == 0) return;
-        if (Vector3.Distance(player.position, route[0].position) <= checkpointRadius)
-            playerNextWaypoint = 1;
+        if (!HasReachedWaypoint(route[0])) return;
+
+        playerNextWaypoint = 1;
+        UpdateRouteGuidance();
     }
 
-    private void FinishRace()
+private bool HasReachedWaypoint(Transform waypoint)
+    {
+        if (waypoint == null || player == null) return false;
+
+        Vector3 difference = player.position - waypoint.position;
+        bool isBeach = SceneManager.GetActiveScene().name == "Beach";
+        float radius = isBeach
+            ? Mathf.Max(checkpointRadius, 4.5f)
+            : Mathf.Max(checkpointRadius, 3f);
+        float horizontalDistanceSquared = difference.x * difference.x + difference.z * difference.z;
+        float verticalTolerance = isBeach ? float.PositiveInfinity : 3f;
+        return horizontalDistanceSquared <= radius * radius &&
+               Mathf.Abs(difference.y) <= verticalTolerance;
+    }
+
+
+private void FinishRace()
     {
         finished = true;
         var results = new List<ResultEntry>
@@ -207,6 +259,7 @@ public sealed class KitchenRaceManager : MonoBehaviour
         if (motor != null) motor.enabled = false;
         PlayerInputReader input = player.GetComponent<PlayerInputReader>();
         if (input != null) input.enabled = false;
+        if (routeMarker != null) routeMarker.SetActive(false);
 
         ShowResults(results);
         Cursor.lockState = CursorLockMode.None;
@@ -235,7 +288,7 @@ public sealed class KitchenRaceManager : MonoBehaviour
         return length < 0.01f ? 0f : Mathf.Clamp01(1f - Vector3.Distance(position, next.position) / length);
     }
 
-    private void CreateLapDisplay()
+private void CreateLapDisplay()
     {
         Canvas canvas = NewCanvas("Race HUD", 5000);
         GameObject panel = new GameObject("Lap Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -247,6 +300,16 @@ public sealed class KitchenRaceManager : MonoBehaviour
         rect.sizeDelta = new Vector2(280f, 72f);
         panel.GetComponent<Image>().color = new Color(0.12f, 0.055f, 0.015f, 0.78f);
         lapText = NewText(panel.transform, 34, TextAnchor.MiddleCenter);
+
+        GameObject routePanel = new GameObject("Next Checkpoint", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        routePanel.transform.SetParent(canvas.transform, false);
+        RectTransform routeRect = routePanel.GetComponent<RectTransform>();
+        routeRect.anchorMin = routeRect.anchorMax = new Vector2(0.5f, 1f);
+        routeRect.pivot = new Vector2(0.5f, 1f);
+        routeRect.anchoredPosition = new Vector2(0f, -108f);
+        routeRect.sizeDelta = new Vector2(360f, 58f);
+        routePanel.GetComponent<Image>().color = new Color(0.68f, 0.25f, 0.02f, 0.84f);
+        routeText = NewText(routePanel.transform, 25, TextAnchor.MiddleCenter);
     }
 
     private void UpdateLapText()
@@ -254,7 +317,144 @@ public sealed class KitchenRaceManager : MonoBehaviour
         if (lapText != null) lapText.text = "LAP  " + Mathf.Min(playerLaps + 1, targetLaps) + " / " + targetLaps;
     }
 
-    private void ShowResults(List<ResultEntry> results)
+private void CreateRouteMarker()
+    {
+        if (route.Count == 0) return;
+
+        routeMarker = new GameObject(
+            "Current Race Checkpoint Star",
+            typeof(MeshFilter),
+            typeof(MeshRenderer));
+
+        routeMarker.GetComponent<MeshFilter>().sharedMesh = CreateStarMesh();
+        routeMarker.transform.localScale = Vector3.one * 0.68f;
+
+        MeshRenderer markerRenderer = routeMarker.GetComponent<MeshRenderer>();
+        Shader markerShader = Shader.Find("Universal Render Pipeline/Lit");
+        if (markerShader == null) markerShader = Shader.Find("Standard");
+        if (markerShader == null) markerShader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (markerShader != null)
+        {
+            Material markerMaterial = new Material(markerShader);
+            Color gold = new Color(1f, 0.62f, 0.035f, 1f);
+            markerMaterial.color = gold;
+            if (markerMaterial.HasProperty("_BaseColor")) markerMaterial.SetColor("_BaseColor", gold);
+            if (markerMaterial.HasProperty("_Metallic")) markerMaterial.SetFloat("_Metallic", 0.22f);
+            if (markerMaterial.HasProperty("_Smoothness")) markerMaterial.SetFloat("_Smoothness", 0.58f);
+            if (markerMaterial.HasProperty("_EmissionColor"))
+            {
+                markerMaterial.SetColor("_EmissionColor", new Color(0.28f, 0.08f, 0.005f));
+                markerMaterial.EnableKeyword("_EMISSION");
+            }
+            markerRenderer.material = markerMaterial;
+        }
+        markerRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        markerRenderer.receiveShadows = false;
+
+        GameObject lightObject = new GameObject("Star Light", typeof(Light));
+        lightObject.transform.SetParent(routeMarker.transform, false);
+        Light markerLight = lightObject.GetComponent<Light>();
+        markerLight.type = LightType.Point;
+        markerLight.color = new Color(1f, 0.50f, 0.06f);
+        markerLight.range = 3.5f;
+        markerLight.intensity = 1.4f;
+        markerLight.shadows = LightShadows.None;
+    }
+
+private static Mesh CreateStarMesh()
+    {
+        const int pointCount = 10;
+        const float outerRadius = 0.9f;
+        const float innerRadius = 0.42f;
+        const float halfDepth = 0.32f;
+
+        Vector3[] ring = new Vector3[pointCount];
+        for (int i = 0; i < pointCount; i++)
+        {
+            float radius = i % 2 == 0 ? outerRadius : innerRadius;
+            float angle = Mathf.PI * 0.5f + i * Mathf.PI * 2f / pointCount;
+            ring[i] = new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0f);
+        }
+
+        // Each triangle owns its vertices so RecalculateNormals creates crisp,
+        // gem-like facets instead of smoothing the whole star into a flat shape.
+        Vector3[] vertices = new Vector3[pointCount * 6];
+        int[] triangles = new int[pointCount * 6];
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            int next = (i + 1) % pointCount;
+            int front = i * 3;
+            vertices[front] = new Vector3(0f, 0f, halfDepth);
+            vertices[front + 1] = ring[i];
+            vertices[front + 2] = ring[next];
+            triangles[front] = front;
+            triangles[front + 1] = front + 1;
+            triangles[front + 2] = front + 2;
+
+            int back = pointCount * 3 + i * 3;
+            vertices[back] = new Vector3(0f, 0f, -halfDepth);
+            vertices[back + 1] = ring[next];
+            vertices[back + 2] = ring[i];
+            triangles[back] = back;
+            triangles[back + 1] = back + 1;
+            triangles[back + 2] = back + 2;
+        }
+
+        Mesh mesh = new Mesh { name = "Faceted 3D Checkpoint Star" };
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+
+private void UpdateRouteGuidance()
+    {
+        if (route.Count == 0) return;
+
+        int targetIndex = Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1);
+        Transform target = route[targetIndex];
+        if (target == null) return;
+
+        if (routeText != null)
+        {
+            routeText.text = targetIndex == 0
+                ? "NEXT: LAP GATE"
+                : "NEXT CHECKPOINT  " + (targetIndex + 1).ToString("00") + " / " + route.Count.ToString("00");
+        }
+
+        if (routeMarker != null)
+        {
+            routeMarker.transform.position = target.position + Vector3.up * 0.7f;
+            if (Time.time >= routeMarkerRevealTime) routeMarker.SetActive(true);
+        }
+    }
+
+private void AnimateRouteMarker()
+    {
+        if (routeMarker == null || route.Count == 0) return;
+
+        if (!routeMarker.activeSelf)
+        {
+            if (Time.time < routeMarkerRevealTime) return;
+            routeMarker.SetActive(true);
+        }
+
+        int targetIndex = Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1);
+        Transform target = route[targetIndex];
+        if (target == null) return;
+
+        float hover = 0.7f + Mathf.Sin(Time.time * 3f) * 0.1f;
+        routeMarker.transform.position = target.position + Vector3.up * hover;
+        routeMarker.transform.Rotate(0f, 120f * Time.deltaTime, 0f, Space.World);
+    }
+
+
+
+
+private void ShowResults(List<ResultEntry> results)
     {
         Canvas canvas = NewCanvas("Race Results", 10000);
         GameObject shade = new GameObject("Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -277,10 +477,10 @@ public sealed class KitchenRaceManager : MonoBehaviour
         // Coordinates match the four dashed name boxes in ranking-podium.png.
         Vector2[] positions =
         {
-            new Vector2(-113f, -168f), // 1st, center red podium
-            new Vector2(-441f, -209f), // 2nd, left blue podium
-            new Vector2(202f, -210f),  // 3rd, right green podium
-            new Vector2(492f, -247f)   // 4th, far-right orange podium
+            new Vector2(-113f, -168f),
+            new Vector2(-441f, -209f),
+            new Vector2(202f, -210f),
+            new Vector2(492f, -247f)
         };
         Vector2[] sizes =
         {
@@ -293,7 +493,72 @@ public sealed class KitchenRaceManager : MonoBehaviour
             Text nameText = NewPlacedText(board.transform, "Rank " + (i + 1) + " Name", positions[i], sizes[i], fontSizes[i]);
             nameText.text = results[i].name + (results[i].isPlayer ? " ★" : "");
         }
+
+        string currentScene = SceneManager.GetActiveScene().name;
+        string nextLabel = currentScene == "Beach" ? "NEXT: KITCHEN" : "FINISH";
+
+        Button replayButton = NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-300f, -330f));
+        replayButton.onClick.AddListener(ReplayCurrentLevel);
+
+        Button menuButton = NewResultButton(board.transform, "Main Menu Button", "MAIN MENU", new Vector2(0f, -330f));
+        menuButton.onClick.AddListener(ReturnToMainMenu);
+
+        Button nextButton = NewResultButton(board.transform, "Next Level Button", nextLabel, new Vector2(300f, -330f));
+        nextButton.onClick.AddListener(LoadNextLevel);
     }
+
+private void LoadNextLevel()
+    {
+        Time.timeScale = 1f;
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        if (currentScene == "Beach")
+            SceneManager.LoadScene("Kitchen_Adventure");
+        else
+            SceneManager.LoadScene("MainMenuScene");
+    }
+
+private void ReplayCurrentLevel()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+private void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
+private static Button NewResultButton(Transform parent, string name, string label, Vector2 position)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = new Vector2(260f, 70f);
+
+        Image image = go.GetComponent<Image>();
+        image.color = new Color(0.18f, 0.48f, 0.33f, 0.98f);
+
+        Button button = go.GetComponent<Button>();
+        button.targetGraphic = image;
+        ColorBlock colors = button.colors;
+        colors.highlightedColor = new Color(0.28f, 0.70f, 0.48f, 1f);
+        colors.pressedColor = new Color(0.11f, 0.30f, 0.20f, 1f);
+        button.colors = colors;
+
+        Text text = NewText(go.transform, 28, TextAnchor.MiddleCenter);
+        text.text = label;
+        text.raycastTarget = false;
+        return button;
+    }
+
+
+
+
 
     private static Text NewPlacedText(Transform parent, string name, Vector2 position, Vector2 size, int fontSize)
     {
@@ -315,9 +580,9 @@ public sealed class KitchenRaceManager : MonoBehaviour
         return text;
     }
 
-    private static Canvas NewCanvas(string name, int order)
+private static Canvas NewCanvas(string name, int order)
     {
-        GameObject go = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         Canvas canvas = go.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = order;

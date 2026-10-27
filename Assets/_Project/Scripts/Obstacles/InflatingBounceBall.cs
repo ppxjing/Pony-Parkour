@@ -83,13 +83,13 @@ namespace Adventure.Obstacles
             {
                 RaycastHit hit = groundHits[i];
                 if (hit.transform.IsChildOf(transform) || hit.collider is CharacterController ||
-                    hit.rigidbody != null || hit.normal.y < 0.99f || hit.distance >= nearest) continue;
+                    hit.rigidbody != null || hit.normal.y < 0.7f || hit.distance >= nearest) continue;
                 nearest = hit.distance;
                 GroundY = hit.point.y;
             }
             if (float.IsInfinity(nearest))
             {
-                Debug.LogError("InflatingBounceBall: no stationary horizontal floor below the spawn. Check Ground Mask and colliders.", this);
+                Debug.LogError("InflatingBounceBall: no stationary walkable floor below the spawn. Check height, Ground Mask and colliders.", this);
                 enabled = false;
                 return;
             }

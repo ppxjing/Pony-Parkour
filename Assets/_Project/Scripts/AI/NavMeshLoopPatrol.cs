@@ -1,3 +1,5 @@
+
+using Adventure.Obstacles;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -26,14 +28,18 @@ namespace Adventure.AI
         private float arrivalPause;
         private Transform currentTarget;
         private Vector3 targetPosition;
-        private Vector3 destination;
+        
+        private float obstacleStunRemaining;
+private Vector3 destination;
 
         public int CurrentWaypointIndex { get; private set; }
         public int CompletedLoops { get; private set; }
         public IReadOnlyList<Transform> Waypoints => waypoints;
         public bool IsWaiting { get; private set; }
         public bool IsFinished => finished;
-        public float RemainingWaitTime => Mathf.Max(0f, waitRemaining);
+        
+        public bool IsObstacleStunned => obstacleStunRemaining > 0f;
+public float RemainingWaitTime => Mathf.Max(0f, waitRemaining);
 
         public void BeginRaceAtWaypoint(int waypointIndex)
         {
@@ -69,7 +75,9 @@ namespace Adventure.AI
             reportedFailure = false;
             IsWaiting = false;
             waitRemaining = 0f;
-            retryRemaining = 0f;
+            
+            obstacleStunRemaining = 0f;
+retryRemaining = 0f;
             originalStoppingDistance = agent.stoppingDistance;
             if (agent.isActiveAndEnabled && agent.isOnNavMesh)
                 agent.isStopped = false;
@@ -77,7 +85,19 @@ namespace Adventure.AI
 
         private void Update()
         {
-            if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+            
+
+            if (obstacleStunRemaining > 0f)
+            {
+                obstacleStunRemaining = Mathf.Max(0f, obstacleStunRemaining - Time.deltaTime);
+                if (obstacleStunRemaining <= 0f)
+                {
+                    agent.isStopped = false;
+                    hasDestination = false;
+                }
+                return;
+            }
+if (finished || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
                 return;
 
             if (IsWaiting)
@@ -223,5 +243,39 @@ namespace Adventure.AI
             if (agent.isActiveAndEnabled && agent.isOnNavMesh)
                 agent.isStopped = true;
         }
-    }
+    
+
+private static bool IsGameplayObstacle(Collider other)
+        {
+            return other.GetComponentInParent<InflatingBounceBall>() != null ||
+                   other.GetComponentInParent<RotatingPillarRod>() != null ||
+                   other.GetComponentInParent<HammerHeadDamage>() != null;
+        }
+
+
+private void OnTriggerStay(Collider other)
+        {
+            if (IsGameplayObstacle(other)) ApplyObstacleHit();
+        }
+
+
+private void OnTriggerEnter(Collider other)
+        {
+            if (IsGameplayObstacle(other)) ApplyObstacleHit();
+        }
+
+
+public void ApplyObstacleHit(float stunDuration = 1.25f)
+        {
+            if (finished || agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+
+            obstacleStunRemaining = Mathf.Max(obstacleStunRemaining, Mathf.Max(0.1f, stunDuration));
+            hasDestination = false;
+            IsWaiting = false;
+            waitRemaining = 0f;
+            agent.isStopped = true;
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
+}
 }

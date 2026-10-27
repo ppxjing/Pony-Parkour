@@ -40,7 +40,10 @@ namespace Adventure.Player
         private Vector3 supportLocalPoint, supportWorldPoint;
         public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
-        private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
+        
+        private float obstacleStunnedUntil;
+        public bool IsObstacleStunned => Time.time < obstacleStunnedUntil;
+private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
         public Vector3 FootPosition => controller.bounds.center - Vector3.up * controller.bounds.extents.y;
 
@@ -59,7 +62,8 @@ namespace Adventure.Player
             if (dt <= 0f) return;
             FollowSupport(dt);
             if (!isActiveAndEnabled) return;
-            Vector2 stick = Vector2.ClampMagnitude(input.Move, 1f);
+            bool isObstacleStunned = IsObstacleStunned;
+            Vector2 stick = isObstacleStunned ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
             Vector3 desired = (forward * stick.y + right * stick.x) * moveSpeed;
@@ -69,7 +73,7 @@ namespace Adventure.Player
 
             if (controller.isGrounded && verticalVelocity <= 0f)
             { lastGrounded = Time.time; verticalVelocity = -2f; }
-            if (input.JumpPressed) jumpRequested = Time.time;
+            if (!isObstacleStunned && input.JumpPressed) jumpRequested = Time.time;
             if (Time.time - jumpRequested <= jumpBufferTime && Time.time - lastGrounded <= coyoteTime)
             {
                 if (standingTurntable != null)
@@ -157,7 +161,12 @@ namespace Adventure.Player
         }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (!isActiveAndEnabled) return;
+            
+            var rotatingRod = hit.collider.GetComponentInParent<RotatingPillarRod>();
+            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) ApplyObstacleStun();
+
+            
+if (!isActiveAndEnabled) return;
             if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
             {
                 var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
@@ -196,8 +205,16 @@ namespace Adventure.Player
             lastGrounded = jumpRequested = float.NegativeInfinity;
             return true;
         }
-        private void OnDisable()
-        { ClearSupport(); externalHorizontalVelocity = Vector3.zero; detachUntil = 0f; horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
+private void OnDisable()
+        {
+            ClearSupport();
+            externalHorizontalVelocity = Vector3.zero;
+            detachUntil = 0f;
+            obstacleStunnedUntil = 0f;
+            horizontalVelocity = Vector3.zero;
+            verticalVelocity = 0f;
+            lastGrounded = jumpRequested = float.NegativeInfinity;
+        }
         private void OnValidate()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
@@ -218,5 +235,16 @@ namespace Adventure.Player
             verticalVelocity = 0f;
             lastGrounded = jumpRequested = float.NegativeInfinity;
         }
-    }
+    
+
+public void ApplyObstacleStun(float duration = 1.25f)
+        {
+            if (!isActiveAndEnabled || duration <= 0f) return;
+            obstacleStunnedUntil = Mathf.Max(obstacleStunnedUntil, Time.time + duration);
+            horizontalVelocity = Vector3.zero;
+            externalHorizontalVelocity = Vector3.zero;
+            jumpRequested = float.NegativeInfinity;
+            ClearSupport();
+        }
+}
 }
