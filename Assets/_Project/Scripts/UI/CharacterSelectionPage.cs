@@ -205,7 +205,9 @@ public sealed class SelectedPlayerCharacter : MonoBehaviour
         {
             Bounds bounds = renderers[0].bounds;
             for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
-            float scale = bounds.size.y > 0.001f ? targetHeight / bounds.size.y : 1f;
+            // Keep skin sizing proportional to the player body's authored scale.
+            float bodyScale = Mathf.Abs(motor.transform.localScale.y);
+            float scale = bounds.size.y > 0.001f ? targetHeight * bodyScale / bounds.size.y : 1f;
             visual.transform.localScale = Vector3.one * scale;
 
             bounds = renderers[0].bounds;

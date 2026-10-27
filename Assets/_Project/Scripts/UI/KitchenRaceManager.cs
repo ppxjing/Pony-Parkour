@@ -157,7 +157,9 @@ private void Start()
         {
             Bounds bounds = renderers[0].bounds;
             for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
-            float scale = bounds.size.y > 0.001f ? 1.65f / bounds.size.y : 1f;
+            // Bounds are world-space: retain the racer root scale when normalizing models.
+            float bodyScale = Mathf.Abs(racer.transform.lossyScale.y);
+            float scale = bounds.size.y > 0.001f ? 1.65f * bodyScale / bounds.size.y : 1f;
             visual.transform.localScale = Vector3.one * scale * setup.modelScale;
 
             bounds = renderers[0].bounds;
@@ -177,8 +179,13 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
         if (hitbox == null) hitbox = racer.AddComponent<CapsuleCollider>();
 
         hitbox.isTrigger = true;
-        hitbox.radius = Mathf.Max(0.25f, agent.radius);
-        hitbox.height = Mathf.Max(hitbox.radius * 2f, agent.height);
+        // Agent dimensions are world-space; Collider dimensions are local-space.
+        // Convert once so the root scale does not shrink the hitbox twice.
+        Vector3 bodyScale = racer.transform.lossyScale;
+        float radialScale = Mathf.Max(0.001f, Mathf.Max(Mathf.Abs(bodyScale.x), Mathf.Abs(bodyScale.z)));
+        float heightScale = Mathf.Max(0.001f, Mathf.Abs(bodyScale.y));
+        hitbox.radius = Mathf.Max(0.25f, agent.radius / radialScale);
+        hitbox.height = Mathf.Max(hitbox.radius * 2f, agent.height / heightScale);
         hitbox.center = Vector3.up * (hitbox.height * 0.5f);
     }
 
