@@ -63,6 +63,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8347084898542306573}
+  - component: {fileID: 6855336006821960312}
   m_Layer: 0
   m_Name: PF_FloorPanel_2_Trampoline
   m_TagString: Untagged
@@ -88,6 +89,18 @@ Transform:
   - {fileID: 4011843064876624196}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!114 &6855336006821960312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402769946631396240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c0ad1cee6a99294bb6c51da0dfd9eb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Player.CameraObstructionIgnore
 --- !u!1 &2441854965259774928
 GameObject:
   m_ObjectHideFlags: 0

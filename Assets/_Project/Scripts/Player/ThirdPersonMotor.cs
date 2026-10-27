@@ -32,6 +32,9 @@ namespace Adventure.Player
         private float rollerRideTime;
         public RollingCylinderBridge StandingRoller => standingRoller;
         private Vector3 externalHorizontalVelocity;
+        private float racerControlLockUntil, racerImpactCooldownUntil;
+        public Vector3 PlanarVelocity => horizontalVelocity + externalHorizontalVelocity;
+        public bool CanReceiveRacerImpact => isActiveAndEnabled && controller != null && controller.enabled && Time.time >= racerImpactCooldownUntil;
         private float turntableRideTime, detachUntil;
         public SpinningTurntable StandingTurntable => standingTurntable;
         private Transform SupportTransform => standingPlatform != null ? standingPlatform.transform :
@@ -62,7 +65,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
             if (dt <= 0f) return;
             FollowSupport(dt);
             if (!isActiveAndEnabled) return;
-            Vector2 stick = Vector2.ClampMagnitude(input.Move, 1f);
+            Vector2 stick = Time.time < racerControlLockUntil ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
             Vector3 desired = (forward * stick.y + right * stick.x) * moveSpeed;
@@ -72,7 +75,7 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
 
             if (controller.isGrounded && verticalVelocity <= 0f)
             { lastGrounded = Time.time; verticalVelocity = -2f; }
-            if (input.JumpPressed) jumpRequested = Time.time;
+            if (Time.time >= racerControlLockUntil && input.JumpPressed) jumpRequested = Time.time;
             if (Time.time - jumpRequested <= jumpBufferTime && Time.time - lastGrounded <= coyoteTime)
             {
                 if (standingTurntable != null)
@@ -160,6 +163,8 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
         }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
+            var racer = hit.collider.GetComponentInParent<Adventure.AI.RacerCollisionBody>();
+            if (racer != null) racer.TryCollideWithPlayer(this);
             
             var rotatingRod = hit.collider.GetComponentInParent<RotatingPillarRod>();
             if (rotatingRod != null && rotatingRod.isActiveAndEnabled) RespawnFromObstacle();
@@ -194,6 +199,15 @@ if (!isActiveAndEnabled) return;
             var trampoline = hit.collider.GetComponent<TrampolineSurface>();
             if (trampoline != null) trampoline.TryBounce(this, hit.normal);
         }
+        public bool TryReceiveRacerImpact(Vector3 velocity, float controlLockTime, float cooldown)
+        {
+            if (!CanReceiveRacerImpact) return false;
+            horizontalVelocity = Vector3.zero;
+            LaunchFromSupport(velocity);
+            racerControlLockUntil = Time.time + Mathf.Max(0f, controlLockTime);
+            racerImpactCooldownUntil = Time.time + Mathf.Max(0f, cooldown);
+            return true;
+        }
         public bool TryBounce(float height)
         {
             if (!isActiveAndEnabled || controller == null || !controller.enabled || verticalVelocity > 0f || height <= 0f)
@@ -210,6 +224,7 @@ private void OnDisable()
             externalHorizontalVelocity = Vector3.zero;
             detachUntil = 0f;
             obstacleRespawnCooldownUntil = 0f;
+            racerControlLockUntil = racerImpactCooldownUntil = 0f;
             horizontalVelocity = Vector3.zero;
             verticalVelocity = 0f;
             lastGrounded = jumpRequested = float.NegativeInfinity;
@@ -238,6 +253,7 @@ private void OnDisable()
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
+            racerControlLockUntil = racerImpactCooldownUntil = 0f;
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;
             detachUntil = 0f;

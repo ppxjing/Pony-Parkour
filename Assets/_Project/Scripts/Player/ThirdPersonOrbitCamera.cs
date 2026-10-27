@@ -26,7 +26,7 @@ namespace Adventure.Player
         [SerializeField, Min(0.05f)] private float collisionRadius = 0.2f;
         [SerializeField, Min(0)] private float collisionPadding = 0.08f;
         [SerializeField] private LayerMask obstructionMask = ~0;
-        private readonly RaycastHit[] hits = new RaycastHit[32];
+        private RaycastHit[] hits = new RaycastHit[32];
         private Vector3 pivot;
         private Quaternion smoothedRotation;
         private float currentDistance;
@@ -125,10 +125,20 @@ namespace Adventure.Player
         {
             Vector3 backward = smoothedRotation * Vector3.back;
             float safeDistance = distance;
-            int count = Physics.SphereCastNonAlloc(pivot, collisionRadius, backward, hits, distance, obstructionMask, QueryTriggerInteraction.Ignore);
+            int count;
+            // Ignored mechanisms still occupy query results. Grow the reusable buffer
+            // if full so a wall behind a dense mechanism is not accidentally missed.
+            while (true)
+            {
+                count = Physics.SphereCastNonAlloc(pivot, collisionRadius, backward, hits, distance, obstructionMask, QueryTriggerInteraction.Ignore);
+                if (count < hits.Length) break;
+                System.Array.Resize(ref hits, hits.Length * 2);
+            }
             for (int i = 0; i < count; i++)
             {
-                if (playerRoot != null && hits[i].transform.IsChildOf(playerRoot)) continue;
+                if (playerRoot != null && hits[i].collider.transform.IsChildOf(playerRoot)) continue;
+                var ignored = hits[i].collider.GetComponentInParent<CameraObstructionIgnore>();
+                if (ignored != null && ignored.isActiveAndEnabled) continue;
                 safeDistance = Mathf.Min(safeDistance, Mathf.Max(0f, hits[i].distance - collisionPadding));
             }
             // Move inward immediately to avoid clipping; ease outward when an obstruction clears.

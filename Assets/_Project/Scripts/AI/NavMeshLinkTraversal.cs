@@ -128,6 +128,11 @@ namespace Adventure.AI
             IsJumping = false;
         }
 
+        // Physics takes over at the current airborne pose, without snapping back to takeoff.
+        public void SuspendForImpact()
+        {
+            if (IsTraversing) RestoreMovement();
+        }
         private void CancelTraversal()
         {
             if (!IsTraversing || agent == null)

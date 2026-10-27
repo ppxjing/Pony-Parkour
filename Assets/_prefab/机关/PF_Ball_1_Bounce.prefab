@@ -132,6 +132,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3477421507001996402, guid: b74b102b4720e024194af75aa536c37e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8868708932812538476}
+    - targetCorrespondingSourceObject: {fileID: 3477421507001996402, guid: b74b102b4720e024194af75aa536c37e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4052667351029543455}
   m_SourcePrefab: {fileID: 100100000, guid: b74b102b4720e024194af75aa536c37e, type: 3}
 --- !u!4 &4903246126844702281 stripped
 Transform:
@@ -236,3 +239,15 @@ MonoBehaviour:
   solidSphere: {fileID: 1514400863181820314}
   contactTrigger: {fileID: 3826473489598891991}
   contactPadding: 0.05
+--- !u!114 &4052667351029543455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4903246126844801641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c0ad1cee6a99294bb6c51da0dfd9eb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Player.CameraObstructionIgnore
