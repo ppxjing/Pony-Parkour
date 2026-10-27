@@ -35,7 +35,30 @@ namespace Adventure.Player
         private Transform livingTarget;
         private float livingPitch;
 
-        private void Awake() { livingTarget = target; livingPitch = pitch; }
+        private void Awake()
+        {
+            // Beach originally contains a showcase camera. Always make the
+            // PlayerRig camera authoritative when this prefab is spawned there.
+            if (gameObject.scene.name == "Beach")
+            {
+                Camera ownCamera = GetComponent<Camera>();
+                ownCamera.enabled = true;
+                foreach (Camera sceneCamera in FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                    if (sceneCamera != ownCamera) sceneCamera.gameObject.SetActive(false);
+
+                Transform rig = transform.root;
+                ThirdPersonMotor motor = rig.GetComponentInChildren<ThirdPersonMotor>(true);
+                PlayerInputReader reader = rig.GetComponentInChildren<PlayerInputReader>(true);
+                Transform foundTarget = null;
+                foreach (Transform child in rig.GetComponentsInChildren<Transform>(true))
+                    if (child.name == "CameraTarget") { foundTarget = child; break; }
+                if (foundTarget != null) target = foundTarget;
+                if (motor != null) playerRoot = motor.transform;
+                if (reader != null) input = reader;
+            }
+            livingTarget = target;
+            livingPitch = pitch;
+        }
 
         private void OnEnable()
         {
@@ -70,6 +93,14 @@ namespace Adventure.Player
             smoothedRotation = Quaternion.Euler(pitch, yaw, 0);
             currentDistance = distance;
             PlaceCamera(true);
+        }
+        public void Configure(Transform newTarget, Transform newPlayerRoot, PlayerInputReader newInput)
+        {
+            target = newTarget;
+            livingTarget = newTarget;
+            playerRoot = newPlayerRoot;
+            input = newInput;
+            SnapToTarget();
         }
         public void FollowWithoutInput(Transform newTarget)
         {

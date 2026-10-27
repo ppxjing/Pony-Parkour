@@ -40,7 +40,10 @@ namespace Adventure.Player
         private Vector3 supportLocalPoint, supportWorldPoint;
         public SeesawPlatform StandingPlatform => standingPlatform;
         private Vector3 horizontalVelocity, spawnPosition;
-        private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
+        
+        private float obstacleRespawnCooldownUntil;
+        public bool IsObstacleStunned => false;
+private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
         public Vector3 FootPosition => controller.bounds.center - Vector3.up * controller.bounds.extents.y;
 
@@ -157,7 +160,12 @@ namespace Adventure.Player
         }
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (!isActiveAndEnabled) return;
+            
+            var rotatingRod = hit.collider.GetComponentInParent<RotatingPillarRod>();
+            if (rotatingRod != null && rotatingRod.isActiveAndEnabled) RespawnFromObstacle();
+
+            
+if (!isActiveAndEnabled) return;
             if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
             {
                 var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
@@ -196,14 +204,31 @@ namespace Adventure.Player
             lastGrounded = jumpRequested = float.NegativeInfinity;
             return true;
         }
-        private void OnDisable()
-        { ClearSupport(); externalHorizontalVelocity = Vector3.zero; detachUntil = 0f; horizontalVelocity = Vector3.zero; verticalVelocity = 0f; lastGrounded = jumpRequested = float.NegativeInfinity; }
+private void OnDisable()
+        {
+            ClearSupport();
+            externalHorizontalVelocity = Vector3.zero;
+            detachUntil = 0f;
+            obstacleRespawnCooldownUntil = 0f;
+            horizontalVelocity = Vector3.zero;
+            verticalVelocity = 0f;
+            lastGrounded = jumpRequested = float.NegativeInfinity;
+        }
         private void OnValidate()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
         {
+            KitchenRaceManager race = FindFirstObjectByType<KitchenRaceManager>();
+            if (race != null && race.RespawnPlayerAtLastCheckpoint(this)) return;
             if (respawn != null && respawn.isActiveAndEnabled) { respawn.RespawnNow(); return; }
             TeleportAndReset(spawnPosition, transform.rotation);
+        }
+
+        public void RespawnFromObstacle()
+        {
+            if (!isActiveAndEnabled || Time.time < obstacleRespawnCooldownUntil) return;
+            obstacleRespawnCooldownUntil = Time.time + 0.35f;
+            Respawn();
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
@@ -218,5 +243,11 @@ namespace Adventure.Player
             verticalVelocity = 0f;
             lastGrounded = jumpRequested = float.NegativeInfinity;
         }
-    }
+    
+
+public void ApplyObstacleStun(float duration = 1.25f)
+        {
+            RespawnFromObstacle();
+        }
+}
 }

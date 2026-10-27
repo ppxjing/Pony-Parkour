@@ -17,11 +17,11 @@ namespace Adventure.Obstacles
         }
         private void OnTriggerEnter(Collider other) { Touch(other); }
         private void OnTriggerStay(Collider other) { Touch(other); }
-        private void Touch(Collider other)
+private void Touch(Collider other)
         {
             if (!isActiveAndEnabled) return;
-            var player = other.GetComponentInParent<PlayerDeath>();
-            if (player != null) player.RequestDeath(transform.position);
+            ThirdPersonMotor player = other.GetComponentInParent<ThirdPersonMotor>();
+            if (player != null) player.RespawnFromObstacle();
         }
     }
 }

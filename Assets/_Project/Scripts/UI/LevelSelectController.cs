@@ -4,11 +4,11 @@ using UnityEngine.UI;
 
 public sealed class LevelSelectController : MonoBehaviour
 {
-    private void Awake()
+private void Awake()
     {
         WireCard("BeachCard", OpenBeach);
-        WireCard("ToyRoomCard", OpenBedroom);
         WireCard("KitchenCard", OpenKitchen);
+        LockCard("ToyRoomCard");
     }
 
     public void OpenBeach() => Load("Beach");
@@ -37,6 +37,23 @@ public sealed class LevelSelectController : MonoBehaviour
             button.onClick.AddListener(action);
         }
     }
+
+private static void LockCard(string objectName)
+    {
+        GameObject card = GameObject.Find(objectName);
+        if (card == null) return;
+
+        Image image = card.GetComponent<Image>();
+        if (image != null)
+        {
+            image.color = new Color(0.32f, 0.32f, 0.32f, 1f);
+            image.raycastTarget = false;
+        }
+
+        Button button = card.GetComponent<Button>();
+        if (button != null) button.interactable = false;
+    }
+
 
     private static void Load(string sceneName)
     {
