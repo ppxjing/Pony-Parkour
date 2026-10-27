@@ -63,7 +63,7 @@ private Text lapText;
 
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name != "Kitchen_Adventure" && scene.name != "Beach") return;
+        if (scene.name != "Kitchen_Adventure" && scene.name != "Beach" && scene.name != "Bedroom") return;
         if (FindFirstObjectByType<KitchenRaceManager>() == null)
             new GameObject("Kitchen Race Manager").AddComponent<KitchenRaceManager>();
     }
@@ -724,7 +724,8 @@ public sealed class GamePauseMenu : MonoBehaviour
         pausePanel.SetActive(false);
         Time.timeScale = previousTimeScale;
         if (SceneManager.GetActiveScene().name == "Kitchen_Adventure" ||
-            SceneManager.GetActiveScene().name == "Beach")
+            SceneManager.GetActiveScene().name == "Beach" ||
+            SceneManager.GetActiveScene().name == "Bedroom")
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;

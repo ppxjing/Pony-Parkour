@@ -39,7 +39,7 @@ namespace Adventure.Player
         {
             // Beach originally contains a showcase camera. Always make the
             // PlayerRig camera authoritative when this prefab is spawned there.
-            if (gameObject.scene.name == "Beach")
+            if (gameObject.scene.name == "Beach" || gameObject.scene.name == "Bedroom")
             {
                 Camera ownCamera = GetComponent<Camera>();
                 ownCamera.enabled = true;
