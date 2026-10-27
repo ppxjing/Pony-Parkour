@@ -218,6 +218,12 @@ private void OnDisable()
         { gravity = -Mathf.Max(0.1f, Mathf.Abs(gravity)); }
         public void Respawn()
         {
+            if (respawn != null && respawn.isActiveAndEnabled && respawn.CurrentCheckpoint != null)
+            {
+                respawn.RespawnNow();
+                return;
+            }
+
             KitchenRaceManager race = FindFirstObjectByType<KitchenRaceManager>();
             if (race != null && race.RespawnPlayerAtLastCheckpoint(this)) return;
             if (respawn != null && respawn.isActiveAndEnabled) { respawn.RespawnNow(); return; }
