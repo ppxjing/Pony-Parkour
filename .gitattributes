@@ -15,3 +15,4 @@
 *.prefab text eol=lf
 *.meta text eol=lf
 *.cs text eol=lf
+WebGLBuild/Build/*.data.unityweb filter=lfs diff=lfs merge=lfs -text

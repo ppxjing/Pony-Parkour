@@ -2,12 +2,18 @@
 
 ## Game Design Document
 
-**Project status:** In development
+**Project status:** Final submission
 **Genre:** Single-player 3D obstacle racing and adventure
 **Platform:** Desktop web browser
 **Engine:** Unity 6.3.x LTS
 **Build target:** WebGL
 **Complete playthrough target:** Under 10 minutes
+
+## Play the Game
+
+**WebGL build:** [Launch After Hours Toy Race](https://gdat-ap6412.github.io/2026s1-project-2-team-02/)
+
+The browser build is deployed from the `WebGLBuild` folder through GitHub Pages. The large Unity data file is tracked with Git LFS. For local testing, serve the folder through a local HTTP server and open `WebGLBuild/index.html` through that server.
 
 ## Game Concept
 
@@ -204,7 +210,7 @@ The main menu connects to character selection, the opening story, and level sele
 | Three-course build | Kitchen and Bedroom races, three AI models, character selection, and connected narrative |
 | Final build | Audio polish, obstacle tuning, WebGL testing, credits, and complete playthrough timing |
 
-The current build contains the connected three-level race structure, character selection, three AI racers, ranking UI, pause controls, story transitions, and the final ending. Remaining production work should focus on playtesting, audio, course balancing, WebGL performance, and final asset credits.
+The final build contains the connected three-level race structure, character selection, three AI racers, ranking UI, pause controls, story transitions, and the final ending. Final verification covers course balance, checkpoint recovery, AI recovery, WebGL loading, and complete playthrough timing.
 
 ## Acceptance Criteria
 
@@ -230,4 +236,4 @@ The current build contains the connected three-level race structure, character s
 - Imported Flower Horse, Flower Horse B, Horse, Elephant, Giraff, and Rabbit models and their associated materials and textures.
 - Third-party environment and obstacle assets included in the Unity project.
 
-Creators, source links, and licenses for every external model, texture, sound, and environment package should be confirmed and listed before final submission.
+Package documentation and licence files supplied with imported assets are retained in the repository. Additional external resources are listed in [REPORT.md](REPORT.md).
