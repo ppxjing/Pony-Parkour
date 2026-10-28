@@ -277,7 +277,10 @@ Text volumeLabel = CreateText("VolumeLabel", settingsCard, "MASTER VOLUME", 30, 
     {
         string[] paths = {
             "Assets/_Project/Scenes/MainMenuScene.unity",
+            "Assets/_Project/Scenes/StartScene.unity",
+            "Assets/_Project/Scenes/Beach.unity",
             "Assets/_Project/Scenes/Kitchen_Adventure.unity",
+            "Assets/_Project/Scenes/Bedroom.unity",
             "Assets/_Project/Scenes/Kitchen_Playground.unity"
         };
         EditorBuildSettings.scenes = Array.ConvertAll(paths, p => new EditorBuildSettingsScene(p, true));

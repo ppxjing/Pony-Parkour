@@ -1252,6 +1252,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4535142525897260, guid: ac3028c4902518445ab0f749e918a9c9, type: 3}
   m_PrefabInstance: {fileID: 76145117}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &80142893
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.7502894
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 6.1435547
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -13.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9334546
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.3586956
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 42.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (18)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &97464896
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1830,6 +1899,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4283338906609996, guid: c9c72e3094fc8d345937e7ca360f5457, type: 3}
   m_PrefabInstance: {fileID: 129738692}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &131398160
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.7502894
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 6.1435547
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.94987464
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.312631
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -36.436
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (20)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &143761278
 GameObject:
   m_ObjectHideFlags: 0
@@ -3024,6 +3162,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4708670192646363181, guid: c2b77f6c443ddda4694e1f6c98d135c5, type: 3}
   m_PrefabInstance: {fileID: 241903499}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &244147886
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.7502894
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 9.991262
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.69661
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.71745
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -91.689
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (21)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &247030633
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7637,6 +7844,75 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 605469485}
   m_Mesh: {fileID: 4300000, guid: ba4007aa0f19d974fa6008f952eec6f1, type: 3}
+--- !u!1001 &605597143
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -24.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 11.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5171141
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.85591644
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 117.722
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (26)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &608992266
 GameObject:
   m_ObjectHideFlags: 0
@@ -11320,6 +11596,75 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 884634984}
   m_Mesh: {fileID: 4300000, guid: 11eea73be7732fc459bb33c86e1f4bd3, type: 3}
+--- !u!1001 &887275107
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.54
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.92
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7098304
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7043726
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.558
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (24)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &895880130
 GameObject:
   m_ObjectHideFlags: 0
@@ -11575,6 +11920,75 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aff05fc9e2cba9648aa448bed06eb0b4, type: 3}
+--- !u!1001 &902871198
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.889493
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 8.021982
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -11.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 4.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9757089
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.21907118
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 25.309
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (19)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &904377297
 GameObject:
   m_ObjectHideFlags: 0
@@ -14401,6 +14815,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6601218146117311327, guid: 347fb4ad43159e84298f2e10c0426353, type: 3}
   m_PrefabInstance: {fileID: 1113659319}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1115632014
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 4.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6740811
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7386574
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 95.234
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (17)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &1126164342
 GameObject:
   m_ObjectHideFlags: 0
@@ -14966,6 +15449,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4355254122507444, guid: cabe78389efe4b241ba43fb467c70186, type: 3}
   m_PrefabInstance: {fileID: 1161990585}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1163936064
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -28.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.33
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7098304
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7043726
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.558
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (25)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!114 &1165522823 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5935973112608577553, guid: 1ff27566fe44f0a4bb3a8a2644b313ed, type: 3}
@@ -15841,6 +16393,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4710429088910634, guid: 4a8b91962a7e131458783cf4f947951c, type: 3}
   m_PrefabInstance: {fileID: 1242570438}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1248567556
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.1540017
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6.8982697
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4.6457534
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -16.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6440333
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.76499754
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 99.814
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (14)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &1256636124
 GameObject:
   m_ObjectHideFlags: 0
@@ -17346,6 +17967,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eb7edad54ccf484ca8b79455fae6d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Adventure.Checkpoints.RespawnCheckpoint
+--- !u!1001 &1371477575
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.93
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 22.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7098304
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7043726
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.558
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (23)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &1380836711
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18754,6 +19444,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4849130960940576, guid: 7b2e5a10bf66e0d4f895ce7b3ae594a2, type: 3}
   m_PrefabInstance: {fileID: 1467237059}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1469558103
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -13.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 24.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.19564438
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.980675
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 157.435
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (27)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &1471740742
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18806,6 +19565,75 @@ PrefabInstance:
       addedObject: {fileID: 1420146476}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4e4d68bf9cb12a49b57116c17946721, type: 3}
+--- !u!1001 &1490774366
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 11.74004
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.9409437
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 22.632107
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70401573
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.71018445
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (13)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &1498055212
 GameObject:
   m_ObjectHideFlags: 0
@@ -19398,6 +20226,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4849130960940576, guid: 7b2e5a10bf66e0d4f895ce7b3ae594a2, type: 3}
   m_PrefabInstance: {fileID: 1530874419}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1535295287
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 8.45805
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6.8982697
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 49.659447
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -7.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -21.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6671392
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7449331
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 96.307
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (11)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &1537289186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20669,6 +21566,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4355254122507444, guid: cabe78389efe4b241ba43fb467c70186, type: 3}
   m_PrefabInstance: {fileID: 1615101497}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1615466993
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.1540017
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6.8982697
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4.6457534
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -19.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6440333
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.76499754
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 99.814
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (12)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1001 &1618890378
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21296,6 +22262,144 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4586899363459490, guid: b6794f088dcb7a54694ceb221f063217, type: 3}
   m_PrefabInstance: {fileID: 1661034015}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1664961970
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 22.30138
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.9409437
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 22.632107
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70401573
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.71018445
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (16)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+--- !u!1001 &1666162180
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 9.739472
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 14.666179
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -16.48
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6440333
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.76499754
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 99.814
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (15)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &1677729486
 GameObject:
   m_ObjectHideFlags: 0
@@ -24396,6 +25500,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4182363900524102, guid: e4ec3f113f068e24db70bb47fe292ef3, type: 3}
   m_PrefabInstance: {fileID: 1905296186}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1906012698
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 12.317345
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.8766205
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 15.889519
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.69
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 4.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7098304
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7043726
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.558
+      objectReference: {fileID: 0}
+    - target: {fileID: 363620551175242863, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712077957495031645, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
+      propertyPath: m_Name
+      value: DeathZone_Ocean_North (22)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8228abab1a9ae814b9eb6fd3cbb7a5ee, type: 3}
 --- !u!1 &1913128588
 GameObject:
   m_ObjectHideFlags: 0
@@ -27825,3 +28998,20 @@ SceneRoots:
   - {fileID: 445857703}
   - {fileID: 524692531}
   - {fileID: 2113655576}
+  - {fileID: 1535295287}
+  - {fileID: 1615466993}
+  - {fileID: 1248567556}
+  - {fileID: 1666162180}
+  - {fileID: 1115632014}
+  - {fileID: 1906012698}
+  - {fileID: 1371477575}
+  - {fileID: 887275107}
+  - {fileID: 1163936064}
+  - {fileID: 605597143}
+  - {fileID: 1469558103}
+  - {fileID: 80142893}
+  - {fileID: 131398160}
+  - {fileID: 244147886}
+  - {fileID: 902871198}
+  - {fileID: 1490774366}
+  - {fileID: 1664961970}

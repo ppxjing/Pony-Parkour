@@ -13,6 +13,9 @@ public sealed class MainMenuController : MonoBehaviour
 
     private void Awake()
     {
+        // Scene objects can accidentally be saved active in the editor. The main menu must always start clean.
+        ClosePanels();
+
         float volume = PlayerPrefs.GetFloat(VolumeKey, 0.8f);
         AudioListener.volume = volume;
 
@@ -42,14 +45,14 @@ public sealed class MainMenuController : MonoBehaviour
 
     public void OpenSettings()
     {
-        levelsPanel.SetActive(false);
-        settingsPanel.SetActive(true);
+        if (levelsPanel != null) levelsPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(true);
     }
 
     public void ClosePanels()
     {
-        levelsPanel.SetActive(false);
-        settingsPanel.SetActive(false);
+        if (levelsPanel != null) levelsPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
     public void LoadAdventure() => LoadScene("Kitchen_Adventure");

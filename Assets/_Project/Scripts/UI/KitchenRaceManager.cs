@@ -528,7 +528,8 @@ private void ShowResults(List<ResultEntry> results)
         }
 
         string currentScene = SceneManager.GetActiveScene().name;
-        string nextLabel = currentScene == "Beach" ? "NEXT: KITCHEN" : "FINISH";
+        string nextLabel = currentScene == "Beach" ? "NEXT: KITCHEN" :
+            currentScene == "Kitchen_Adventure" ? "NEXT: BEDROOM" : "ENDING";
 
         Button replayButton = NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-330f, -440f));
         replayButton.onClick.AddListener(ReplayCurrentLevel);
@@ -548,6 +549,18 @@ private void LoadNextLevel()
         if (currentScene == "Beach")
         {
             BeachToKitchenStoryPage.Show(() => SceneManager.LoadScene("Kitchen_Adventure"));
+            return;
+        }
+
+        if (currentScene == "Kitchen_Adventure")
+        {
+            KitchenToBedroomStoryPage.Show(() => SceneManager.LoadScene("Bedroom"));
+            return;
+        }
+
+        if (currentScene == "Bedroom")
+        {
+            BedroomEndingStoryPage.Show(() => SceneManager.LoadScene("MainMenuScene"));
             return;
         }
 

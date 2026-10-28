@@ -8,7 +8,7 @@ private void Awake()
     {
         WireCard("BeachCard", OpenBeach);
         WireCard("KitchenCard", OpenKitchen);
-        LockCard("ToyRoomCard");
+        WireCard("ToyRoomCard", OpenBedroom);
     }
 
     public void OpenBeach() => Load("Beach");
@@ -37,23 +37,6 @@ private void Awake()
             button.onClick.AddListener(action);
         }
     }
-
-private static void LockCard(string objectName)
-    {
-        GameObject card = GameObject.Find(objectName);
-        if (card == null) return;
-
-        Image image = card.GetComponent<Image>();
-        if (image != null)
-        {
-            image.color = new Color(0.32f, 0.32f, 0.32f, 1f);
-            image.raycastTarget = false;
-        }
-
-        Button button = card.GetComponent<Button>();
-        if (button != null) button.interactable = false;
-    }
-
 
     private static void Load(string sceneName)
     {

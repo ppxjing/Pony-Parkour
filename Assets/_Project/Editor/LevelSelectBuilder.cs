@@ -135,7 +135,8 @@ private static void SetBuildScenes()
             "Assets/_Project/Scenes/MainMenuScene.unity",
             "Assets/_Project/Scenes/StartScene.unity",
             "Assets/_Project/Scenes/Beach.unity",
-            "Assets/_Project/Scenes/Kitchen_Adventure.unity"
+            "Assets/_Project/Scenes/Kitchen_Adventure.unity",
+            "Assets/_Project/Scenes/Bedroom.unity"
         };
         EditorBuildSettings.scenes = Array.ConvertAll(paths, p => new EditorBuildSettingsScene(p, true));
     }
