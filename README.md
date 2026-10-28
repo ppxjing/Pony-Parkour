@@ -133,7 +133,7 @@ The AI begins at the forward route point instead of returning to the starting gr
 
 **After Hours presentation:** The abandoned play area becomes a secret racing course once the toys awaken and begin following the first fragment's light.
 
-### Level 2 Restaurant
+### Level 2 Kitchen
 
 **Story role:** The Kitchen race reveals the second fragment and the final clue pointing toward the Bedroom.
 
@@ -147,7 +147,7 @@ The AI begins at the forward route point instead of returning to the starting gr
 
 **After Hours presentation:** Warm indoor lighting contrasts with the Beach and makes the second glowing star fragment feel brighter when it appears.
 
-### Level 3 Indoor Room
+### Level 3 Bedroom
 
 **Story role:** The final race reveals the third fragment, completes the golden star, and returns the toys to the room where their adventures began.
 
