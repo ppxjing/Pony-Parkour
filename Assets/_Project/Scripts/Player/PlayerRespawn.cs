@@ -14,6 +14,8 @@ namespace Adventure.Player
         private CheckpointRegistry registry;
         private Vector3 savedPosition;
         private Quaternion savedRotation;
+        private bool initialized;
+        private int lastFrameCount = -1;
         public RespawnCheckpoint CurrentCheckpoint { get; private set; }
         public Vector3 SavedPosition => savedPosition;
         public Quaternion SavedRotation => savedRotation;
@@ -21,17 +23,18 @@ namespace Adventure.Player
 
         private void Awake()
         {
-            death = GetComponent<PlayerDeath>();
-            savedPosition = transform.position;
-            savedRotation = transform.rotation;
+            EnsureInitialized();
         }
+        private void OnEnable() { EnsureInitialized(); }
         private void Update()
         {
-            if (death.IsDead && Time.time >= death.DiedAt + respawnDelay) RespawnNow();
+            EnsureInitialized();
+            if (death != null && death.IsDead && Time.time >= death.DiedAt + respawnDelay) RespawnNow();
         }
         public void SetRegistry(CheckpointRegistry source) { registry = source; }
         public bool TryActivateCheckpoint(RespawnCheckpoint checkpoint)
         {
+            EnsureInitialized();
             if (!isActiveAndEnabled || !death.IsAlive || registry == null ||
                 !registry.Contains(checkpoint) || !checkpoint.isActiveAndEnabled) return false;
             CurrentCheckpoint = checkpoint;
@@ -41,10 +44,12 @@ namespace Adventure.Player
         }
         public void RequestFallRecovery()
         {
-            if (isActiveAndEnabled) death.RequestDeath(transform.position);
+            EnsureInitialized();
+            if (isActiveAndEnabled && death != null) death.RequestDeath(transform.position);
         }
         public void RespawnNow()
         {
+            EnsureInitialized();
             if (!isActiveAndEnabled) return;
             Vector3 position = savedPosition;
             Quaternion rotation = savedRotation;
@@ -59,6 +64,43 @@ namespace Adventure.Player
             }
             death.Revive(position, rotation, protectionTime);
             RespawnCount++;
+        }
+
+        private void EnsureInitialized()
+        {
+            bool newPlaySession = Application.isPlaying && lastFrameCount >= 0 &&
+                                  Time.frameCount < lastFrameCount;
+            if (newPlaySession)
+            {
+                initialized = false;
+                registry = null;
+                CurrentCheckpoint = null;
+                RespawnCount = 0;
+            }
+
+            if (death == null) death = GetComponent<PlayerDeath>();
+            if (!initialized)
+            {
+                savedPosition = transform.position;
+                savedRotation = transform.rotation;
+                initialized = true;
+            }
+
+            if (Application.isPlaying && registry == null)
+            {
+                var registries = FindObjectsByType<CheckpointRegistry>(
+                    FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                foreach (var candidate in registries)
+                {
+                    if (candidate != null && candidate.Player == this)
+                    {
+                        registry = candidate;
+                        break;
+                    }
+                }
+            }
+
+            if (Application.isPlaying) lastFrameCount = Time.frameCount;
         }
     }
 }
