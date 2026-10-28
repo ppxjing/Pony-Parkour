@@ -10,7 +10,7 @@ EditorBuildSettings:
     guid: 3107022f8e1d44941810dab7da99cd1f
   - enabled: 1
     path: Assets/_Project/Scenes/StartScene.unity
-    guid: 06cbe14e58ef1404d920a5b1f51db1ff
+    guid: f46b6b5c09a948439aab7f4a0e1b234c
   - enabled: 1
     path: Assets/_Project/Scenes/Beach.unity
     guid: d76c1bdb4e2323a46869fa5f3b457e43
