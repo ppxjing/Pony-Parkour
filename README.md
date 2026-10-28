@@ -2,211 +2,232 @@
 
 ## Game Design Document
 
-**Project status:** In development  
-**Genre:** Single-player 3D obstacle racing  
-**Platform:** Desktop web browser  
-**Engine:** Unity 6.3.x LTS  
-**Build target:** WebGL  
+**Project status:** In development
+**Genre:** Single-player 3D obstacle racing and adventure
+**Platform:** Desktop web browser
+**Engine:** Unity 6.3.x LTS
+**Build target:** WebGL
 **Complete playthrough target:** Under 10 minutes
 
 ## Game Concept
 
-*After Hours Toy Race* takes place at a seaside hotel after its public facilities close. A group of toy robots has spent the day in the beach activity area. When the rental stand closes and the visitors leave, the toys come to life. Their home is a storage box in an indoor activity room. The robots turn the journey back into a race, following a route from the beach through the restaurant and into the room.
+*After Hours Toy Race* is a colorful third-person racing adventure about four toys searching for the pieces of a magical golden star. The journey begins at the beach, continues through a seaside kitchen, and ends in the bedroom where the toys once lived together.
 
-The player controls one robot against AI racers. Each short course has a clear start and finish. The robot runs forward automatically while the player steers around moving obstacles, collects speed boosts, and looks for a clear path through the oversized environment. The final course ends at the toys' storage box.
+The player chooses Flower Horse, Flower Horse B, or Horse and races against Elephant, Giraff, and Rabbit. Every level begins with a three-second visual countdown. The player completes two laps while navigating oversized objects, ramps, narrow connections, moving platforms, and dangerous fall areas. AI racers follow scene-specific NavMesh routes and compete for the same finish line.
 
-The **After Hours** theme shapes both the setting and the action. Beach equipment stands unused, dinner service has ended, and the indoor room has become quiet. Everyday objects become a miniature racing course once people have left. Evening lighting and small local lights show the route while preserving the sense of a closed space.
+Short story pages connect the three races. Each completed location reveals another part of the star mystery, and the final Bedroom race restores the complete golden star to Woody's saddle.
 
 | Design element | Plan |
 | --- | --- |
-| Player | One animated toy robot |
-| Opponents | AI toy robots with distinct colors |
+| Player | One selectable rocking-horse character |
+| Opponents | Elephant, Giraff, and Rabbit AI racers |
 | Perspective | Third-person follow camera |
-| Main action | Automatic running and keyboard steering |
-| Courses | Beach, Restaurant, Indoor Room |
-| Race objective | Reach each finish ahead of the other toys |
-| Final objective | Return to the storage box |
-| Target duration | Approximately 2 to 2.5 minutes per course |
+| Main action | Run, steer, jump, avoid hazards, and complete two laps |
+| Courses | Beach, Kitchen, Bedroom |
+| Race objective | Finish two laps and achieve the best possible position |
+| Final objective | Recover all three star fragments and restore the magic |
+| Target duration | Approximately 2 to 3 minutes per course |
 
 ## Story
 
-During the day, the hotel's toy robots are brought to the beach activity area. By evening, the visitors have gone and the equipment has been left in place. The closing lights come on. The robots wake near a rental basket and recognize the route back to their indoor storage box.
+Woody and the other toys awaken to discover that the magical star has been broken into three fragments. Without the complete star, the warmth and magic of their world are beginning to fade. The four friends decide to follow its light and turn the search into a race.
 
-The first leg takes them across the beach. Umbrellas, loungers, paddles, inflatable boats, and buckets are much larger than the toys. The robots begin racing between these objects and head toward the restaurant terrace. Their playful competition gives the trip a clear pace: each toy wants to be the first back to the box.
+The first race takes place at the beach. The toys run among oversized seaside objects and complete two laps while searching for the first fragment. When the race ends, a golden piece rises into the air and points toward the kitchen.
 
-The restaurant has finished dinner service. The robots use chair ramps, tables, and a connecting board to cross the room. Moving utensils and rolling food interrupt their path. The race continues through a doorway leading toward the indoor activity room.
+The second race continues through the seaside kitchen. Four racers cross the finish line and discover the second fragment. The two collected pieces respond to one another and create a glowing trail leading toward the bedroom. The toys follow the light, knowing that only one fragment remains.
 
-In the last room, furniture and toys form the final course. The robots follow toy tracks, pass books and boxes, and reach the storage box. The player's finishing position and total play time appear with the results from all three courses. The opening and ending use brief in-game text and short character actions so the full journey remains within the assignment time limit.
+The Bedroom is the final destination. After the last race, the third fragment appears and joins the first two pieces. The restored golden star fills the room with light before returning to Woody's saddle. The toys remember that this room is where their adventures began and decide that they will race together again.
 
 ## Design Goals
 
-**A readable race:** The player can identify the next safe opening, nearby competitors, and their current position while running.
+**A readable race:** Route markers, lap information, a stable follow camera, and visually distinct racers help the player understand where to go and who is ahead.
 
-**A continuous journey:** The same robot and controls carry through all three courses. Each finish moves the group closer to the storage box.
+**A continuous journey:** Story pages connect Beach, Kitchen, and Bedroom so that each race advances the search for the star fragments.
 
-**Distinct locations:** The beach, restaurant, and indoor room use their own objects, lighting, sounds, and obstacle layouts.
+**Distinct locations:** Each level uses a different environment, route shape, obstacle layout, and visual mood while sharing the same race systems.
 
-**A manageable scope:** The courses use continuous running surfaces, shared race systems, and repeatable obstacle behaviors. Boards and ramps connect changes in height.
+**Player choice:** The character-selection screen lets the player use one of three horse models while the AI racers remain recognizable as Elephant, Giraff, and Rabbit.
+
+**A manageable scope:** Shared countdown, navigation, ranking, pause, respawn, camera, and results systems are reused across all three scenes.
 
 ## Core Gameplay Loop
 
-1. Begin a course after a short countdown.
-2. Run forward and steer through the route.
-3. Avoid moving obstacles and slow areas.
-4. Collect speed boosts and pass AI racers.
-5. Cross the finish line and view position and course time.
-6. Continue to the next location.
-7. Reach the storage box and view the overall results.
+1. Choose a player character from the main menu.
+2. View the opening story or select an unlocked level.
+3. Begin the race after the 3, 2, 1, GO countdown.
+4. Follow the route, jump over gaps, and avoid obstacles or death zones.
+5. Complete two laps while racing three AI opponents.
+6. View the final ranking and choose to replay, return to the menu, or continue.
+7. Watch the story transition and enter the next location.
+8. Complete the Bedroom race and restore the golden star.
 
 ```mermaid
 flowchart LR
-    A[Beach activity area] --> B[Beach race]
-    B --> C[Restaurant race]
-    C --> D[Indoor room race]
-    D --> E[Storage box and final results]
+    A[Character selection] --> B[Opening story]
+    B --> C[Beach race]
+    C --> D[First star fragment]
+    D --> E[Kitchen race]
+    E --> F[Second star fragment]
+    F --> G[Bedroom race]
+    G --> H[Complete star and ending]
 ```
 
 ## Controls and Camera
 
 | Input | Action |
 | --- | --- |
-| A or Left Arrow | Steer left |
-| D or Right Arrow | Steer right |
-| Enter | Confirm a menu choice |
-| P | Pause or resume a race |
+| W / A / S / D | Move the player |
+| Space | Jump |
+| Mouse movement | Rotate the third-person camera |
+| Escape | Release the mouse cursor |
+| Left Mouse Button | Capture the mouse cursor again |
+| On-screen Settings button | Pause the race |
 
-The robot runs forward automatically when a race begins. Holding a direction key moves it sideways relative to the course. Releasing the key ends lateral movement. The course surface guides the robot along broad bends, boards, and ramps.
+Movement is relative to the camera, allowing the player to steer freely around corners and line up jumps. The character model rotates toward its movement direction while the collision root remains stable.
 
-The camera follows from behind and slightly above the robot. It turns with the route and keeps upcoming hazards visible. The browser start screen prompts the player to click the game area to focus keyboard input. A visible pause control provides an additional way to stop the race.
+The camera follows from behind and above the player. It turns with mouse input and keeps the selected character as its target in Beach, Kitchen, and Bedroom. The camera setup repairs its references at runtime if a scene is entered through the menu flow.
 
 ## Race Structure and Rules
 
-The initial race design contains one player and six AI opponents. All racers start together and follow the same course. Their movement speeds vary slightly, creating opportunities to overtake during clear sections and after obstacles.
+Each race contains one player and three AI opponents. All racers wait for the visual countdown before starting. A level lasts two laps, and ordered route points track each racer's progress through the course.
 
-Live position reflects progress along the course. Final placement follows the order in which racers cross the finish line. Every finishing position completes the course and allows the player to continue to the next location. Course results show the player's position and completion time. The last screen shows results for all three races and total play time.
+The lap counter displays the current lap. Ranking is calculated from completed laps, the next route point, and progress along the current route segment. When the player finishes the second lap, the game compares all four racers and displays their names on a four-place ranking podium.
 
-Contact with a moving hazard returns the affected racer to the start of the current short course. Slow areas temporarily reduce running speed. Speed boosts temporarily increase it. Hazard frequency and course length will be tuned through playtesting so the full game can be completed within ten minutes.
+The results screen provides Replay, Main Menu, and Continue or Ending options. Beach continues to the Kitchen story, Kitchen continues to the Bedroom story, and Bedroom continues to the final ending sequence.
+
+Falling into a death zone or hitting a lethal obstacle triggers the death and respawn system. The player returns to a valid checkpoint instead of restarting the entire game. AI racers use the same ordered course loop and continue into the second lap through a final-to-first navigation connection.
 
 ## Obstacles and Pickups
 
 | Element | Player effect | Example in the game |
 | --- | --- | --- |
-| Moving hazard | Collision returns the racer to the course start | Swinging paddle, sweeping spoon, moving toy train |
-| Fixed obstacle | Occupies part of the route | Bucket, stacked plate, cardboard box |
-| Slow area | Temporarily lowers running speed | Loose sand, spilled sauce, thick carpet |
-| Speed boost | Temporarily raises running speed | Glowing pickup along a clear route |
+| Moving obstacle | Requires timing or knocks the player away | Rotating rods and moving platforms |
+| Fixed obstacle | Blocks a direct path and changes the racing line | Furniture, kitchen props, boxes, and toys |
+| Gap or death zone | Triggers a death animation and checkpoint respawn | Areas below platforms and outside the course |
+| Jump connection | Lets the player cross between separated surfaces | Ramps, boards, and short gaps |
+| Route marker | Shows the next required section of the course | Floating marker above the next waypoint |
 
-Moving hazards use visible repeating patterns. Their travel range and timing leave an opening during each cycle. The first course introduces one hazard at a time. Later courses combine familiar movements in tighter spaces. Props, colliders, and motion timing are adjusted for the scale of each location.
+Obstacle movement uses visible, repeating patterns so the player can read a safe opening. Colliders and death regions are adjusted separately for each scene. Checkpoints prevent a single mistake from removing too much progress, while two-lap races allow players to learn the course during the first lap and improve during the second.
 
 ## AI Racers
 
-The AI racers are other toy robots returning to the same storage box. Distinct body colors make opponents easy to recognize. They share the player's route, start signal, hazards, pickups, and finish point.
+The three opponents are Elephant, Giraff, and Rabbit. Different models and proportions make each racer easy to identify on the course and ranking screen. Their movement speeds vary slightly to create overtaking opportunities.
 
-Each course has its own navigable surface for AI movement. A small sequence of invisible route targets guides the AI through important turns and connections. On the restaurant course, for example, a racer travels to the first table, crosses the board, reaches the second table, and then heads for the finish. The navigation system handles movement between those targets.
+Every level has its own baked NavMesh and an ordered set of editable route points. Kitchen uses its established navigation route, Beach has a scene-specific course with shortcut links, and Bedroom contains twenty route points for detailed adjustment. NavMesh Links connect jumps, separated surfaces, and the last route point back to the first.
 
-Agent size and route width are set together. Wide fixed boards and ramps connect playable surfaces. The ranking system uses ordered route progress so a racer on a curved or elevated section receives the correct position. Finish crossing order determines the final result.
+The AI begins at the forward route point instead of returning to the starting grid, preventing a racer from initially travelling in the wrong direction. Navigation agents orient toward their movement path, traverse links, complete laps, and report their progress to the shared ranking manager.
 
 ## Level Design
 
 ### Level 1 Beach
 
-**Story role:** The robots leave the closed beach activity area and race toward the hotel restaurant terrace.
+**Story role:** The first race begins the search and reveals the first golden star fragment.
 
-**Route:** Rental basket → umbrella passage → boat-side boardwalk → lounger corridor → terrace entrance.
+**Route:** Starting grid → seaside obstacle route → connected platforms and jumps → final corner → starting line for lap two.
 
-**Environment:** Umbrellas, loungers, buckets, inflatable boats, beach balls, paddles, and a closed rental stand create the toy-scale beach. The sand and boardwalk form one continuous course.
+**Environment:** A bright toy-scale beach filled with oversized seaside props, boards, platforms, and playful obstacles.
 
-**Hazards and pickups:** A sideways-moving beach ball or paddle teaches timing. A rotating beach toy creates a second movement pattern. Loose sand slows racers, while an early boost teaches pickup placement.
+**Hazards and pickups:** Moving or rotating obstacles interrupt the route, while gaps and out-of-bounds areas use death regions and checkpoint respawns.
 
-**Difficulty:** The opening has generous width. Hazards appear separately before a final section combines a moving obstacle and a boost opportunity.
+**Difficulty:** Broad opening sections introduce movement and camera control before later route points require more accurate steering and jumping.
 
-**After Hours presentation:** A closed sign, empty loungers, cooler evening light, and warm lamps near the terrace mark the end of the day.
+**After Hours presentation:** The abandoned play area becomes a secret racing course once the toys awaken and begin following the first fragment's light.
 
 ### Level 2 Restaurant
 
-**Story role:** The robots cross the restaurant after dinner service to reach the indoor part of the hotel.
+**Story role:** The Kitchen race reveals the second fragment and the final clue pointing toward the Bedroom.
 
-**Route:** Terrace chair ramp → first dining table → wide board bridge → second dining table → interior doorway.
+**Route:** Kitchen starting grid → elevated counters and connected surfaces → obstacle sections → finish line → second lap.
 
-**Environment:** Chairs, tables, plates, cups, food trays, utensils, and a preparation counter create elevated paths and recognizable landmarks. Fixed ramps and boards connect all running surfaces.
+**Environment:** A warm seaside toy kitchen with oversized pots, utensils, counters, food props, bridges, and narrow connections.
 
-**Hazards and pickups:** A sweeping spoon blocks part of a table. A rolling food item crosses the next section. Spilled sauce slows racers. A boost on a clear side of the route rewards accurate steering.
+**Hazards and pickups:** Rotating and moving course objects require timing. Falling from raised surfaces triggers the recovery system.
 
-**Difficulty:** Tables introduce height changes and tighter bends. Route targets guide AI racers across each table connection.
+**Difficulty:** Height changes and narrower connections demand more precise movement. AI route points and navigation links guide racers through each important section.
 
-**After Hours presentation:** Stacked dishes, cleared seats, dim dining lights, and a remaining counter lamp show that service has ended.
+**After Hours presentation:** Warm indoor lighting contrasts with the Beach and makes the second glowing star fragment feel brighter when it appears.
 
 ### Level 3 Indoor Room
 
-**Story role:** The toys make their final run to the storage box.
+**Story role:** The final race reveals the third fragment, completes the golden star, and returns the toys to the room where their adventures began.
 
-**Route:** Doorway → floor toy road → book ramp → table connection → storage box finish.
+**Route:** Bedroom starting grid → floor route around furniture and toys → connected obstacle sections → final straight → second lap and ending.
 
-**Environment:** A bed, books, chairs, cardboard boxes, toy tracks, and scattered toys create the final miniature course. The storage box is visible near the end.
+**Environment:** A warm Bedroom containing a bed, shelves, blocks, a toy train, a teddy bear, and other familiar childhood objects.
 
-**Hazards and pickups:** A moving toy train crosses the course. A rotating barrier tests obstacle timing. A thick carpet section slows racers, and a final boost creates an overtaking chance.
+**Hazards and pickups:** Bedroom-specific death areas and navigation connections keep both the player and AI on the intended route.
 
-**Difficulty:** The course combines known hazard types, then opens into a wider final approach where racers can change positions before the finish.
+**Difficulty:** Twenty editable route points create a longer closed course and allow precise tuning of AI turns, jumps, and the final return to the starting line.
 
-**After Hours presentation:** Low room lighting and small toy lights keep the route readable. The quiet room and returning toys complete the nighttime journey.
+**After Hours presentation:** Golden light fills the room during the ending as all three star fragments join and the magic returns.
 
 ## Art and Animation
 
-The game uses a stylized, low-poly look with large household objects and small toy characters. One robot model with color variants provides a consistent visual identity for the player and AI racers. The intended character is [Quaternius's Animated Robot Pack](https://quaternius.com/packs/animatedrobot.html). Running and idle animations support racing and menu presentation.
+The game uses a colorful handcrafted toy style with painted wood, warm lighting, and oversized environments. The UI uses wooden signs, toy-like buttons, illustrated level cards, a 3D countdown, and a four-place ranking podium.
 
-The player has a distinctive color and a small marker above the character. Moving obstacles have readable silhouettes, clear motion ranges, and collision shapes that match their visible forms. Beach, restaurant, and indoor props follow the team's visual references for scale and arrangement.
+The player can select Flower Horse, Flower Horse B, or Horse. Their imported materials and textures preserve the floral, wooden, and rocking-horse designs. Elephant, Giraff, and Rabbit are the three AI opponents. Model visuals are placed under separate character roots so their position, rotation, and scale can be adjusted without changing movement or collision logic.
 
-Lighting changes across the route: cool evening beach light, warm restaurant practical lights, and softer indoor room light. Route edges and hazards retain enough contrast for fast movement.
+Story pages use gold and dark-blue presentation panels to match the magical star narrative. Beach, Kitchen, and Bedroom retain different environmental colors while sharing the same playful visual identity.
 
 ## Audio and User Interface
 
-Audio includes a countdown, toy footsteps, moving obstacle sounds, impact, boost pickup, course finish, and final celebration. Waves identify the beach. A quiet interior ambience identifies the restaurant and indoor room.
+The game currently focuses on clear visual feedback, with space for countdown, jump, impact, magical chime, finish, and ambient sounds. The Bedroom ending specifically calls for a gentle magical chime when the three fragments form the complete star.
 
 | Screen | Content |
 | --- | --- |
-| Main menu | Start, Level Select, Audio Settings, Credits |
-| Race display | Current position, timer, course progress, active boost, pause control |
-| Pause menu | Resume, Restart Course, Main Menu |
-| Course results | Position, time, Continue, Replay |
-| Final results | Three course positions, total time, Replay, Main Menu |
+| Main menu | Play, Level Select, Settings |
+| Character selection | Flower Horse, Flower Horse B, Horse |
+| Story pages | Click anywhere to advance dialogue and narration |
+| Race display | Lap counter, next-route guidance, Settings button |
+| Pause menu | Resume, Main Menu |
+| Course results | Four-place ranking, Replay, Main Menu, Continue |
+| Final ending | Completed star story and Thank You for Playing message |
 
-Large text and simple icons support quick reading during a race. The opening displays a brief instruction for keyboard steering. Results appear promptly so the three-course journey stays short.
+Large text and simple buttons support fast reading. The Settings button pauses gameplay by setting the game time scale to zero. Returning to the race restores the previous time scale and mouse capture. The main menu closes its settings panel when loaded so no menu appears unexpectedly.
 
 ## Technical Design
 
-The team will develop the game in **Unity 6.3.x LTS**, manage the project through **GitHub**, and submit a **WebGL build playable in a desktop browser**. The exact Unity patch version will be recorded with the final submission.
+The project is developed in **Unity 6.3.x LTS**, managed through **GitHub**, and prepared for a **WebGL build playable in a desktop browser**.
 
-Each course needs a navigable route for AI racers, appropriately sized agent settings, route targets, and finish detection. Continuous fixed boards and ramps connect elevated sections. Player steering follows the local course direction, and the camera follows the same turns. Ranking measures progress through the ordered route and finish crossing order.
+Player movement uses Unity's Input System, a Character Controller, camera-relative movement, jumping, gravity, obstacle response, death, and checkpoint recovery. The third-person orbit camera follows the active player character and restores missing scene references when required.
 
-The team will test a small WebGL prototype early. Later browser tests cover loading, keyboard focus, menu input, AI navigation, moving obstacles, course transitions, results, and the complete playthrough. Simple collision shapes, restrained visual effects, and modest texture sizes support browser performance.
+AI movement uses Unity NavMesh surfaces, ordered waypoints, NavMesh agents, and NavMesh Links. Beach, Kitchen, and Bedroom have independent navigation data because their geometry and jump connections differ. Shared race logic manages the countdown, two-lap progress, AI spawning, ranking, result screen, pause menu, and scene transitions.
+
+The main menu connects to character selection, the opening story, and level selection. All three gameplay scenes are included in Build Settings. Runtime story pages connect Beach to Kitchen, Kitchen to Bedroom, and Bedroom to the final ending.
 
 ## Production Plan
 
 | Milestone | Playable result |
 | --- | --- |
-| Core prototype | Robot movement, keyboard steering, one AI racer, one moving obstacle, browser build |
-| Beach course | Complete route, pickups, AI navigation, race display, results |
-| Three-course build | Restaurant, indoor room, transitions, route-based ranking |
-| Final build | Lighting, audio, credits, browser testing, playthrough timing |
+| Core prototype | Player movement, jump, follow camera, one AI route, and obstacle response |
+| Beach course | Complete two-lap route, death zones, AI navigation, ranking, and first story transition |
+| Three-course build | Kitchen and Bedroom races, three AI models, character selection, and connected narrative |
+| Final build | Audio polish, obstacle tuning, WebGL testing, credits, and complete playthrough timing |
 
-The team will complete the route through all three locations before adding final visual detail. GitHub commits will track changes to gameplay, scenes, UI, and assets. Scene ownership will be coordinated when team members work in parallel.
+The current build contains the connected three-level race structure, character selection, three AI racers, ranking UI, pause controls, story transitions, and the final ending. Remaining production work should focus on playtesting, audio, course balancing, WebGL performance, and final asset credits.
 
 ## Acceptance Criteria
 
-- The game presents a complete Beach → Restaurant → Indoor Room journey after closing time.
-- One human player competes against AI toy robots in all three courses.
-- Every course has a continuous route that AI racers can complete.
-- Moving obstacles, collision resets, speed boosts, and slow areas function in the themed environments.
-- Keyboard steering, pause, restart, course results, and scene transitions work in a desktop browser.
-- Live position reflects route progress, and final placement follows finish order.
-- Every finishing position allows the player to continue the journey.
-- The final race ends at the toys' storage box.
-- A full first playthrough reaches the final results within ten minutes.
-- The submitted project uses Unity 6.3.x LTS, GitHub version control, and a tested WebGL build.
+- The game presents a complete Beach → Kitchen → Bedroom journey.
+- The player can select Flower Horse, Flower Horse B, or Horse.
+- One human player competes against Elephant, Giraff, and Rabbit in all three courses.
+- Every race begins after a 3, 2, 1, GO countdown and lasts two laps.
+- Every course has a baked NavMesh, ordered route points, and a closed loop that AI racers can complete.
+- Player movement, jumping, third-person camera control, pause, respawn, and scene transitions function correctly.
+- Falling into a death zone returns the player to a valid checkpoint.
+- Live progress and final placement use route order, lap count, and finish progress.
+- The ranking screen displays all four racer names and provides replay, menu, and continuation controls.
+- Kitchen completion plays the Bedroom transition story.
+- Bedroom completion restores the star and displays the final message.
+- Beach, Kitchen, and Bedroom are accessible through the connected flow and level-selection screen.
+- A complete playthrough can be finished within the intended time target.
+- The final WebGL build is tested in a desktop browser.
 
 ## Credits and References
 
-- [Quaternius Animated Robot Pack](https://quaternius.com/packs/animatedrobot.html), planned toy character, CC0 license.
-- Team-provided beach, restaurant, and indoor room references, visual direction for layout and scale.
+- Unity Engine and Unity AI Navigation, used for runtime, input, scene management, and NavMesh systems.
+- Team-created and team-provided wooden toy UI artwork, level cards, countdown graphics, story direction, and environment references.
+- Imported Flower Horse, Flower Horse B, Horse, Elephant, Giraff, and Rabbit models and their associated materials and textures.
+- Third-party environment and obstacle assets included in the Unity project.
 
-Additional external assets used in the final game will be listed here with their creators and licenses.
+Creators, source links, and licenses for every external model, texture, sound, and environment package should be confirmed and listed before final submission.
