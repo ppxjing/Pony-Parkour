@@ -42,7 +42,19 @@ public sealed class KitchenRaceManager : MonoBehaviour
     [SerializeField, Min(1)] private int targetLaps = 2;
     [SerializeField, Range(1f, 2f)] private float npcSpeedScale = 1.2f;
     
-[SerializeField, Min(0.5f)] private float checkpointRadius = 2.5f;
+    // Legacy serialized field retained for existing scenes and installation tools.
+#pragma warning disable CS0414
+    [SerializeField, HideInInspector] private float checkpointRadius = 2.5f;
+#pragma warning restore CS0414
+
+    [Header("Checkpoint Star")]
+    [SerializeField, Min(0.05f)] private float starScale = 0.68f;
+    [SerializeField, Min(0f)] private float starHoverHeight = 0.7f;
+    [SerializeField, Min(0f)] private float starBobHeight = 0.1f;
+    [SerializeField] private float starIdleRotationSpeed = 120f;
+    [SerializeField, Min(0.05f)] private float starCollectDuration = 0.8f;
+    [SerializeField, Min(0f)] private float starCollectRise = 1.25f;
+    [SerializeField] private float starCollectRotationSpeed = 540f;
 
     private int playerNextWaypoint = 1;
     private int playerLaps;
@@ -50,8 +62,10 @@ public sealed class KitchenRaceManager : MonoBehaviour
     
     private Text routeText;
     
-    private float routeMarkerRevealTime;
-private GameObject routeMarker;
+    private CheckpointStarPickup routeMarker;
+    private CharacterController playerController;
+    private ThirdPersonMotor playerMotor;
+    private PlayerDeath playerDeath;
 private Text lapText;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -73,7 +87,12 @@ private void Start()
         AutoConfigureIfNeeded();
         targetLaps = 2;
         CreateLapDisplay();
-        CreateRouteMarker();
+        if (player != null)
+        {
+            playerController = player.GetComponent<CharacterController>();
+            playerMotor = player.GetComponent<ThirdPersonMotor>();
+            playerDeath = player.GetComponent<PlayerDeath>();
+        }
         UpdateLapText();
         UpdateRouteGuidance();
     }
@@ -186,65 +205,32 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
     }
 
 
-private void Update()
+    private void LateUpdate()
     {
-        if (finished || player == null || route.Count < 2) return;
-        AnimateRouteMarker();
+        if (finished || Time.timeScale <= 0f || player == null || route.Count < 2 ||
+            playerMotor == null || !playerMotor.isActiveAndEnabled ||
+            (playerDeath != null && !playerDeath.IsAlive)) return;
 
-        Transform next = route[Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1)];
-        if (next == null || !HasReachedWaypoint(next)) return;
-
-        if (routeMarker != null)
-        {
-            routeMarker.SetActive(false);
-            routeMarkerRevealTime = Time.time + 0.3f;
-        }
+        // All player movement has run this frame. Only the visible star's collider
+        // touching the live player capsule can advance progress, including the lap gate.
+        if (routeMarker == null || !routeMarker.IsTouching(playerController)) return;
+        routeMarker.Collect();
+        routeMarker = null;
 
         playerNextWaypoint++;
-        if (playerNextWaypoint < route.Count)
+        if (playerNextWaypoint >= route.Count)
         {
-            UpdateRouteGuidance();
-            return;
+            playerNextWaypoint = 0;
+            playerLaps++;
+            UpdateLapText();
+            if (playerLaps >= targetLaps)
+            {
+                FinishRace();
+                return;
+            }
         }
-
-        playerNextWaypoint = 0;
-        playerLaps++;
-        UpdateLapText();
-        UpdateRouteGuidance();
-        if (playerLaps >= targetLaps)
-        {
-            FinishRace();
-            return;
-        }
-
-        // Require crossing the start waypoint before beginning the next lap.
-        playerNextWaypoint = 0;
-    }
-
-private void LateUpdate()
-    {
-        if (finished || playerNextWaypoint != 0 || route.Count == 0) return;
-        if (!HasReachedWaypoint(route[0])) return;
-
-        playerNextWaypoint = 1;
         UpdateRouteGuidance();
     }
-
-private bool HasReachedWaypoint(Transform waypoint)
-    {
-        if (waypoint == null || player == null) return false;
-
-        Vector3 difference = player.position - waypoint.position;
-        bool isBeach = SceneManager.GetActiveScene().name == "Beach";
-        float radius = isBeach
-            ? Mathf.Max(checkpointRadius, 4.5f)
-            : Mathf.Max(checkpointRadius, 4.25f);
-        float horizontalDistanceSquared = difference.x * difference.x + difference.z * difference.z;
-        float verticalTolerance = isBeach ? float.PositiveInfinity : 3f;
-        return horizontalDistanceSquared <= radius * radius &&
-               Mathf.Abs(difference.y) <= verticalTolerance;
-    }
-
 
 public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
     {
@@ -292,7 +278,7 @@ private void FinishRace()
         if (motor != null) motor.enabled = false;
         PlayerInputReader input = player.GetComponent<PlayerInputReader>();
         if (input != null) input.enabled = false;
-        if (routeMarker != null) routeMarker.SetActive(false);
+        if (routeMarker != null) Destroy(routeMarker.gameObject);
 
         ShowResults(results);
         Cursor.lockState = CursorLockMode.None;
@@ -350,50 +336,27 @@ private void CreateLapDisplay()
         if (lapText != null) lapText.text = "LAP  " + Mathf.Min(playerLaps + 1, targetLaps) + " / " + targetLaps;
     }
 
-private void CreateRouteMarker()
+    private void CreateRouteMarker(Transform waypoint)
     {
-        if (route.Count == 0) return;
-
-        routeMarker = new GameObject(
-            "Current Race Checkpoint Star",
-            typeof(MeshFilter),
-            typeof(MeshRenderer));
-
-        routeMarker.GetComponent<MeshFilter>().sharedMesh = CreateStarMesh();
-        routeMarker.transform.localScale = Vector3.one * 0.68f;
-
-        MeshRenderer markerRenderer = routeMarker.GetComponent<MeshRenderer>();
-        Shader markerShader = Shader.Find("Universal Render Pipeline/Lit");
-        if (markerShader == null) markerShader = Shader.Find("Standard");
-        if (markerShader == null) markerShader = Shader.Find("Universal Render Pipeline/Unlit");
-        if (markerShader != null)
+        Material material = Resources.Load<Material>("Materials/CheckpointStar");
+        if (material == null)
         {
-            Material markerMaterial = new Material(markerShader);
-            Color gold = new Color(1f, 0.62f, 0.035f, 1f);
-            markerMaterial.color = gold;
-            if (markerMaterial.HasProperty("_BaseColor")) markerMaterial.SetColor("_BaseColor", gold);
-            if (markerMaterial.HasProperty("_Metallic")) markerMaterial.SetFloat("_Metallic", 0.22f);
-            if (markerMaterial.HasProperty("_Smoothness")) markerMaterial.SetFloat("_Smoothness", 0.58f);
-            if (markerMaterial.HasProperty("_EmissionColor"))
-            {
-                markerMaterial.SetColor("_EmissionColor", new Color(0.28f, 0.08f, 0.005f));
-                markerMaterial.EnableKeyword("_EMISSION");
-            }
-            markerRenderer.material = markerMaterial;
+            Debug.LogError("Checkpoint star material is missing: Resources/Materials/CheckpointStar", this);
+            return;
         }
-        markerRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        markerRenderer.receiveShadows = false;
 
-        GameObject lightObject = new GameObject("Star Light", typeof(Light));
-        lightObject.transform.SetParent(routeMarker.transform, false);
-        Light markerLight = lightObject.GetComponent<Light>();
-        markerLight.type = LightType.Point;
-        markerLight.color = new Color(1f, 0.50f, 0.06f);
-        markerLight.range = 3.5f;
-        markerLight.intensity = 1.4f;
-        markerLight.shadows = LightShadows.None;
+        GameObject marker = new GameObject("Current Race Checkpoint Star");
+        // Keep generated markers owned by this race, with world scale independent of it.
+        marker.transform.SetParent(transform, true);
+        marker.transform.localScale = new Vector3(
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x)),
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.y)),
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.z)));
+        routeMarker = marker.AddComponent<CheckpointStarPickup>();
+        routeMarker.Initialize(waypoint, CreateStarMesh(), material, starHoverHeight,
+            starBobHeight, starIdleRotationSpeed, starCollectDuration,
+            starCollectRise, starCollectRotationSpeed);
     }
-
 private static Mesh CreateStarMesh()
     {
         const int pointCount = 10;
@@ -458,34 +421,8 @@ private void UpdateRouteGuidance()
                 : "NEXT CHECKPOINT  " + (targetIndex + 1).ToString("00") + " / " + route.Count.ToString("00");
         }
 
-        if (routeMarker != null)
-        {
-            routeMarker.transform.position = target.position + Vector3.up * 0.7f;
-            if (Time.time >= routeMarkerRevealTime) routeMarker.SetActive(true);
-        }
+        if (routeMarker == null) CreateRouteMarker(target);
     }
-
-private void AnimateRouteMarker()
-    {
-        if (routeMarker == null || route.Count == 0) return;
-
-        if (!routeMarker.activeSelf)
-        {
-            if (Time.time < routeMarkerRevealTime) return;
-            routeMarker.SetActive(true);
-        }
-
-        int targetIndex = Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1);
-        Transform target = route[targetIndex];
-        if (target == null) return;
-
-        float hover = 0.7f + Mathf.Sin(Time.time * 3f) * 0.1f;
-        routeMarker.transform.position = target.position + Vector3.up * hover;
-        routeMarker.transform.Rotate(0f, 120f * Time.deltaTime, 0f, Space.World);
-    }
-
-
-
 
 private void ShowResults(List<ResultEntry> results)
     {
