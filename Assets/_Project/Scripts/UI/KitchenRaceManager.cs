@@ -64,6 +64,9 @@ public sealed class KitchenRaceManager : MonoBehaviour
     public int CollectedStars => collectedStars;
     public int TotalStars => totalStars;
     private bool finished;
+    private bool timedOut;
+    public int RequiredStarsToAdvance => LevelStarProgress.RequiredStars(totalStars);
+    public bool CanAdvance => finished && !timedOut && LevelStarProgress.HasEnoughStars(collectedStars, totalStars);
     private float remainingSeconds;
     private float levelDurationSeconds;
     private LevelCountdownHud countdownHud;
@@ -236,6 +239,7 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
     {
         if (finished) return;
         finished = true;
+        timedOut = true;
         if (playerMotor != null) playerMotor.enabled = false;
         if (player != null)
         {
@@ -292,6 +296,8 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
         routeMarker.Collect();
         routeMarker = null;
         collectedStars++;
+        // Unlock selection at 80%, independently of finishing this two-lap race.
+        LevelStarProgress.RecordQualification(gameObject.scene.name, collectedStars, totalStars);
         UpdateStarCount();
 
         playerNextWaypoint++;
@@ -300,11 +306,11 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
             playerNextWaypoint = 0;
             playerLaps++;
             UpdateLapText();
-            if (playerLaps >= targetLaps)
-            {
-                FinishRace();
-                return;
-            }
+        }
+        if (playerLaps >= targetLaps)
+        {
+            FinishRace();
+            return;
         }
         UpdateRouteGuidance();
     }
@@ -341,7 +347,9 @@ public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
 
 private void FinishRace()
     {
+        if (finished) return;
         finished = true;
+        LevelStarProgress.RecordQualification(gameObject.scene.name, collectedStars, totalStars);
         var results = new List<ResultEntry>
         {
             new ResultEntry("PLAYER", PlayerProgress(), true)
@@ -575,11 +583,39 @@ private void ShowResults(List<ResultEntry> results)
         menuButton.onClick.AddListener(ReturnToMainMenu);
 
         Button nextButton = NewResultButton(board.transform, "Next Level Button", nextLabel, new Vector2(330f, -440f));
+        nextButton.interactable = CanAdvance;
+        if (!CanAdvance)
+        {
+            // Use neutral gray directly; tinting the gold button would leave it brown.
+            nextButton.GetComponent<Image>().color = new Color(0.42f, 0.42f, 0.42f, 1f);
+            ColorBlock disabledColors = nextButton.colors;
+            disabledColors.disabledColor = Color.white;
+            nextButton.colors = disabledColors;
+            nextButton.GetComponent<Outline>().effectColor = new Color(0.22f, 0.22f, 0.22f, 1f);
+            nextButton.GetComponentInChildren<Text>().color = new Color(0.78f, 0.78f, 0.78f, 1f);
+        }
         nextButton.onClick.AddListener(LoadNextLevel);
+
+        Image unlockPanel = new GameObject("Star Unlock Result", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        unlockPanel.transform.SetParent(board.transform, false);
+        unlockPanel.rectTransform.anchorMin = unlockPanel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        unlockPanel.rectTransform.anchoredPosition = new Vector2(0f, -350f);
+        unlockPanel.rectTransform.sizeDelta = new Vector2(980f, 54f);
+        unlockPanel.color = new Color(0.12f, 0.055f, 0.015f, 0.94f);
+        unlockPanel.raycastTarget = false;
+        Text unlockText = NewText(unlockPanel.transform, 26, TextAnchor.MiddleCenter);
+        unlockText.rectTransform.offsetMin = new Vector2(12f, 5f);
+        unlockText.rectTransform.offsetMax = new Vector2(-12f, -5f);
+        unlockText.color = new Color(1f, 0.85f, 0.3f);
+        unlockText.raycastTarget = false;
+        unlockText.text = "STARS " + collectedStars + "/" + totalStars + (CanAdvance
+            ? "  -  80% GOAL MET"
+            : "  -  NEED " + Mathf.Max(0, RequiredStarsToAdvance - collectedStars) + " MORE TO UNLOCK");
     }
 
 private void LoadNextLevel()
     {
+        if (!CanAdvance) return;
         Time.timeScale = 1f;
         string currentScene = SceneManager.GetActiveScene().name;
 

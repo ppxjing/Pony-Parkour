@@ -69,6 +69,11 @@ public sealed class MainMenuController : MonoBehaviour
 
     private static void LoadScene(string sceneName)
     {
+        if (!LevelStarProgress.IsUnlocked(sceneName))
+        {
+            SceneManager.LoadScene("StartScene");
+            return;
+        }
         if (Application.CanStreamedLevelBeLoaded(sceneName))
             SceneManager.LoadScene(sceneName);
         else
