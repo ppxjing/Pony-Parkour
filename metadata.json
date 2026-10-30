@@ -1,6 +1,8 @@
 {
   "repoUrl": "https://github.com/GDAT-AP6412/2026s1-project-2-team-02",
   "teamName": "team-02",
+  "gameTitle": "Toy Dash",
+  "gameBlurb": "Race a toy horse through the Beach, Kitchen, and Bedroom, dodge moving obstacles, compete against AI rivals, and recover three pieces of a magical golden star.",
   "teamMembers": [
     {
       "name": "Peng Xuanjing",
