@@ -34,6 +34,8 @@ namespace Adventure.Player
         private bool inputBlocked;
         private Transform livingTarget;
         private float livingPitch;
+        private RaceStartCountdown startCountdown;
+        private bool wasCountingDown;
 
         private void Awake()
         {
@@ -65,9 +67,32 @@ namespace Adventure.Player
             SnapToTarget();
             if (Application.isPlaying && lockCursor && !inputBlocked) CaptureCursor();
         }
+        private void Start()
+        {
+            startCountdown = FindFirstObjectByType<RaceStartCountdown>();
+            // Scene setup may place or rotate the player after this camera's OnEnable.
+            AlignBehindPlayer();
+        }
+
+        private void AlignBehindPlayer()
+        {
+            if (playerRoot != null) yaw = playerRoot.eulerAngles.y;
+            pitch = Mathf.Clamp(livingPitch, minPitch, maxPitch);
+            SnapToTarget();
+        }
+
         private void LateUpdate()
         {
             if (target == null || input == null) return;
+            bool countingDown = startCountdown != null && startCountdown.IsCountingDown;
+            if (countingDown || wasCountingDown)
+            {
+                // Countdown runs at timeScale 0: snap instead of interpolating, and
+                // discard mouse movement until the race starts (including the release frame).
+                AlignBehindPlayer();
+                wasCountingDown = countingDown;
+                return;
+            }
             bool capturedThisFrame = false;
             if (lockCursor && !inputBlocked)
             {

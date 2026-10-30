@@ -18,6 +18,8 @@ public sealed class RaceStartCountdown : MonoBehaviour
     private Image countdownImage;
     private bool released;
 
+    public bool IsCountingDown => !released;
+
     private void Awake()
     {
         previousTimeScale = Time.timeScale;
