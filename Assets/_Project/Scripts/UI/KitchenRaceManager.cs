@@ -58,6 +58,11 @@ public sealed class KitchenRaceManager : MonoBehaviour
 
     private int playerNextWaypoint = 1;
     private int playerLaps;
+    private int collectedStars;
+    private int totalStars;
+    private Text starCountText;
+    public int CollectedStars => collectedStars;
+    public int TotalStars => totalStars;
     private bool finished;
     
     private Text routeText;
@@ -86,7 +91,11 @@ private void Start()
     {
         AutoConfigureIfNeeded();
         targetLaps = 2;
+        collectedStars = 0;
+        // The first lap starts at waypoint 1; later laps also collect waypoint 0.
+        totalStars = route.Count >= 2 ? route.Count * targetLaps - 1 : 0;
         CreateLapDisplay();
+        UpdateStarCount();
         if (player != null)
         {
             playerController = player.GetComponent<CharacterController>();
@@ -216,6 +225,8 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
         if (routeMarker == null || !routeMarker.IsTouching(playerController)) return;
         routeMarker.Collect();
         routeMarker = null;
+        collectedStars++;
+        UpdateStarCount();
 
         playerNextWaypoint++;
         if (playerNextWaypoint >= route.Count)
@@ -310,6 +321,21 @@ private void FinishRace()
 private void CreateLapDisplay()
     {
         Canvas canvas = NewCanvas("Race HUD", 5000);
+        GameObject starPanel = new GameObject("Star Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        starPanel.transform.SetParent(canvas.transform, false);
+        RectTransform starRect = starPanel.GetComponent<RectTransform>();
+        starRect.anchorMin = starRect.anchorMax = new Vector2(0f, 1f);
+        starRect.pivot = new Vector2(0f, 1f);
+        starRect.anchoredPosition = new Vector2(28f, -28f);
+        starRect.sizeDelta = new Vector2(240f, 72f);
+        Image starBackground = starPanel.GetComponent<Image>();
+        starBackground.color = new Color(0.12f, 0.055f, 0.015f, 0.88f);
+        starBackground.raycastTarget = false;
+        starCountText = NewText(starPanel.transform, 34, TextAnchor.MiddleCenter);
+        starCountText.gameObject.name = "Star Count Text";
+        starCountText.color = new Color(1f, 0.85f, 0.3f);
+        starCountText.raycastTarget = false;
+
         GameObject panel = new GameObject("Lap Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         panel.transform.SetParent(canvas.transform, false);
         RectTransform rect = panel.GetComponent<RectTransform>();
@@ -329,6 +355,12 @@ private void CreateLapDisplay()
         routeRect.sizeDelta = new Vector2(360f, 58f);
         routePanel.GetComponent<Image>().color = new Color(0.68f, 0.25f, 0.02f, 0.84f);
         routeText = NewText(routePanel.transform, 25, TextAnchor.MiddleCenter);
+    }
+
+    private void UpdateStarCount()
+    {
+        if (starCountText != null)
+            starCountText.text = "⭐ " + collectedStars + "/" + totalStars;
     }
 
     private void UpdateLapText()
