@@ -1,0 +1,51 @@
+Shift 冲刺与喷气烟雾
+
+操作
+WASD 控制移动方向，按一次左 Shift 或右 Shift 触发一次冲刺。
+默认速度倍率 2，持续 1 秒；冲刺结束后冷却 3 秒，长按不会连续触发。
+站着按 Shift 也会消耗本次冲刺时间；期间按 WASD 才会移动。
+允许在空中使用，但不改变重力和跳跃高度，也不会穿过墙壁。
+
+调整参数
+打开 Assets/_prefab/玩家/PlayerRig.prefab，选择 Player 子物体。
+Third Person Motor 组件的 Sprint 分组：
+- Sprint Speed Multiplier = 2：普通移动速度倍率，默认 5 -> 10。
+- Sprint Duration = 1：持续时间（秒）。
+- Sprint Cooldown = 3：冲刺结束后的冷却时间（秒）。
+- Sprint Effect Prefab：喷气烟雾预制体引用。
+- Sprint Effect Offset = (0, 0.5, -0.5)：相对 Visuals 的发射位置；Y 向上，负 Z 向后。
+优先改共享 PlayerRig 预制体，Beach、Kitchen_Adventure 和 Bedroom 的玩家会继承。
+
+特效资源
+Assets/_prefab/特效/PF_PlayerSprintPuff.prefab：粒子预制体，可单独预览。
+Assets/_Project/VFX/Sprint/SprintPuff.mat：透明粒子材质。
+Assets/_Project/VFX/Sprint/SprintPuffTexture.asset：程序生成的柔边烟团纹理。
+在粒子预制体中可调 Start Color、Start Size、Start Lifetime、Start Speed、Emission Rate over Time、Cone Angle。
+世界空间模拟：已喷出的烟留在原处，不随玩家一起移动；最大 96 个粒子。
+每个玩家运行时只创建一份特效，后续冲刺复用；特效位于 Player 下，换模型不会被隐藏。
+
+逻辑文件
+Assets/_Project/Input/PlayerControls.inputactions：Gameplay/Sprint，左右 Shift 绑定。
+Assets/_Project/Scripts/Player/PlayerInputReader.cs：读取 Sprint 输入。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：速度倍率、持续/冷却计时、特效播放与清理。
+
+状态处理
+暂停时冲刺时间、冷却和粒子模拟都暂停，暂停期间不能触发新冲刺。
+死亡、复活、传送或禁用移动组件时清除冲刺、冷却和旧粒子。
+被 AI 撞飞会打断冲刺并进入冷却；保留原有击飞和重力效果。
+正常冲刺结束立即恢复正常速度上限；残留粒子自然淡出。
+
+验收
+1. Play，倒计时结束，按住 W 再按左 Shift：明显提速，身后出现黄绿色烟团。
+2. 约 1 秒后回到正常速度；接下来 3 秒内重复按 Shift 无效。
+3. 一直按住 Shift，冷却结束也不会自动再次触发；松开再按即可。
+4. 右 Shift 同样生效。冲刺期间可以转向、跳跃，墙体仍会阻挡。
+5. 冲刺中暂停，恢复后继续；冲刺中碰机关死亡，不应继续喷烟或保留加速。
+6. 复活后可正常移动、再次冲刺，场景中不会累计多份特效。
+
+已验证
+Play 模式实际 W+Shift 输入：速度 5 -> 10；持续约 1.001～1.002 秒，冷却约 3 秒。
+左右 Shift、冷却拒绝、游戏输入帧中持续按住 Shift 不连发、暂停、禁用输入、死亡与复活、
+AI 撞击打断、单份特效复用与粒子清理均通过。最终粒子已截图检查。
+测试结束已停止 Play，未保存测试地面或临时输入设备/配置。
+尚未重新打包或发布 WebGL。

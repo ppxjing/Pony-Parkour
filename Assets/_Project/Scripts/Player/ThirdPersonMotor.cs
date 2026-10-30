@@ -16,6 +16,19 @@ namespace Adventure.Player
         [SerializeField, Min(0)] private float moveSpeed = 5f;
         [SerializeField, Min(0.1f)] private float acceleration = 25f;
         [SerializeField, Min(0)] private float turnSpeed = 720f;
+        [Header("Sprint")]
+        [SerializeField, Min(1f)] private float sprintSpeedMultiplier = 2f;
+        [SerializeField, Min(0.05f)] private float sprintDuration = 1f;
+        [Tooltip("Cooldown begins after the sprint ends. Pausing also pauses this timer.")]
+        [SerializeField, Min(0f)] private float sprintCooldown = 3f;
+        [SerializeField] private ParticleSystem sprintEffectPrefab;
+        [Tooltip("Emission position relative to Visuals; negative Z places it behind the character.")]
+        [SerializeField] private Vector3 sprintEffectOffset = new Vector3(0f, 0.5f, -0.5f);
+        private ParticleSystem sprintEffect;
+        private float sprintRemaining, sprintCooldownRemaining;
+        public bool IsSprinting => sprintRemaining > 0f;
+        public float SprintRemaining => sprintRemaining;
+        public float SprintCooldownRemaining => sprintCooldownRemaining;
         [Header("Jump and gravity")]
         [SerializeField, Min(0)] private float jumpHeight = 1.4f;
         [SerializeField] private float gravity = -25f;
@@ -65,11 +78,14 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
             if (dt <= 0f) return;
             FollowSupport(dt);
             if (!isActiveAndEnabled) return;
+            UpdateSprint(dt);
+            if (input.SprintPressed) TryStartSprint();
             Vector2 stick = Time.time < racerControlLockUntil ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
-            Vector3 desired = (forward * stick.y + right * stick.x) * moveSpeed;
-            horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, desired, acceleration * dt);
+            float speedMultiplier = IsSprinting ? sprintSpeedMultiplier : 1f;
+            Vector3 desired = (forward * stick.y + right * stick.x) * (moveSpeed * speedMultiplier);
+            horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, desired, acceleration * speedMultiplier * dt);
             if (desired.sqrMagnitude > 0.001f)
                 visuals.rotation = Quaternion.RotateTowards(visuals.rotation, Quaternion.LookRotation(desired), turnSpeed * dt);
 
@@ -116,6 +132,77 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
                 else Respawn();
             }
         }
+        public bool TryStartSprint()
+        {
+            if (!isActiveAndEnabled || input == null || !input.isActiveAndEnabled ||
+                controller == null || !controller.enabled || Time.timeScale <= 0f ||
+                Time.time < racerControlLockUntil || IsSprinting || sprintCooldownRemaining > 0f)
+                return false;
+
+            sprintRemaining = Mathf.Max(0.05f, sprintDuration);
+            if (sprintEffect == null && sprintEffectPrefab != null)
+            {
+                // Keep the effect outside Visuals so character swapping does not hide it.
+                sprintEffect = Instantiate(sprintEffectPrefab, transform);
+                sprintEffect.name = "Sprint Puff Effect";
+            }
+            if (sprintEffect != null)
+            {
+                UpdateSprintEffectPose();
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                sprintEffect.Play(true);
+            }
+            return true;
+        }
+
+        private void UpdateSprint(float dt)
+        {
+            if (IsSprinting)
+            {
+                if (!input.isActiveAndEnabled || Time.time < racerControlLockUntil)
+                {
+                    EndSprint();
+                    return;
+                }
+                float activeTime = Mathf.Min(dt, sprintRemaining);
+                sprintRemaining = Mathf.Max(0f, sprintRemaining - dt);
+                if (sprintRemaining <= 0f)
+                {
+                    EndSprint();
+                    sprintCooldownRemaining = Mathf.Max(0f, sprintCooldownRemaining - (dt - activeTime));
+                }
+            }
+            else
+                sprintCooldownRemaining = Mathf.Max(0f, sprintCooldownRemaining - dt);
+        }
+
+        private void EndSprint()
+        {
+            sprintRemaining = 0f;
+            sprintCooldownRemaining = Mathf.Max(0f, sprintCooldown);
+            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, moveSpeed);
+            if (sprintEffect != null)
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+
+        private void ResetSprint()
+        {
+            sprintRemaining = sprintCooldownRemaining = 0f;
+            if (sprintEffect != null)
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        private void LateUpdate()
+        {
+            if (sprintEffect != null) UpdateSprintEffectPose();
+        }
+
+        private void UpdateSprintEffectPose()
+        {
+            sprintEffect.transform.position = visuals.TransformPoint(sprintEffectOffset);
+            sprintEffect.transform.rotation = Quaternion.LookRotation(-visuals.forward, Vector3.up);
+        }
+
         private void FollowSupport(float dt)
         {
             Transform support = SupportTransform;
@@ -202,6 +289,7 @@ if (!isActiveAndEnabled) return;
         public bool TryReceiveRacerImpact(Vector3 velocity, float controlLockTime, float cooldown)
         {
             if (!CanReceiveRacerImpact) return false;
+            if (IsSprinting) EndSprint();
             horizontalVelocity = Vector3.zero;
             LaunchFromSupport(velocity);
             racerControlLockUntil = Time.time + Mathf.Max(0f, controlLockTime);
@@ -220,6 +308,7 @@ if (!isActiveAndEnabled) return;
         }
 private void OnDisable()
         {
+            ResetSprint();
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;
             detachUntil = 0f;
@@ -263,6 +352,7 @@ private void OnDisable()
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
+            ResetSprint();
             racerControlLockUntil = racerImpactCooldownUntil = 0f;
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;

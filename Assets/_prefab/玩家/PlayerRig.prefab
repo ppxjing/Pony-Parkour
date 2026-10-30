@@ -547,6 +547,11 @@ MonoBehaviour:
   moveSpeed: 5
   acceleration: 25
   turnSpeed: 720
+  sprintSpeedMultiplier: 2
+  sprintDuration: 1
+  sprintCooldown: 3
+  sprintEffectPrefab: {fileID: 8665318108149960762, guid: 5cb97d156754df44c9c9570c74b53976, type: 3}
+  sprintEffectOffset: {x: 0, y: 0.5, z: -0.5}
   jumpHeight: 1.4
   gravity: -25
   terminalSpeed: 35
