@@ -64,6 +64,11 @@ public sealed class KitchenRaceManager : MonoBehaviour
     public int CollectedStars => collectedStars;
     public int TotalStars => totalStars;
     private bool finished;
+    private float remainingSeconds;
+    private float levelDurationSeconds;
+    private LevelCountdownHud countdownHud;
+    public float RemainingSeconds => remainingSeconds;
+    public float LevelDurationSeconds => levelDurationSeconds;
     
     private Text routeText;
     
@@ -94,6 +99,9 @@ private void Start()
         collectedStars = 0;
         // The first lap starts at waypoint 1; later laps also collect waypoint 0.
         totalStars = route.Count >= 2 ? route.Count * targetLaps - 1 : 0;
+        LevelTimeLimitSettings timeLimits = Resources.Load<LevelTimeLimitSettings>("Settings/LevelTimeLimits");
+        levelDurationSeconds = timeLimits != null ? timeLimits.GetDuration(gameObject.scene.name) : 180f;
+        remainingSeconds = levelDurationSeconds;
         CreateLapDisplay();
         UpdateStarCount();
         if (player != null)
@@ -214,6 +222,64 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
     }
 
 
+    private void Update()
+    {
+        // Scaled time excludes the starting countdown and the pause menu.
+        // A death/respawn does not restart this level-wide clock.
+        if (finished || remainingSeconds <= 0f || Time.timeScale <= 0f) return;
+        remainingSeconds = Mathf.Max(0f, remainingSeconds - Time.deltaTime);
+        countdownHud.SetTime(remainingSeconds, levelDurationSeconds);
+        if (remainingSeconds <= 0f) TimeExpired();
+    }
+
+    private void TimeExpired()
+    {
+        if (finished) return;
+        finished = true;
+        if (playerMotor != null) playerMotor.enabled = false;
+        if (player != null)
+        {
+            PlayerInputReader reader = player.GetComponent<PlayerInputReader>();
+            if (reader != null) reader.enabled = false;
+            PlayerRespawn respawn = player.GetComponent<PlayerRespawn>();
+            if (respawn != null) respawn.enabled = false;
+        }
+        foreach (ThirdPersonOrbitCamera camera in FindObjectsByType<ThirdPersonOrbitCamera>(FindObjectsSortMode.None))
+            camera.enabled = false;
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        ShowTimeExpired();
+    }
+
+    private void ShowTimeExpired()
+    {
+        // Above the settings canvas so a completed run cannot resume through that menu.
+        Canvas canvas = NewCanvas("Time Expired", 40000);
+        Image shade = new GameObject("Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        shade.transform.SetParent(canvas.transform, false);
+        shade.rectTransform.anchorMin = Vector2.zero;
+        shade.rectTransform.anchorMax = Vector2.one;
+        shade.rectTransform.offsetMin = shade.rectTransform.offsetMax = Vector2.zero;
+        shade.color = new Color(0.03f, 0.012f, 0f, 0.84f);
+
+        Image board = new GameObject("Timeout Board", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        board.transform.SetParent(canvas.transform, false);
+        board.rectTransform.anchorMin = board.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        board.rectTransform.sizeDelta = new Vector2(760f, 400f);
+        board.color = new Color(0.15f, 0.07f, 0.035f, 1f);
+        Text title = NewPlacedText(board.transform, "Timeout Title", new Vector2(0f, 100f), new Vector2(680f, 80f), 58);
+        title.text = "TIME'S UP!";
+        title.color = new Color(1f, 0.28f, 0.2f);
+        title.raycastTarget = false;
+        Text score = NewPlacedText(board.transform, "Timeout Stars", new Vector2(0f, 5f), new Vector2(680f, 60f), 34);
+        score.text = "STARS  " + collectedStars + " / " + totalStars;
+        score.color = new Color(1f, 0.85f, 0.3f);
+        score.raycastTarget = false;
+        NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-170f, -115f)).onClick.AddListener(ReplayCurrentLevel);
+        NewResultButton(board.transform, "Main Menu Button", "MAIN MENU", new Vector2(170f, -115f)).onClick.AddListener(ReturnToMainMenu);
+    }
+
     private void LateUpdate()
     {
         if (finished || Time.timeScale <= 0f || player == null || route.Count < 2 ||
@@ -321,6 +387,8 @@ private void FinishRace()
 private void CreateLapDisplay()
     {
         Canvas canvas = NewCanvas("Race HUD", 5000);
+        countdownHud = LevelCountdownHud.Create(canvas.transform);
+        countdownHud.SetTime(remainingSeconds, levelDurationSeconds);
         GameObject starPanel = new GameObject("Star Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         starPanel.transform.SetParent(canvas.transform, false);
         RectTransform starRect = starPanel.GetComponent<RectTransform>();
@@ -649,6 +717,9 @@ public sealed class GamePauseMenu : MonoBehaviour
     private GameObject pausePanel;
     private float previousTimeScale = 1f;
     private bool paused;
+    public bool IsPaused => paused;
+
+    public void SetResumeTimeScale(float value) => previousTimeScale = value;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterForScenes()

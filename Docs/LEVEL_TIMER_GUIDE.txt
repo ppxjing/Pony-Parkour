@@ -1,0 +1,46 @@
+关卡倒计时 UI
+
+镜头修复已先提交：ee19f33。
+
+调整参数（停止 Play 后修改）：
+在 Project 中选中 Assets/_Project/Resources/Settings/LevelTimeLimits.asset。
+在 Inspector 的 Levels 列表里找到对应 Scene Name，修改 Duration Seconds（单位秒，最小 1）。
+Beach = 海滩；Kitchen_Adventure = 厨房；Bedroom = 卧室。
+三关默认均为 180 秒，可以各自设置不同数值。
+Default Duration Seconds 是没有匹配条目时使用的时长。
+Scene Name 必须与场景文件名完全一致，不含 .unity。添加关卡配置时避免重复名称。
+配置在关卡开始时读取；运行中更改配置不会重置当前计时。
+
+显示与规则：
+- 左上角星星计数下方显示时钟圆环进度和剩余秒数。
+- 圆环比例为剩余时间/本关初始时间，数字向上取整；例如 9.2 秒显示 10。
+- 最后 10 秒（剩余时间 <= 10）圆环和数字变红。
+- 开局 3、2、1 期间不扣时，从开跑开始计时。
+- 暂停菜单冻结计时，关闭菜单继续。
+- 死亡/布娃娃/复活期间继续计时，复活不会补时间。
+- 正常完成比赛后停止计时，不再触发超时失败。
+- 归零后本关失败、停止游戏与玩家操作，显示 TIME'S UP、星星数、REPLAY / MAIN MENU。
+- REPLAY 重载本关、时间补满、星星计数清零并重新倒数 3、2、1。
+- 切换关卡重新读取该关配置；主菜单不显示关卡时钟。
+
+文件管理：
+Assets/_Project/Resources/Settings/LevelTimeLimits.asset：持久化的三关时间配置。
+Assets/_Project/Scripts/UI/LevelTimeLimitSettings.cs：配置定义。
+Assets/_Project/Scripts/UI/LevelCountdownHud.cs：秒数与颜色显示。
+Assets/_Project/Scripts/UI/CountdownClockGraphic.cs：时钟刻度与圆环进度绘制，无需额外贴图。
+Assets/_Project/Scripts/UI/KitchenRaceManager.cs：实际计时和超时结算，复用现有比赛系统。
+Assets/_Project/Scripts/UI/RaceStartCountdown.cs：防止开局倒数结束时覆盖已打开的暂停菜单。
+运行时 UI 位于 Race HUD/Level Countdown，无需逐场景拖入预制体。
+
+验收：
+1. 先将某一关 Duration Seconds 改为 15，进入该关：3、2、1 时保持 15；开跑后开始减少。
+2. 观察圆环逐渐减少，10 秒及以下显示红色。
+3. 打开设置暂停几秒：时间不变；继续后正常走时。
+4. 死亡复活：计时继续，复活不补满。
+5. 时间归零：停在 0，显示失败界面，玩家不能继续移动或收集星星。
+6. 点 REPLAY：恢复该关完整时长、重新开局；点 MAIN MENU：返回主菜单。
+7. 给另一关设不同秒数并进入：读取该关的时长，不继承上一关剩余时间。
+8. 在时间耗尽前正常通关：保留正常排名结算，不再弹失败界面。
+测试后可将时长改回 180 秒。
+
+验证记录：Unity 编译及 Console 无错误；三关均创建单个时钟；计时与游戏时间相符；暂停保持不变；10 秒边界变红；死亡/复活不重置；归零后只结算一次并禁用输入；重玩重置时间与星星；正常完成比赛后停止计时；不同配置时长（19 秒）实际加载生效，测试后已恢复三关 180 秒。
