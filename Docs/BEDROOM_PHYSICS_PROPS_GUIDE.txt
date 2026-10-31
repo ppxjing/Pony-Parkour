@@ -1,0 +1,47 @@
+卧室积木与笔物理道具
+
+场景：Assets/_Project/Scenes/Bedroom.unity
+本次仅将 Cube_Toys_01～06 与 Pen_01～08 设为独立动态物理体，共 140 个。
+积木 77 个：01=10、02=5、03=17、04=5、05=10、06=30。
+笔 63 支：01=5、02=11、03=12、04=9、05=9、06=9、07=4、08=4。
+Pen_Mug 笔筒及其他普通道具没有纳入本次物理化。
+原有枕头弹性机关保持原配置。原场景物体引用、父级和 Transform 均保留。
+修改前备份：Logs/BedroomPhysicsWork/Bedroom-before-cubes-pens.unity，包含任务开始时编辑器中尚未保存的修改。
+
+预制体目录：Assets/_prefab/卧室/物理道具/
+PF_Cube_Toys_01_Physics ～ PF_Cube_Toys_06_Physics
+PF_Pen_01_Physics ～ PF_Pen_08_Physics
+14 款预制体均为原素材的项目自有变体，供拖入场景复用。
+场景原有对象原位增加物理组件以保留引用；修改这些新增预制体不会自动覆盖场景旧对象参数。
+
+碰撞设置
+积木使用贴合模型边界的 BoxCollider。
+笔使用沿本地 X 轴的细长 CapsuleCollider，适合滚动；笔筒中的笔原来缺少碰撞体，本次也补齐。
+所有目标都有动态 Rigidbody、重力、连续碰撞检测和插值，碰撞后可移动、滚动、翻倒。
+原有堆叠和悬空摆放在 Play 后会受重力重新落稳，停止后恢复编辑时摆放。
+
+Inspector 调整
+Rigidbody / Mass：积木默认 0.15，笔默认 0.08；越大越难推动。
+Rigidbody / Linear Damping：默认 0.15，越大移动越快衰减。
+Rigidbody / Angular Damping：积木 0.25、笔 0.12，越大越快停止旋转。
+Pushable Prop / Push Impulse：积木 0.8、笔 0.35，玩家水平推力冲量。
+Lift Impulse：积木 0.18、笔 0.06，向上冲量。
+Tumble Impulse：积木 0.04、笔 0.01，翻滚冲量。
+Minimum Player Speed：0.5。
+Push Cooldown：0.25 秒。
+Max Push Speed：积木 8、笔 6，限制主动推动速度，避免轻小物体被过度加速。
+复用 Assets/_Project/Scripts/Obstacles/PushableProp.cs 和现有玩家碰撞转发，本次没有修改共用运行代码。
+
+验收
+1. 打开 Bedroom 并 Play，等待开局倒计时。
+2. 走向积木，确认能撞动和翻倒。
+3. 正常走过地面的笔，确认笔能被带动并滚动。
+4. 从空中放下积木或笔，确认受重力下落并停在地面。
+5. 停止 Play，确认恢复编辑时摆放。
+
+验证
+所有 140 个目标均有非运动学 Rigidbody 和重力，无缺失脚本。
+真实 CharacterController 碰撞后，积木 0.35 秒位移约 1.4 米并翻转约 150 度。
+正常逐帧移动接触三种长度笔均触发推动：0.65 秒位移约 0.47～0.74 米，旋转约 52～129 度。
+自由下落 1.3 秒后，积木和笔底部均停在测试地面 Y=10.5，速度为 0。
+Console 无新增脚本或碰撞配置错误。
