@@ -1,0 +1,43 @@
+卧室弹性枕头
+
+场景：Assets/_Project/Scenes/Bedroom.unity
+全部 14 个枕头均已接入：13 个 Pillow_01、1 个 Pillow_02。
+预制体目录：Assets/_prefab/卧室/
+- PF_Pillow_01_Bumper.prefab
+- PF_Pillow_02_Bumper.prefab
+均为第三方原预制体的项目自有变体，保留原模型、材质和贴合模型的 MeshCollider。
+场景对象已关联新预制体，原物体 ID、父级、位置、朝向和缩放保留。
+修改前场景副本：Logs/BedroomPrefabWork/Bedroom-before-pillows.unity。
+光照数据单独复制到 Assets/_Project/Scenes/Bedroom/LightingData.asset，避免修改第三方共享光照资产。
+
+行为
+玩家或 AI 实际接触后：先缩小 -> 快速膨胀 -> 弹开接触者 -> 恢复原大小。
+枕头固定摆放，不主动翻滚。角色被弹开后使用已有重力运动。
+弹开初速度按枕头静止时世界最长尺寸缩放，包含模型原始大小、Transform 和父级缩放。
+动画临时膨胀和旋转摆放不会增加弹力倍率。Pillow_02 本身大于 Pillow_01，因此默认更有弹力。
+
+Inspector / Compressible Bumper 参数
+Horizontal Speed = 5：基准大小下水平弹开速度。
+Upward Speed = 7：基准大小下向上弹开速度。
+Reference Diameter = 2.6：基准尺寸（世界最长边，米）。实际速度 = 上述速度 × 静止世界最长尺寸 / 2.6。
+Shrunken Scale = 0.75：缩小比例。
+Shrink Seconds = 0.12：缩小耗时。
+Inflated Scale = 1.18：最大膨胀比例。
+Inflate Seconds = 0.08：膨胀耗时。
+Recover Seconds = 0.3：恢复耗时。
+Control Lock Seconds = 0.25：玩家弹开后暂时锁定移动。
+Hit Cooldown = 0.6：重复触发冷却。
+直接修改场景实例的 Transform Scale 即可改变大小和弹力；建议均匀缩放保持枕头形状。
+要修改所有同款实例，修改 Project 中的对应预制体；仅修改一个实例则在 Hierarchy 中选中它调整。
+
+验收
+1. 打开 Bedroom，Play 并等待开局倒计时。
+2. 走到或落到枕头上：接触后缩小，再膨胀并弹开，约 0.5 秒恢复原大小。
+3. 复制同款枕头，分别设均匀 Scale 为 0.5、1、2，确认大枕头弹得更强。
+4. 让 AI 与枕头真实接触，确认同样触发动画并被弹开。
+5. 停止运行后，枕头恢复编辑时的大小和摆放。
+
+运行验证
+两款模型的 CharacterController 真实碰撞均触发一次弹开；缩小阶段比例约 0.785 且未弹开，膨胀阶段约 1.18 时弹开，恢复到 1。
+Pillow_01 的 0.5/1/2 倍缩放水平速度分别约 2.50/5.00/10.00；Pillow_02 原始尺寸倍率约 1.587，水平速度约 7.93。
+AI 胶囊与枕头真实接触可触发膨胀并进入物理击飞。
