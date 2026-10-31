@@ -101,7 +101,7 @@ namespace Adventure.AI
         {
             var player = other.GetComponentInParent<ThirdPersonMotor>();
             if (player != null) TryCollideWithPlayer(player);
-            var ball = other.GetComponentInParent<Adventure.Obstacles.BeachBumperBall>();
+            var ball = other.GetComponentInParent<Adventure.Obstacles.CompressibleBumper>();
             if (ball == null || other.isTrigger || !CanReceiveObstacleImpact) return;
             // The sensor has padding for player contacts. A ball must touch the actual AI capsule.
             Vector3 separation;
