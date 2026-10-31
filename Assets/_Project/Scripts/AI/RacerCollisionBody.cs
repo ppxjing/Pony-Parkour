@@ -47,6 +47,9 @@ namespace Adventure.AI
         public int DeathRespawnCount { get; private set; }
         public bool IsKnockedBack { get; private set; }
         public int ImpactCount { get; private set; }
+        public bool CanReceiveObstacleImpact => isActiveAndEnabled && !IsDead && !IsKnockedBack &&
+            Time.time >= nextImpactTime && agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh &&
+            (patrol == null || !patrol.IsFinished);
 
         private void Awake()
         {
@@ -98,6 +101,14 @@ namespace Adventure.AI
         {
             var player = other.GetComponentInParent<ThirdPersonMotor>();
             if (player != null) TryCollideWithPlayer(player);
+            var ball = other.GetComponentInParent<Adventure.Obstacles.BeachBumperBall>();
+            if (ball == null || other.isTrigger || !CanReceiveObstacleImpact) return;
+            // The sensor has padding for player contacts. A ball must touch the actual AI capsule.
+            Vector3 separation;
+            float penetration;
+            if (Physics.ComputePenetration(capsule, capsule.transform.position, capsule.transform.rotation,
+                other, other.transform.position, other.transform.rotation, out separation, out penetration))
+                ball.TryBump(this);
         }
 
         public bool TryCollideWithPlayer(ThirdPersonMotor player)
@@ -115,19 +126,31 @@ namespace Adventure.AI
             if (!player.TryReceiveRacerImpact(-direction * speed + Vector3.up * upwardSpeed,
                 playerControlLockTime, collisionCooldown)) return false;
 
+            LaunchForImpact(direction * speed + Vector3.up * upwardSpeed, collisionCooldown);
+            return true;
+        }
+
+        public bool TryReceiveObstacleImpact(Vector3 velocity, float cooldown)
+        {
+            if (!CanReceiveObstacleImpact || Time.timeScale <= 0f) return false;
+            LaunchForImpact(velocity, cooldown);
+            return true;
+        }
+
+        private void LaunchForImpact(Vector3 velocity, float cooldown)
+        {
             if (traversal != null) traversal.SuspendForImpact();
             agent.enabled = false;
             IsKnockedBack = true;
             ImpactCount++;
-            nextImpactTime = Time.time + collisionCooldown;
+            nextImpactTime = Time.time + Mathf.Max(0f, cooldown);
             launchTime = Time.time;
             groundContactTime = float.NegativeInfinity;
             body.position = transform.position;
             body.isKinematic = false;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            body.linearVelocity = direction * speed + Vector3.up * upwardSpeed;
+            body.linearVelocity = velocity;
             body.WakeUp();
-            return true;
         }
 
         public bool RequestDeath(Vector3 sourcePosition)

@@ -258,6 +258,10 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
 
             
 if (!isActiveAndEnabled) return;
+            var bumper = hit.collider.GetComponentInParent<BeachBumperBall>();
+            if (bumper != null) bumper.TryBump(this, hit.normal);
+            var bottle = hit.collider.GetComponentInParent<BeachPushableBottle>();
+            if (bottle != null) bottle.TryPush(this, hit.point, hit.moveDirection);
             if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
             {
                 var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
