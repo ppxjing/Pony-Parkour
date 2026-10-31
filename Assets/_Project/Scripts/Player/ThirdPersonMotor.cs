@@ -267,6 +267,8 @@ if (!isActiveAndEnabled) return;
             if (bumper != null) bumper.TryBump(this, hit.normal);
             var banana = hit.collider.GetComponentInParent<BananaSlip>();
             if (banana != null) banana.TrySlip(this, hit.normal);
+            var prop = hit.collider.GetComponentInParent<PushableProp>();
+            if (prop != null) prop.TryPush(this, hit.point, hit.moveDirection);
             var bottle = hit.collider.GetComponentInParent<BeachPushableBottle>();
             if (bottle != null) bottle.TryPush(this, hit.point, hit.moveDirection);
             if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)

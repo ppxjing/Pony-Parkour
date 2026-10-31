@@ -1,0 +1,29 @@
+厨房物理道具（限定六类）
+
+以提交 879166d 的 Kitchen_Adventure 场景为基础，撤回上次 26 类全量物理化。
+当前仅对以下六类普通道具增加动态刚体和玩家推动：
+Potato（土豆）30 个；Bowl（碗）21 个；Plate（盘子）60 个；Lemon（柠檬）6 个；Cup（杯子）18 个；Carrot（胡萝卜）3 个。共 138 个。
+其他普通道具恢复提交中的原状态；面包、香蕉、旋转刀及已有机关行为保留。
+
+预制体目录：Assets/_prefab/厨房/物理道具/
+仅有 PF_Potato_Physics、PF_Bowl_Physics、PF_Plate_Physics、PF_Lemon_Physics、PF_Cup_Physics、PF_Carrot_Physics 六款。
+场景原对象原位添加组件以保留引用，新预制体供新增物体拖入复用；修改新预制体不会自动覆盖原场景对象的参数。
+碰撞资源：Assets/_Project/Meshes/KitchenPhysics/
+运行脚本：Assets/_Project/Scripts/Obstacles/PushableProp.cs
+编辑器配置：Assets/_Project/Editor/KitchenPhysicsPropSetup.cs（名单已限定六类）
+
+选中场景中的目标物体，在 Inspector 调整：
+- Rigidbody / Mass：重量。默认土豆 0.22、碗 0.65、盘子 0.6、杯子 0.35、柠檬和胡萝卜 0.2。
+- Linear Damping = 0.15：移动阻尼；Angular Damping = 0.25：旋转阻尼。
+- Use Gravity：默认开启。
+- Pushable Prop / Push Impulse = 2.2：玩家水平推力冲量。
+- Lift Impulse = 0.9：向上冲量，设为 0 可减少弹起。
+- Tumble Impulse = 0.25：翻滚冲量。
+- Minimum Player Speed = 0.5：开始主动施力所需的玩家速度。
+- Push Cooldown = 0.25：推动冷却。
+- Max Push Speed = 12：主动推动的速度上限。
+
+碗和杯子使用保留空腔的组合碰撞，杯内咖啡随杯子移动。其他四类使用低面数凸碰撞。
+Play 后六类物体受重力影响，可撞动、翻滚和堆叠；停止运行恢复编辑时摆放。
+验收：碰土豆、碗、盘子、柠檬、杯子、胡萝卜检查物理反应；检查锅、水瓶、调料罐等没有本次新增的动态刚体。
+物体移动不会自动让已烘焙的 NavMesh 跟随移动。
