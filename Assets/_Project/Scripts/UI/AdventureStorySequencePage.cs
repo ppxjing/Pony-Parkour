@@ -2,208 +2,106 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>A reusable click-anywhere story page used between race levels and after the finale.</summary>
 public sealed class AdventureStorySequencePage : MonoBehaviour
 {
+    // 调整这五组锚点即可微调对话框、标题和正文的位置。
+    private static readonly Vector2 DialogueMin = new(0.025f, 0.018f), DialogueMax = new(0.975f, 0.325f);
+    private static readonly Vector2 TitleMin = new(0.095f, 0.57f), TitleMax = new(0.82f, 0.86f);
+    private static readonly Vector2 BodyMin = new(0.10f, 0.16f), BodyMax = new(0.84f, 0.61f);
+
     public readonly struct Page
     {
-        public readonly string title;
-        public readonly string description;
-        public readonly string dialogue;
+        public readonly string title, description, dialogue, imagePath;
         public readonly bool finalCard;
-
-        public Page(string title, string description, string dialogue, bool finalCard = false)
-        {
-            this.title = title;
-            this.description = description;
-            this.dialogue = dialogue;
-            this.finalCard = finalCard;
-        }
+        public Page(string title, string description, string dialogue, bool finalCard = false, string imagePath = null)
+        { this.title = title; this.description = description; this.dialogue = dialogue; this.finalCard = finalCard; this.imagePath = imagePath; }
     }
 
-    private Page[] pages;
-    private Action onComplete;
-    private int index;
-    private Text titleText;
-    private Text descriptionText;
-    private Text dialogueText;
-    private Text progressText;
-    private Text hintText;
+    private Page[] pages; private Action onComplete; private int index;
+    private Image storyImage; private Text titleText, bodyText, progressText;
 
     public static void Show(string objectName, Page[] pages, Action onComplete)
     {
-        AdventureStorySequencePage existing = FindFirstObjectByType<AdventureStorySequencePage>();
-        if (existing != null) Destroy(existing.gameObject);
-
-        GameObject root = new GameObject(objectName);
-        AdventureStorySequencePage page = root.AddComponent<AdventureStorySequencePage>();
-        page.pages = pages;
-        page.onComplete = onComplete;
-        page.Build();
-        page.Display();
+        AdventureStorySequencePage old = FindFirstObjectByType<AdventureStorySequencePage>();
+        if (old != null) Destroy(old.gameObject);
+        GameObject root = new(objectName);
+        AdventureStorySequencePage view = root.AddComponent<AdventureStorySequencePage>();
+        view.pages = pages; view.onComplete = onComplete; view.Build(); view.Display();
     }
 
     private void Build()
     {
         gameObject.AddComponent<RectTransform>();
-        Canvas canvas = gameObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 26000;
-
-        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        Canvas canvas = gameObject.AddComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 26000;
+        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080); scaler.matchWidthOrHeight = .5f;
         gameObject.AddComponent<GraphicRaycaster>();
 
-        Image shade = Panel("Story Shade", transform, Vector2.zero, Vector2.one,
-            new Color(0.025f, 0.035f, 0.075f, 0.96f));
-        shade.raycastTarget = true;
-        Button advance = shade.gameObject.AddComponent<Button>();
-        advance.transition = Selectable.Transition.None;
-        advance.onClick.AddListener(Next);
+        storyImage = Panel("Story Image", transform, Vector2.zero, Vector2.one, Color.white);
+        Image clickLayer = Panel("Click Anywhere", transform, Vector2.zero, Vector2.one, new Color(0, 0, 0, .06f));
+        clickLayer.raycastTarget = true; Button button = clickLayer.gameObject.AddComponent<Button>();
+        button.transition = Selectable.Transition.None; button.onClick.AddListener(Next);
 
-        Image frame = Panel("Golden Story Frame", transform, new Vector2(0.10f, 0.12f), new Vector2(0.90f, 0.88f),
-            new Color(0.97f, 0.69f, 0.22f, 1f));
-        Panel("Story Inset", frame.transform, new Vector2(0.016f, 0.025f), new Vector2(0.984f, 0.975f),
-            new Color(0.095f, 0.065f, 0.075f, 0.985f));
-
-        titleText = Label("Title", frame.transform, new Vector2(0.06f, 0.73f), new Vector2(0.94f, 0.92f),
-            48, TextAnchor.MiddleCenter, new Color(1f, 0.81f, 0.34f));
-        descriptionText = Label("Description", frame.transform, new Vector2(0.09f, 0.39f), new Vector2(0.91f, 0.72f),
-            28, TextAnchor.MiddleCenter, new Color(1f, 0.94f, 0.82f));
-        dialogueText = Label("Dialogue", frame.transform, new Vector2(0.09f, 0.18f), new Vector2(0.91f, 0.40f),
-            31, TextAnchor.MiddleCenter, Color.white);
-        dialogueText.fontStyle = FontStyle.BoldAndItalic;
-        progressText = Label("Progress", frame.transform, new Vector2(0.05f, 0.05f), new Vector2(0.25f, 0.14f),
-            18, TextAnchor.MiddleLeft, new Color(0.97f, 0.73f, 0.31f));
-        hintText = Label("Continue Hint", frame.transform, new Vector2(0.50f, 0.05f), new Vector2(0.95f, 0.14f),
-            18, TextAnchor.MiddleRight, new Color(0.97f, 0.73f, 0.31f));
+        Image frame = Panel("Ornate Dialogue Frame", transform, DialogueMin, DialogueMax, Color.white);
+        frame.sprite = Resources.Load<Sprite>("UI/Story/ornate-dialogue-frame");
+        titleText = Label("Shot Title", frame.transform, TitleMin, TitleMax, 31, TextAnchor.MiddleLeft);
+        bodyText = Label("Story Text", frame.transform, BodyMin, BodyMax, 25, TextAnchor.MiddleLeft);
+        progressText = Label("Page Number", frame.transform, new Vector2(.80f, .12f), new Vector2(.91f, .30f), 18, TextAnchor.MiddleCenter);
     }
 
     private void Next()
     {
-        index++;
-        if (index < pages.Length)
-        {
-            Display();
-            return;
-        }
-
-        Action callback = onComplete;
-        Destroy(gameObject);
-        callback?.Invoke();
+        if (++index < pages.Length) { Display(); return; }
+        Action callback = onComplete; Destroy(gameObject); callback?.Invoke();
     }
 
     private void Display()
     {
         Page page = pages[index];
-        titleText.text = page.title;
-        titleText.fontSize = page.finalCard ? 68 : 48;
-        descriptionText.text = page.description;
-        dialogueText.text = page.dialogue;
-        progressText.text = (index + 1) + "  /  " + pages.Length;
-        hintText.text = page.finalCard ? "CLICK TO CONTINUE  ▶" : "CLICK ANYWHERE TO CONTINUE  ▶";
+        Sprite sprite = string.IsNullOrWhiteSpace(page.imagePath) ? null : Resources.Load<Sprite>(page.imagePath);
+        storyImage.sprite = sprite; storyImage.color = sprite == null ? new Color(.05f, .06f, .1f, 1) : Color.white;
+        titleText.text = page.title; titleText.fontSize = page.finalCard ? 38 : 31;
+        bodyText.text = page.description + (string.IsNullOrWhiteSpace(page.dialogue) ? "" : "\n" + page.dialogue);
+        bodyText.fontSize = page.finalCard ? 28 : 25; progressText.text = $"{index + 1} / {pages.Length}";
     }
 
     private static Image Panel(string name, Transform parent, Vector2 min, Vector2 max, Color color)
     {
-        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        go.transform.SetParent(parent, false);
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = min;
-        rect.anchorMax = max;
-        rect.offsetMin = rect.offsetMax = Vector2.zero;
-        Image image = go.GetComponent<Image>();
-        image.color = color;
-        image.raycastTarget = false;
-        return image;
+        GameObject go = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)); go.transform.SetParent(parent, false);
+        RectTransform r = go.GetComponent<RectTransform>(); r.anchorMin = min; r.anchorMax = max; r.offsetMin = r.offsetMax = Vector2.zero;
+        Image image = go.GetComponent<Image>(); image.color = color; image.raycastTarget = false; return image;
     }
 
-    private static Text Label(string name, Transform parent, Vector2 min, Vector2 max, int size,
-        TextAnchor alignment, Color color)
+    private static Text Label(string name, Transform parent, Vector2 min, Vector2 max, int size, TextAnchor alignment)
     {
-        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-        go.transform.SetParent(parent, false);
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = min;
-        rect.anchorMax = max;
-        rect.offsetMin = rect.offsetMax = Vector2.zero;
-        Text text = go.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = size;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = alignment;
-        text.color = color;
-        text.horizontalOverflow = HorizontalWrapMode.Wrap;
-        text.verticalOverflow = VerticalWrapMode.Truncate;
-        text.raycastTarget = false;
-        return text;
+        GameObject go = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text)); go.transform.SetParent(parent, false);
+        RectTransform r = go.GetComponent<RectTransform>(); r.anchorMin = min; r.anchorMax = max; r.offsetMin = r.offsetMax = Vector2.zero;
+        Text t = go.GetComponent<Text>(); t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); t.fontSize = size;
+        t.fontStyle = FontStyle.Bold; t.alignment = alignment; t.color = new Color(.27f, .13f, .045f);
+        t.horizontalOverflow = HorizontalWrapMode.Wrap; t.verticalOverflow = VerticalWrapMode.Truncate; t.raycastTarget = false; return t;
     }
 }
 
 public static class KitchenToBedroomStoryPage
 {
-    public static void Show(Action onComplete)
+    public static void Show(Action done) => AdventureStorySequencePage.Show("Kitchen To Bedroom Story", new[]
     {
-        AdventureStorySequencePage.Show("Kitchen To Bedroom Story", new[]
-        {
-            new AdventureStorySequencePage.Page(
-                "SCENE 1 — THE KITCHEN RACE ENDS",
-                "Four toy horses cross the kitchen finish line. As the race ends, the second star fragment slowly appears in the air, glowing with warm golden light.",
-                "Narration:  “The second star fragment has been found!”"),
-            new AdventureStorySequencePage.Page(
-                "SCENE 2 — THE FINAL CLUE",
-                "The first and second fragments answer one another with a gentle glow. Their light joins into a sparkling trail pointing towards the bedroom.",
-                "Narration:  “Only one fragment remains!”"),
-            new AdventureStorySequencePage.Page(
-                "SCENE 3 — THE FINAL DESTINATION",
-                "The camera follows the starlight through the kitchen and along the hallway. Warm sunlight shines through a half-open bedroom door as the trail disappears inside.",
-                "Narration:  “The final fragment is waiting in the bedroom!”"),
-            new AdventureStorySequencePage.Page(
-                "SCENE 4 — ONE LAST RACE",
-                "The four toy horses look towards the bedroom, then run forward together. The camera pulls away and the picture fades.",
-                "Narration:  “One last race. Let's find our way home!”"),
-            new AdventureStorySequencePage.Page(
-                "LEVEL 3 — BEDROOM",
-                "THE FINAL RACE",
-                "",
-                true)
-        }, onComplete);
-    }
+        new AdventureStorySequencePage.Page("SHOT 1 — THE KITCHEN RACE ENDS", "The four friends cross the kitchen finish line. A second golden fragment rises above the moonlit tables.", "Narration:  “The second star fragment has been found!”", imagePath: "UI/Story/story-09"),
+        new AdventureStorySequencePage.Page("SHOT 2 — ONLY ONE REMAINS", "The first and second fragments answer one another. Their joined light points through an open doorway.", "Clover:  “Only one fragment remains!”", imagePath: "UI/Story/story-10"),
+        new AdventureStorySequencePage.Page("SHOT 3 — FOLLOW THE LIGHT", "The glowing trail winds along the quiet hotel corridor towards the bedroom.", "Woody:  “The final fragment is waiting for us!”", imagePath: "UI/Story/story-15"),
+        new AdventureStorySequencePage.Page("LEVEL 3 — BEDROOM", "THE FINAL RACE", "One last race. Let's find our way home!", true, "UI/Story/story-11")
+    }, done);
 }
 
 public static class BedroomEndingStoryPage
 {
-    public static void Show(Action onComplete)
+    public static void Show(Action done) => AdventureStorySequencePage.Show("Bedroom Ending Story", new[]
     {
-        AdventureStorySequencePage.Show("Bedroom Ending Story", new[]
-        {
-            new AdventureStorySequencePage.Page(
-                "SHOT 1 — THE FINAL FINISH LINE",
-                "Four toy horses cross the bedroom finish line and slowly come to a stop. They look at one another as the camera settles on Woody.",
-                "Blaze:  “What a race! That was our best one yet!”\nWoody:  “We made it!”"),
-            new AdventureStorySequencePage.Page(
-                "SHOT 2 — THE LAST STAR",
-                "Warm golden light appears in the bedroom. The third fragment rises while the first two fly from Woody's side. All three circle closer together.",
-                "Bubbles:  “Look! The last piece!”\nClover:  “The star is finally complete!”"),
-            new AdventureStorySequencePage.Page(
-                "SHOT 3 — THE MAGIC RETURNS",
-                "The fragments form a complete golden star. Its gentle light fills the bedroom, making the blocks, toy train and teddy bear sparkle before returning to Woody's saddle.",
-                "Woody:  “We did it... We brought the magic back!”\n♪ Gentle magical chime"),
-            new AdventureStorySequencePage.Page(
-                "SHOT 4 — THE WAY HOME",
-                "As the glow fades, Woody recognises the toy shelves, blocks and teddy bear by the window. This is where their adventures began, and the four friends stand together again.",
-                "Woody:  “This is where our adventures began.”\nBlaze:  “And what an adventure it was!”\nBubbles:  “So... are we racing again tomorrow?”"),
-            new AdventureStorySequencePage.Page(
-                "SHOT 5 — A NEW BEGINNING",
-                "The four horses look out of the window in the warm sunlight. The golden star on Woody's saddle glimmers as the camera slowly pulls back and fades to black.",
-                "Clover:  “Of course. The adventure never ends.”\nWoody:  “Next time, let's race together!”"),
-            new AdventureStorySequencePage.Page(
-                "TOY DASH",
-                "The best adventures are the ones we share.",
-                "THANK YOU FOR PLAYING!",
-                true)
-        }, onComplete);
-    }
+        new AdventureStorySequencePage.Page("SHOT 1 — THE FINAL FINISH LINE", "The four toy horses cross the final finish line and gather in the moonlit bedroom.", "Blaze:  “We did it! That was amazing!”\nBubbles:  “That was the best race ever!”", imagePath: "UI/Story/story-12"),
+        new AdventureStorySequencePage.Page("SHOT 2 — THE FINAL STAR FRAGMENT", "The third fragment rises. All three pieces spin beneath the moonlight and form one magical star.", "Clover:  “Look! The star is complete!”\nWoody:  “We found all three pieces!”", imagePath: "UI/Story/story-16"),
+        new AdventureStorySequencePage.Page("SHOT 3 — THE MAGIC OF AFTER HOURS", "Golden light sweeps across the room. The teddy bear, blocks and other toys begin to awaken.", "Bubbles:  “Wow! Everything is coming to life!”\nWoody:  “That's the magic of after hours!”", imagePath: "UI/Story/story-11"),
+        new AdventureStorySequencePage.Page("SHOT 4 — TIME TO GO HOME", "The night begins to fade. The magical star lights a path back to the toy box.", "Clover:  “Look! It's almost morning!”\nBlaze:  “Then we'd better hurry!”", imagePath: "UI/Story/story-15"),
+        new AdventureStorySequencePage.Page("SHOT 5 — JUST ORDINARY TOYS?", "The horses return to their places. Morning light enters the quiet room, as though nothing happened.", "Narration:  “When the world wakes up, the toys go back to sleep.”", imagePath: "UI/Story/story-13"),
+        new AdventureStorySequencePage.Page("TOY DASH — THE ADVENTURE NEVER ENDS", "Woody's little star gives one final glow before the picture fades to black.", "Narration:  “But when the lights go out... the adventure begins again.”\nEvery night has a secret adventure.\nTHANK YOU FOR PLAYING!", true, "UI/Story/story-14")
+    }, done);
 }

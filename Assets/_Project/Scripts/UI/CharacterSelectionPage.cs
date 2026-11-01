@@ -9,6 +9,28 @@ public sealed class CharacterSelectionPage : MonoBehaviour
     public const string SelectionKey = "selected-player-horse";
     private Action onSelected;
 
+    // Character-card layout. These values use the 1920 x 1080 Canvas reference size.
+    // Edit these values if the supplied artwork or portraits need small visual adjustments.
+    private static readonly Vector2 CardAreaSize = new Vector2(1840f, 690f);
+    private static readonly Vector2 CardAreaPosition = new Vector2(0f, -75f);
+
+    private static readonly Vector2[] CardMin =
+    {
+        new Vector2(0.035f, 0.025f),
+        new Vector2(0.345f, 0.025f),
+        new Vector2(0.670f, 0.025f)
+    };
+
+    private static readonly Vector2[] CardMax =
+    {
+        new Vector2(0.330f, 0.975f),
+        new Vector2(0.655f, 0.975f),
+        new Vector2(0.965f, 0.975f)
+    };
+
+    private static readonly Vector2 PortraitMin = new Vector2(0.10f, 0.22f);
+    private static readonly Vector2 PortraitMax = new Vector2(0.90f, 0.84f);
+
     private readonly CharacterEntry[] entries =
     {
         new CharacterEntry("FLOWER HORSE", "flowerhorse", "UI/Characters/flowerhorse"),
@@ -43,15 +65,20 @@ public sealed class CharacterSelectionPage : MonoBehaviour
         background.sprite = Resources.Load<Sprite>("UI/character-select-bg");
         background.preserveAspect = false;
 
-        Image shade = ImageObject("Card Shade", transform);
-        Stretch(shade.rectTransform, new Vector2(0.055f, 0.18f), new Vector2(0.945f, 0.66f));
-        shade.color = new Color(0.15f, 0.055f, 0.018f, 0.28f);
+        Image cardArtwork = ImageObject("Three Horse Card Artwork", transform);
+        RectTransform cardArea = cardArtwork.rectTransform;
+        cardArea.anchorMin = cardArea.anchorMax = new Vector2(0.5f, 0.5f);
+        cardArea.pivot = new Vector2(0.5f, 0.5f);
+        cardArea.anchoredPosition = CardAreaPosition;
+        cardArea.sizeDelta = CardAreaSize;
+        cardArtwork.sprite = Resources.Load<Sprite>("UI/character-select-cards");
+        cardArtwork.preserveAspect = false;
+        cardArtwork.raycastTarget = false;
 
         for (int i = 0; i < entries.Length; i++)
         {
             CharacterEntry entry = entries[i];
-            float x = 0.08f + i * 0.28f;
-            Button card = Card(entry, new Vector2(x, 0.20f), new Vector2(x + 0.26f, 0.63f));
+            Button card = Card(entry, cardArea, CardMin[i], CardMax[i]);
             card.onClick.AddListener(() => Select(entry.id));
         }
 
@@ -60,30 +87,23 @@ public sealed class CharacterSelectionPage : MonoBehaviour
         hint.color = new Color(1f, 0.91f, 0.70f);
     }
 
-    private Button Card(CharacterEntry entry, Vector2 min, Vector2 max)
+    private Button Card(CharacterEntry entry, Transform parent, Vector2 min, Vector2 max)
     {
-        Image panel = ImageObject(entry.label, transform);
+        Image panel = ImageObject(entry.label + " Card", parent);
         Stretch(panel.rectTransform, min, max);
-        panel.color = new Color(1f, 0.76f, 0.32f, 0.98f);
+        // Nearly transparent so the supplied card artwork remains visible while
+        // the full card is still an easy click target.
+        panel.color = new Color(1f, 1f, 1f, 0.001f);
 
         Button button = panel.gameObject.AddComponent<Button>();
         button.targetGraphic = panel;
-        ColorBlock colors = button.colors;
-        colors.normalColor = Color.white;
-        colors.highlightedColor = new Color(1f, 0.93f, 0.67f, 1f);
-        colors.pressedColor = new Color(0.80f, 0.62f, 0.32f, 1f);
-        button.colors = colors;
+        button.transition = Selectable.Transition.None;
 
         Image portrait = ImageObject("Portrait", panel.transform);
-        Stretch(portrait.rectTransform, new Vector2(0.035f, 0.19f), new Vector2(0.965f, 0.965f));
+        Stretch(portrait.rectTransform, PortraitMin, PortraitMax);
         portrait.sprite = Resources.Load<Sprite>(entry.portraitPath);
         portrait.preserveAspect = true;
         portrait.raycastTarget = false;
-
-        Text name = Label("Name", panel.transform, new Vector2(0.04f, 0.02f), new Vector2(0.96f, 0.18f), 30);
-        name.text = entry.label;
-        name.color = new Color(0.24f, 0.075f, 0.015f);
-        name.raycastTarget = false;
         return button;
     }
 
