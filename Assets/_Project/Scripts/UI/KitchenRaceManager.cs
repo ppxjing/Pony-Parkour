@@ -8,6 +8,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
 [DefaultExecutionOrder(-500)]
@@ -750,10 +751,22 @@ private static Canvas NewCanvas(string name, int order)
 
 public sealed class GamePauseMenu : MonoBehaviour
 {
+    // Pause UI layout controls. Change these values to fine-tune all three gameplay scenes.
+    private static readonly Vector2 SettingsButtonMin = new Vector2(0.805f, 0.865f);
+    private static readonly Vector2 SettingsButtonMax = new Vector2(0.985f, 0.975f);
+    private static readonly Vector2 BoardSize = new Vector2(960f, 640f);
+    private static readonly Vector2 BackButtonMin = new Vector2(0.12f, 0.10f);
+    private static readonly Vector2 BackButtonMax = new Vector2(0.47f, 0.25f);
+    private static readonly Vector2 BackButtonOffset = new Vector2(200f, 236f);
+    private static readonly Vector2 MainMenuButtonMin = new Vector2(0.53f, 0.10f);
+    private static readonly Vector2 MainMenuButtonMax = new Vector2(0.88f, 0.25f);
+    private static readonly Vector2 MainMenuButtonOffset = new Vector2(-185f, 123f);
+
     private GameObject pausePanel;
     private float previousTimeScale = 1f;
     private bool paused;
     public bool IsPaused => paused;
+    public static bool IsAnyPaused { get; private set; }
 
     public void SetResumeTimeScale(float value) => previousTimeScale = value;
 
@@ -776,7 +789,8 @@ public sealed class GamePauseMenu : MonoBehaviour
         EnsureEventSystem();
         Canvas canvas = NewPauseCanvas();
 
-        Button settings = NewButton(canvas.transform, "Settings Button", "⚙  SETTINGS", new Vector2(0.84f, 0.88f), new Vector2(0.98f, 0.97f), 27);
+        Button settings = NewSpriteButton(canvas.transform, "Settings Button", "UI/Pause/settings-button",
+            SettingsButtonMin, SettingsButtonMax);
         settings.onClick.AddListener(Open);
 
         pausePanel = new GameObject("Pause Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -790,24 +804,35 @@ public sealed class GamePauseMenu : MonoBehaviour
         board.transform.SetParent(pausePanel.transform, false);
         RectTransform boardRect = board.GetComponent<RectTransform>();
         boardRect.anchorMin = boardRect.anchorMax = new Vector2(0.5f, 0.5f);
-        boardRect.sizeDelta = new Vector2(620f, 520f);
-        board.GetComponent<Image>().color = new Color(0.91f, 0.56f, 0.18f, 0.99f);
+        boardRect.sizeDelta = BoardSize;
+        Image boardImage = board.GetComponent<Image>();
+        boardImage.sprite = Resources.Load<Sprite>("UI/Pause/settings-panel");
+        boardImage.color = Color.white;
 
-        Text title = PauseText(board.transform, "PAUSED", new Vector2(0.08f, 0.69f), new Vector2(0.92f, 0.93f), 56);
-        title.color = new Color(0.22f, 0.065f, 0.012f);
-
-        Button resume = NewButton(board.transform, "Resume", "▶  RESUME", new Vector2(0.18f, 0.40f), new Vector2(0.82f, 0.59f), 32);
+        Button resume = NewSpriteButton(board.transform, "Back", "UI/Pause/back-button",
+            BackButtonMin, BackButtonMax);
+        SetUniformOffset(resume.GetComponent<RectTransform>(), BackButtonOffset);
         resume.onClick.AddListener(Resume);
-        Button mainMenu = NewButton(board.transform, "Main Menu", "⌂  MAIN MENU", new Vector2(0.18f, 0.15f), new Vector2(0.82f, 0.34f), 30);
+        Button mainMenu = NewSpriteButton(board.transform, "Main Menu", "UI/Pause/main-menu-button",
+            MainMenuButtonMin, MainMenuButtonMax);
+        SetUniformOffset(mainMenu.GetComponent<RectTransform>(), MainMenuButtonOffset);
         mainMenu.onClick.AddListener(ReturnToMainMenu);
 
         pausePanel.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+        if (paused) Resume();
+        else Open();
     }
 
     private void Open()
     {
         if (paused) return;
         paused = true;
+        IsAnyPaused = true;
         previousTimeScale = Time.timeScale;
         Time.timeScale = 0f;
         pausePanel.SetActive(true);
@@ -819,6 +844,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     {
         if (!paused) return;
         paused = false;
+        IsAnyPaused = false;
         pausePanel.SetActive(false);
         Time.timeScale = previousTimeScale;
         if (SceneManager.GetActiveScene().name == "Kitchen_Adventure" ||
@@ -833,6 +859,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     private void ReturnToMainMenu()
     {
         paused = false;
+        IsAnyPaused = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenuScene");
     }
@@ -840,6 +867,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     private void OnDestroy()
     {
         if (paused) Time.timeScale = 1f;
+        IsAnyPaused = false;
     }
 
     private static void EnsureEventSystem()
@@ -888,6 +916,37 @@ public sealed class GamePauseMenu : MonoBehaviour
         Text text = PauseText(go.transform, label, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f), size);
         text.color = new Color(0.25f, 0.075f, 0.02f, 1f);
         return button;
+    }
+
+    private static Button NewSpriteButton(Transform parent, string name, string spritePath, Vector2 min, Vector2 max)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = min;
+        rect.anchorMax = max;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+
+        Image image = go.GetComponent<Image>();
+        image.sprite = Resources.Load<Sprite>(spritePath);
+        image.color = Color.white;
+        image.preserveAspect = false;
+
+        Button button = go.GetComponent<Button>();
+        button.targetGraphic = image;
+        ColorBlock colors = button.colors;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.94f, 0.72f, 1f);
+        colors.pressedColor = new Color(0.82f, 0.82f, 0.82f, 1f);
+        colors.selectedColor = colors.highlightedColor;
+        button.colors = colors;
+        return button;
+    }
+
+    private static void SetUniformOffset(RectTransform rect, Vector2 offset)
+    {
+        rect.offsetMin = offset;
+        rect.offsetMax = offset;
     }
 
     private static Text PauseText(Transform parent, string value, Vector2 min, Vector2 max, int size)

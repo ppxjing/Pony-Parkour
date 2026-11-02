@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f7122dadfe3c788428375895dcd2fc13
+guid: e3d832ee3767ae541bf316f32db60fcf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7501201644240826356
-    second: horse_0
+      213: -8206886701184490385
+    second: "\u7070\u5976\u6CB9\u8272\u7ED2\u5E03\u6728\u9A6C\u73A9\u5177_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -42,7 +42,7 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: horse_0
+      name: "\u7070\u5976\u6CB9\u8272\u7ED2\u5E03\u6728\u9A6C\u73A9\u5177_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 408
-        height: 399
+        width: 1429
+        height: 1100
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c00137ef8d066e790800000000000000
-      internalID: -7501201644240826356
+      spriteID: f646508f6084b1e80800000000000000
+      internalID: -8206886701184490385
       vertices: []
       indices: 
       edges: []
@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "\u7070\u5976\u6CB9\u8272\u7ED2\u5E03\u6728\u9A6C\u73A9\u5177_0": -8206886701184490385
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

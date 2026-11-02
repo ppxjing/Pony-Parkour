@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 04542e5a508907344a613801c4eca324
+guid: aac2ad3f6207c76478cdcf1d1b3d2009
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5590727045835913407
-    second: flowerhorse-b_0
+      213: 3072446247356917195
+    second: "\u590D\u53E4\u82B1\u5349\u5E03\u827A\u6447\u6447\u9A6C_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -42,7 +42,7 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: flowerhorse-b_0
+      name: "\u590D\u53E4\u82B1\u5349\u5E03\u827A\u6447\u6447\u9A6C_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 450
-        height: 414
+        width: 1429
+        height: 1100
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 14708cc6f5fb962b0800000000000000
-      internalID: -5590727045835913407
+      spriteID: bc5e03d559583aa20800000000000000
+      internalID: 3072446247356917195
       vertices: []
       indices: 
       edges: []
@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "\u590D\u53E4\u82B1\u5349\u5E03\u827A\u6447\u6447\u9A6C_0": 3072446247356917195
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

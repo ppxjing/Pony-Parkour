@@ -82,7 +82,7 @@ public sealed class CharacterSelectionPage : MonoBehaviour
             card.onClick.AddListener(() => Select(entry.id));
         }
 
-        Text hint = Label("Hint", transform, new Vector2(0.25f, 0.105f), new Vector2(0.75f, 0.17f), 28);
+        Text hint = Label("Hint", transform, new Vector2(0.25f, 0.055f), new Vector2(0.75f, 0.12f),28);
         hint.text = "CHOOSE A HORSE TO CONTINUE";
         hint.color = new Color(1f, 0.91f, 0.70f);
     }

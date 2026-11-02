@@ -5,9 +5,9 @@ using UnityEngine.UI;
 public sealed class AdventureStorySequencePage : MonoBehaviour
 {
     // 调整这五组锚点即可微调对话框、标题和正文的位置。
-    private static readonly Vector2 DialogueMin = new(0.025f, 0.018f), DialogueMax = new(0.975f, 0.325f);
-    private static readonly Vector2 TitleMin = new(0.095f, 0.57f), TitleMax = new(0.82f, 0.86f);
-    private static readonly Vector2 BodyMin = new(0.10f, 0.16f), BodyMax = new(0.84f, 0.61f);
+    private static readonly Vector2 DialogueMin = new(0.025f, 0.0f), DialogueMax = new(0.975f, 0.4f);
+    private static readonly Vector2 TitleMin = new(0.095f, 0.43f), TitleMax = new(0.82f, 0.71f);
+    private static readonly Vector2 BodyMin = new(0.10f, 0.13f), BodyMax = new(0.84f, 0.77f);
 
     public readonly struct Page
     {
@@ -43,9 +43,22 @@ public sealed class AdventureStorySequencePage : MonoBehaviour
         button.transition = Selectable.Transition.None; button.onClick.AddListener(Next);
 
         Image frame = Panel("Ornate Dialogue Frame", transform, DialogueMin, DialogueMax, Color.white);
+        RectTransform fr = frame.rectTransform;
+        fr.offsetMin = new Vector2(0f, -91f);   // Left, Bottom
+        fr.offsetMax = new Vector2(0f, -33f);   // -Right, -Top
         frame.sprite = Resources.Load<Sprite>("UI/Story/ornate-dialogue-frame");
+
         titleText = Label("Shot Title", frame.transform, TitleMin, TitleMax, 31, TextAnchor.MiddleLeft);
+        RectTransform titleRect = titleText.rectTransform;
+        titleRect.offsetMin = new Vector2(0f, 0f);    // Left, Bottom
+        titleRect.offsetMax = new Vector2(0f, 0f);    // -Right, -Top
+
         bodyText = Label("Story Text", frame.transform, BodyMin, BodyMax, 25, TextAnchor.MiddleLeft);
+        RectTransform bodyRect = bodyText.rectTransform;
+        bodyRect.offsetMin = new Vector2(0f, 0f);
+        bodyRect.offsetMax = new Vector2(0f, 0f);
+
+        progressText = Label("Page Number", frame.transform, new Vector2(.80f, .12f), new Vector2(.91f, .30f), 18, TextAnchor.MiddleCenter);
         progressText = Label("Page Number", frame.transform, new Vector2(.80f, .12f), new Vector2(.91f, .30f), 18, TextAnchor.MiddleCenter);
     }
 

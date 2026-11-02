@@ -84,6 +84,7 @@ namespace Adventure.Player
         private void LateUpdate()
         {
             if (target == null || input == null) return;
+            if (GamePauseMenu.IsAnyPaused) return;
             bool countingDown = startCountdown != null && startCountdown.IsCountingDown;
             if (countingDown || wasCountingDown)
             {
