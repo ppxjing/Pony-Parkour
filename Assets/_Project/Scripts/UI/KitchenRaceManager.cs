@@ -423,15 +423,6 @@ private void CreateLapDisplay()
         panel.GetComponent<Image>().color = new Color(0.12f, 0.055f, 0.015f, 0.78f);
         lapText = NewText(panel.transform, 34, TextAnchor.MiddleCenter);
 
-        GameObject routePanel = new GameObject("Next Checkpoint", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        routePanel.transform.SetParent(canvas.transform, false);
-        RectTransform routeRect = routePanel.GetComponent<RectTransform>();
-        routeRect.anchorMin = routeRect.anchorMax = new Vector2(0.5f, 1f);
-        routeRect.pivot = new Vector2(0.5f, 1f);
-        routeRect.anchoredPosition = new Vector2(0f, -108f);
-        routeRect.sizeDelta = new Vector2(360f, 58f);
-        routePanel.GetComponent<Image>().color = new Color(0.68f, 0.25f, 0.02f, 0.84f);
-        routeText = NewText(routePanel.transform, 25, TextAnchor.MiddleCenter);
     }
 
     private void UpdateStarCount()

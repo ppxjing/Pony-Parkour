@@ -29,37 +29,44 @@ public sealed class AdventureStorySequencePage : MonoBehaviour
         view.pages = pages; view.onComplete = onComplete; view.Build(); view.Display();
     }
 
-    private void Build()
+private void Build()
     {
         gameObject.AddComponent<RectTransform>();
-        Canvas canvas = gameObject.AddComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 26000;
-        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080); scaler.matchWidthOrHeight = .5f;
+        Canvas canvas = gameObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 26000;
+
+        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.matchWidthOrHeight = .5f;
         gameObject.AddComponent<GraphicRaycaster>();
 
         storyImage = Panel("Story Image", transform, Vector2.zero, Vector2.one, Color.white);
+
         Image clickLayer = Panel("Click Anywhere", transform, Vector2.zero, Vector2.one, new Color(0, 0, 0, .06f));
-        clickLayer.raycastTarget = true; Button button = clickLayer.gameObject.AddComponent<Button>();
-        button.transition = Selectable.Transition.None; button.onClick.AddListener(Next);
+        clickLayer.raycastTarget = true;
+        Button button = clickLayer.gameObject.AddComponent<Button>();
+        button.transition = Selectable.Transition.None;
+        button.onClick.AddListener(Next);
 
         Image frame = Panel("Ornate Dialogue Frame", transform, DialogueMin, DialogueMax, Color.white);
-        RectTransform fr = frame.rectTransform;
-        fr.offsetMin = new Vector2(0f, -91f);   // Left, Bottom
-        fr.offsetMax = new Vector2(0f, -33f);   // -Right, -Top
+        RectTransform frameRect = frame.rectTransform;
+        frameRect.offsetMin = new Vector2(0f, -91f);
+        frameRect.offsetMax = new Vector2(0f, -33f);
         frame.sprite = Resources.Load<Sprite>("UI/Story/ornate-dialogue-frame");
 
-        titleText = Label("Shot Title", frame.transform, TitleMin, TitleMax, 31, TextAnchor.MiddleLeft);
-        RectTransform titleRect = titleText.rectTransform;
-        titleRect.offsetMin = new Vector2(0f, 0f);    // Left, Bottom
-        titleRect.offsetMax = new Vector2(0f, 0f);    // -Right, -Top
+        titleText = Label("Shot Title", frame.transform,
+            new Vector2(.10f, .60f), new Vector2(.80f, .79f),
+            27, TextAnchor.MiddleLeft);
 
-        bodyText = Label("Story Text", frame.transform, BodyMin, BodyMax, 25, TextAnchor.MiddleLeft);
-        RectTransform bodyRect = bodyText.rectTransform;
-        bodyRect.offsetMin = new Vector2(0f, 0f);
-        bodyRect.offsetMax = new Vector2(0f, 0f);
+        bodyText = Label("Story Text", frame.transform,
+            new Vector2(.10f, .20f), new Vector2(.80f, .58f),
+            21, TextAnchor.UpperLeft);
 
-        progressText = Label("Page Number", frame.transform, new Vector2(.80f, .12f), new Vector2(.91f, .30f), 18, TextAnchor.MiddleCenter);
-        progressText = Label("Page Number", frame.transform, new Vector2(.80f, .12f), new Vector2(.91f, .30f), 18, TextAnchor.MiddleCenter);
+        progressText = Label("Page Number", frame.transform,
+            new Vector2(.80f, .28f), new Vector2(.88f, .38f),
+            17, TextAnchor.MiddleCenter);
     }
 
     private void Next()
@@ -68,14 +75,41 @@ public sealed class AdventureStorySequencePage : MonoBehaviour
         Action callback = onComplete; Destroy(gameObject); callback?.Invoke();
     }
 
-    private void Display()
+private void Display()
     {
         Page page = pages[index];
         Sprite sprite = string.IsNullOrWhiteSpace(page.imagePath) ? null : Resources.Load<Sprite>(page.imagePath);
-        storyImage.sprite = sprite; storyImage.color = sprite == null ? new Color(.05f, .06f, .1f, 1) : Color.white;
-        titleText.text = page.title; titleText.fontSize = page.finalCard ? 38 : 31;
+        storyImage.sprite = sprite;
+        storyImage.color = sprite == null ? new Color(.05f, .06f, .1f, 1) : Color.white;
+
+        titleText.text = page.title;
         bodyText.text = page.description + (string.IsNullOrWhiteSpace(page.dialogue) ? "" : "\n" + page.dialogue);
-        bodyText.fontSize = page.finalCard ? 28 : 25; progressText.text = $"{index + 1} / {pages.Length}";
+        progressText.text = $"{index + 1} / {pages.Length}";
+
+        RectTransform titleRect = titleText.rectTransform;
+        RectTransform bodyRect = bodyText.rectTransform;
+
+        if (page.finalCard)
+        {
+            titleRect.anchorMin = new Vector2(.10f, .61f);
+            titleRect.anchorMax = new Vector2(.80f, .80f);
+            bodyRect.anchorMin = new Vector2(.10f, .20f);
+            bodyRect.anchorMax = new Vector2(.80f, .58f);
+            titleText.fontSize = 27;
+            bodyText.fontSize = 20;
+        }
+        else
+        {
+            titleRect.anchorMin = new Vector2(.10f, .60f);
+            titleRect.anchorMax = new Vector2(.80f, .79f);
+            bodyRect.anchorMin = new Vector2(.10f, .20f);
+            bodyRect.anchorMax = new Vector2(.80f, .58f);
+            titleText.fontSize = 27;
+            bodyText.fontSize = 21;
+        }
+
+        titleRect.offsetMin = titleRect.offsetMax = Vector2.zero;
+        bodyRect.offsetMin = bodyRect.offsetMax = Vector2.zero;
     }
 
     private static Image Panel(string name, Transform parent, Vector2 min, Vector2 max, Color color)
