@@ -24,10 +24,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository and LFS files
+      - name: Check out the browser build
         uses: actions/checkout@v4
         with:
-          lfs: true
+          sparse-checkout: WebGLBuild
+          lfs: false
+
+      - name: Download browser build data and check entry point
+        run: |
+          git lfs install --local
+          git lfs pull --include="WebGLBuild/**" --exclude=""
+          test -s WebGLBuild/index.html
+          if grep -rl '^version https://git-lfs.github.com/spec/v1' WebGLBuild; then
+            echo "Unresolved Git LFS pointer in browser build"
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

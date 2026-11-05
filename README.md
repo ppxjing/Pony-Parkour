@@ -4,11 +4,25 @@
 
 ## Play
 
-[Play the WebGL build](https://gdat-ap6412.github.io/2026s1-project-2-team-02/)
+[Play Toy Dash in your browser](https://gdat-ap6412.github.io/2026s1-project-2-team-02/)
 
-Platform: Desktop web browser  
-Build target: WebGL  
-Target playtime: Under 10 minutes
+Open the link in desktop Chrome or Edge, wait for the game to load, then click **Play** and choose a character. No Unity installation or download is required. Click through the opening story to begin the Beach race. The first visit downloads the game assets and may take a little time.
+
+Latest release: **2026-11-05**, built from game source `e008743` with Unity **6000.3.19f1**. The browser build opens the main menu automatically.
+
+### Windows build
+
+Extract the complete `ToyDash-Windows-x64.zip`, then double-click `ToyDash.exe`. Keep `ToyDash_Data`, `UnityPlayer.dll`, `MonoBleedingEdge`, and the other supplied files alongside the executable. Local build output: `Builds/2026-11-05/Windows/ToyDash.exe`.
+
+### Build scene order
+
+1. `MainMenuScene`
+2. `StartScene`
+3. `Beach`
+4. `Kitchen_Adventure`
+5. `Bedroom`
+
+`Kitchen_Playground` is not included in the release. WebGL is hosted from the contents of `WebGLBuild` using the repository's GitHub Pages deployment workflow.
 
 ## Features
 
