@@ -91,8 +91,8 @@ private void Display()
 
         if (page.finalCard)
         {
-            titleRect.anchorMin = new Vector2(.10f, .61f);
-            titleRect.anchorMax = new Vector2(.80f, .80f);
+            titleRect.anchorMin = new Vector2(.10f, .50f);
+            titleRect.anchorMax = new Vector2(.80f, .60f);
             bodyRect.anchorMin = new Vector2(.10f, .10f);
             bodyRect.anchorMax = new Vector2(.80f, .50f);
             titleText.fontSize = 27;
@@ -100,8 +100,8 @@ private void Display()
         }
         else
         {
-            titleRect.anchorMin = new Vector2(.10f, .60f);
-            titleRect.anchorMax = new Vector2(.80f, .79f);
+            titleRect.anchorMin = new Vector2(.10f, .50f);
+            titleRect.anchorMax = new Vector2(.80f, .60f);
             bodyRect.anchorMin = new Vector2(.10f, .10f);
             bodyRect.anchorMax = new Vector2(.80f, .50f);
             titleText.fontSize = 27;
