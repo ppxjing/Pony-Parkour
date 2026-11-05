@@ -93,8 +93,8 @@ private void Display()
         {
             titleRect.anchorMin = new Vector2(.10f, .61f);
             titleRect.anchorMax = new Vector2(.80f, .80f);
-            bodyRect.anchorMin = new Vector2(.10f, .20f);
-            bodyRect.anchorMax = new Vector2(.80f, .58f);
+            bodyRect.anchorMin = new Vector2(.10f, .10f);
+            bodyRect.anchorMax = new Vector2(.80f, .50f);
             titleText.fontSize = 27;
             bodyText.fontSize = 20;
         }
@@ -102,8 +102,8 @@ private void Display()
         {
             titleRect.anchorMin = new Vector2(.10f, .60f);
             titleRect.anchorMax = new Vector2(.80f, .79f);
-            bodyRect.anchorMin = new Vector2(.10f, .20f);
-            bodyRect.anchorMax = new Vector2(.80f, .58f);
+            bodyRect.anchorMin = new Vector2(.10f, .10f);
+            bodyRect.anchorMax = new Vector2(.80f, .50f);
             titleText.fontSize = 27;
             bodyText.fontSize = 21;
         }
