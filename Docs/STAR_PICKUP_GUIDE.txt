@@ -1,0 +1,43 @@
+星星接触收集与消失动画
+
+修正原因
+旧逻辑在路线点水平半径 4.25～4.5 米内就推进进度，Beach 不限制高度。
+现在仅检查当前星星的 MeshCollider（凸形触发体）与玩家 CharacterController 是否重叠。
+星星碰撞体随星星缩放、悬浮和旋转变化，不产生阻挡。AI、死亡中或关闭胶囊的玩家不触发。
+
+收集行为
+接触立即记录路线进度和复活进度，只记录一次；下一个目标立即出现。
+旧星星在原位置向上飘、绕世界 Y 轴旋转，材质透明度与光照逐渐降到 0，最后销毁。
+暂停游戏时动画暂停。终点收集后动画仍能结束。运行时材质和网格随星星销毁释放。
+
+调整位置
+在 Beach、Kitchen_Adventure、Bedroom 中选择带 KitchenRaceManager 组件的物体，
+在 Inspector 的 Checkpoint Star 分组调整。修改前先停止 Play。
+Star Scale: 0.68，星星视觉尺寸和触发体同步缩放。
+Star Hover Height: 0.7，星星相对途经点的悬浮高度（米）。
+Star Bob Height: 0.1，上下浮动幅度（米）。
+Star Idle Rotation Speed: 120，未收集时每秒旋转角度。
+Star Collect Duration: 0.8，收集动画持续秒数。
+Star Collect Rise: 1.25，收集后上升高度（米）。
+Star Collect Rotation Speed: 540，收集后每秒旋转角度；负数反向。
+星星位置跟随 AI 途经点；高度不要设置到玩家无法接触的位置。
+旧 Checkpoint Radius 已隐藏且不再参与拾取判定。
+
+文件
+Assets/_Project/Scripts/UI/KitchenRaceManager.cs：路线进度与参数。
+Assets/_Project/Scripts/UI/CheckpointStarPickup.cs：接触形状、悬浮和收集动画。
+Assets/_Project/Resources/Materials/CheckpointStar.mat：金色透明材质；放在 Resources 中随构建包含透明 shader 变体。
+
+验收
+1. Play 后站在离星星约 3 米处，或从星星所在平台下方经过，星星和 NEXT CHECKPOINT 不应变化。
+2. 用 WASD 让玩家胶囊实际接触当前星星，应只推进一个路线点。
+3. 旧星星应一边旋转一边上升并渐隐，约 0.8 秒消失；下一个目标立即出现。
+4. 动画期间暂停，动画应停住；恢复后继续。
+5. AI 靠近星星、玩家死亡或布娃娃经过，不能收集。
+6. 跨圈的起点星星也需要接触；两圈终点仍正常结算。
+
+本次验证
+Unity 编译与 Console 检查；Beach Play 模式中的 3 米外、下方 5 米、关闭胶囊、死亡请求、
+接触后单次推进、暂停、渐隐与清理、两圈路线与终点动画测试。
+Kitchen_Adventure 和 Bedroom 均通过远距离不触发、胶囊接触后在正常游戏帧自动推进的 Play 验证；Console 无错误。
+未重新生成或发布 WebGL；现有 WebGLBuild 不会自动包含此修改。

@@ -102,3 +102,6 @@ InitTestScene*.unity*
 *.slnx
 .vsconfig
 
+
+# Local Windows player distribution
+/游戏运行包_Windows/

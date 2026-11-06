@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5733713311806483224
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1564652323606924, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_Name
+      value: PF_K_Ball_05_Bumper
+      objectReference: {fileID: 0}
+    - target: {fileID: 1564652323606924, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4317177756933184, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1564652323606924, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2713281170479413205}
+    - targetCorrespondingSourceObject: {fileID: 1564652323606924, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3206401387382103220}
+  m_SourcePrefab: {fileID: 100100000, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+--- !u!1 &5735249376823310996 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1564652323606924, guid: 1b0209df1c379d147a24ff6441f1ba85, type: 3}
+  m_PrefabInstance: {fileID: 5733713311806483224}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2713281170479413205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5735249376823310996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c0ad1cee6a99294bb6c51da0dfd9eb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Player.CameraObstructionIgnore
+--- !u!114 &3206401387382103220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5735249376823310996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c41c1f3ba52d2eb47baf5dda9f7317e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Adventure.Obstacles.BeachBumperBall
+  horizontalSpeed: 7
+  upwardSpeed: 4
+  referenceDiameter: 0.5
+  controlLockSeconds: 0.25
+  hitCooldown: 0.6
+  shrunkenScale: 0.75
+  shrinkSeconds: 0.12
+  inflatedScale: 1.18
+  inflateSeconds: 0.08
+  recoverSeconds: 0.3

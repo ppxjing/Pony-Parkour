@@ -55,5 +55,9 @@ Integration and playtesting were shared across the team.
 - Fun Obstacle Course Vol. 1
 - Minicar Environment Pack
 - Imported toy horse, Elephant, Giraffe, and Rabbit models
+- [Beach Stage](https://opengameart.org/content/beach-stage) by MintoDog, CC0
+- [Children's March Theme](https://opengameart.org/content/childrens-march-theme) by Cleyton Kauffman, CC0
+- [Flowerbed Fields](https://opengameart.org/content/flowerbed-fields-loop) by Zane Little Music, CC0
+- [Sleep Talking](https://opengameart.org/content/sleep-talking-loop-fantasy-rpg-sci-fi) by KiluaBoy, CC0
 
 The game design and project overview are maintained in [README.md](README.md). Team information is recorded in [metadata.json](metadata.json).

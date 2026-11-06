@@ -8,6 +8,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
 [DefaultExecutionOrder(-500)]
@@ -42,16 +43,43 @@ public sealed class KitchenRaceManager : MonoBehaviour
     [SerializeField, Min(1)] private int targetLaps = 2;
     [SerializeField, Range(1f, 2f)] private float npcSpeedScale = 1.2f;
     
-[SerializeField, Min(0.5f)] private float checkpointRadius = 2.5f;
+    // Legacy serialized field retained for existing scenes and installation tools.
+#pragma warning disable CS0414
+    [SerializeField, HideInInspector] private float checkpointRadius = 2.5f;
+#pragma warning restore CS0414
+
+    [Header("Checkpoint Star")]
+    [SerializeField, Min(0.05f)] private float starScale = 0.68f;
+    [SerializeField, Min(0f)] private float starHoverHeight = 0.7f;
+    [SerializeField, Min(0f)] private float starBobHeight = 0.1f;
+    [SerializeField] private float starIdleRotationSpeed = 120f;
+    [SerializeField, Min(0.05f)] private float starCollectDuration = 0.8f;
+    [SerializeField, Min(0f)] private float starCollectRise = 1.25f;
+    [SerializeField] private float starCollectRotationSpeed = 540f;
 
     private int playerNextWaypoint = 1;
     private int playerLaps;
+    private int collectedStars;
+    private int totalStars;
+    private Text starCountText;
+    public int CollectedStars => collectedStars;
+    public int TotalStars => totalStars;
     private bool finished;
+    private bool timedOut;
+    public int RequiredStarsToAdvance => LevelStarProgress.RequiredStars(totalStars);
+    public bool CanAdvance => finished && !timedOut && LevelStarProgress.HasEnoughStars(collectedStars, totalStars);
+    private float remainingSeconds;
+    private float levelDurationSeconds;
+    private LevelCountdownHud countdownHud;
+    public float RemainingSeconds => remainingSeconds;
+    public float LevelDurationSeconds => levelDurationSeconds;
     
     private Text routeText;
     
-    private float routeMarkerRevealTime;
-private GameObject routeMarker;
+    private CheckpointStarPickup routeMarker;
+    private CharacterController playerController;
+    private ThirdPersonMotor playerMotor;
+    private PlayerDeath playerDeath;
 private Text lapText;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -72,8 +100,20 @@ private void Start()
     {
         AutoConfigureIfNeeded();
         targetLaps = 2;
+        collectedStars = 0;
+        // The first lap starts at waypoint 1; later laps also collect waypoint 0.
+        totalStars = route.Count >= 2 ? route.Count * targetLaps - 1 : 0;
+        LevelTimeLimitSettings timeLimits = Resources.Load<LevelTimeLimitSettings>("Settings/LevelTimeLimits");
+        levelDurationSeconds = timeLimits != null ? timeLimits.GetDuration(gameObject.scene.name) : 180f;
+        remainingSeconds = levelDurationSeconds;
         CreateLapDisplay();
-        CreateRouteMarker();
+        UpdateStarCount();
+        if (player != null)
+        {
+            playerController = player.GetComponent<CharacterController>();
+            playerMotor = player.GetComponent<ThirdPersonMotor>();
+            playerDeath = player.GetComponent<PlayerDeath>();
+        }
         UpdateLapText();
         UpdateRouteGuidance();
     }
@@ -186,65 +226,95 @@ private static void EnsureAIObstacleHitbox(GameObject racer, NavMeshAgent agent)
     }
 
 
-private void Update()
+    private void Update()
     {
-        if (finished || player == null || route.Count < 2) return;
-        AnimateRouteMarker();
+        // Scaled time excludes the starting countdown and the pause menu.
+        // A death/respawn does not restart this level-wide clock.
+        if (finished || remainingSeconds <= 0f || Time.timeScale <= 0f) return;
+        remainingSeconds = Mathf.Max(0f, remainingSeconds - Time.deltaTime);
+        countdownHud.SetTime(remainingSeconds, levelDurationSeconds);
+        if (remainingSeconds <= 0f) TimeExpired();
+    }
 
-        Transform next = route[Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1)];
-        if (next == null || !HasReachedWaypoint(next)) return;
-
-        if (routeMarker != null)
+    private void TimeExpired()
+    {
+        if (finished) return;
+        finished = true;
+        timedOut = true;
+        if (playerMotor != null) playerMotor.enabled = false;
+        if (player != null)
         {
-            routeMarker.SetActive(false);
-            routeMarkerRevealTime = Time.time + 0.3f;
+            PlayerInputReader reader = player.GetComponent<PlayerInputReader>();
+            if (reader != null) reader.enabled = false;
+            PlayerRespawn respawn = player.GetComponent<PlayerRespawn>();
+            if (respawn != null) respawn.enabled = false;
         }
+        foreach (ThirdPersonOrbitCamera camera in FindObjectsByType<ThirdPersonOrbitCamera>(FindObjectsSortMode.None))
+            camera.enabled = false;
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        ShowTimeExpired();
+    }
+
+    private void ShowTimeExpired()
+    {
+        // Above the settings canvas so a completed run cannot resume through that menu.
+        Canvas canvas = NewCanvas("Time Expired", 40000);
+        Image shade = new GameObject("Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        shade.transform.SetParent(canvas.transform, false);
+        shade.rectTransform.anchorMin = Vector2.zero;
+        shade.rectTransform.anchorMax = Vector2.one;
+        shade.rectTransform.offsetMin = shade.rectTransform.offsetMax = Vector2.zero;
+        shade.color = new Color(0.03f, 0.012f, 0f, 0.84f);
+
+        Image board = new GameObject("Timeout Board", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        board.transform.SetParent(canvas.transform, false);
+        board.rectTransform.anchorMin = board.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        board.rectTransform.sizeDelta = new Vector2(760f, 400f);
+        board.color = new Color(0.15f, 0.07f, 0.035f, 1f);
+        Text title = NewPlacedText(board.transform, "Timeout Title", new Vector2(0f, 100f), new Vector2(680f, 80f), 58);
+        title.text = "TIME'S UP!";
+        title.color = new Color(1f, 0.28f, 0.2f);
+        title.raycastTarget = false;
+        Text score = NewPlacedText(board.transform, "Timeout Stars", new Vector2(0f, 5f), new Vector2(680f, 60f), 34);
+        score.text = "STARS  " + collectedStars + " / " + totalStars;
+        score.color = new Color(1f, 0.85f, 0.3f);
+        score.raycastTarget = false;
+        NewResultButton(board.transform, "Replay Button", "REPLAY", new Vector2(-170f, -115f)).onClick.AddListener(ReplayCurrentLevel);
+        NewResultButton(board.transform, "Main Menu Button", "MAIN MENU", new Vector2(170f, -115f)).onClick.AddListener(ReturnToMainMenu);
+    }
+
+    private void LateUpdate()
+    {
+        if (finished || Time.timeScale <= 0f || player == null || route.Count < 2 ||
+            playerMotor == null || !playerMotor.isActiveAndEnabled ||
+            (playerDeath != null && !playerDeath.IsAlive)) return;
+
+        // All player movement has run this frame. Only the visible star's collider
+        // touching the live player capsule can advance progress, including the lap gate.
+        if (routeMarker == null || !routeMarker.IsTouching(playerController)) return;
+        routeMarker.Collect();
+        routeMarker = null;
+        collectedStars++;
+        // Unlock selection at 80%, independently of finishing this two-lap race.
+        LevelStarProgress.RecordQualification(gameObject.scene.name, collectedStars, totalStars);
+        UpdateStarCount();
 
         playerNextWaypoint++;
-        if (playerNextWaypoint < route.Count)
+        if (playerNextWaypoint >= route.Count)
         {
-            UpdateRouteGuidance();
-            return;
+            playerNextWaypoint = 0;
+            playerLaps++;
+            UpdateLapText();
         }
-
-        playerNextWaypoint = 0;
-        playerLaps++;
-        UpdateLapText();
-        UpdateRouteGuidance();
         if (playerLaps >= targetLaps)
         {
             FinishRace();
             return;
         }
-
-        // Require crossing the start waypoint before beginning the next lap.
-        playerNextWaypoint = 0;
-    }
-
-private void LateUpdate()
-    {
-        if (finished || playerNextWaypoint != 0 || route.Count == 0) return;
-        if (!HasReachedWaypoint(route[0])) return;
-
-        playerNextWaypoint = 1;
         UpdateRouteGuidance();
     }
-
-private bool HasReachedWaypoint(Transform waypoint)
-    {
-        if (waypoint == null || player == null) return false;
-
-        Vector3 difference = player.position - waypoint.position;
-        bool isBeach = SceneManager.GetActiveScene().name == "Beach";
-        float radius = isBeach
-            ? Mathf.Max(checkpointRadius, 4.5f)
-            : Mathf.Max(checkpointRadius, 4.25f);
-        float horizontalDistanceSquared = difference.x * difference.x + difference.z * difference.z;
-        float verticalTolerance = isBeach ? float.PositiveInfinity : 3f;
-        return horizontalDistanceSquared <= radius * radius &&
-               Mathf.Abs(difference.y) <= verticalTolerance;
-    }
-
 
 public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
     {
@@ -278,7 +348,9 @@ public bool RespawnPlayerAtLastCheckpoint(ThirdPersonMotor motor)
 
 private void FinishRace()
     {
+        if (finished) return;
         finished = true;
+        LevelStarProgress.RecordQualification(gameObject.scene.name, collectedStars, totalStars);
         var results = new List<ResultEntry>
         {
             new ResultEntry("PLAYER", PlayerProgress(), true)
@@ -292,7 +364,7 @@ private void FinishRace()
         if (motor != null) motor.enabled = false;
         PlayerInputReader input = player.GetComponent<PlayerInputReader>();
         if (input != null) input.enabled = false;
-        if (routeMarker != null) routeMarker.SetActive(false);
+        if (routeMarker != null) Destroy(routeMarker.gameObject);
 
         ShowResults(results);
         Cursor.lockState = CursorLockMode.None;
@@ -324,6 +396,23 @@ private void FinishRace()
 private void CreateLapDisplay()
     {
         Canvas canvas = NewCanvas("Race HUD", 5000);
+        countdownHud = LevelCountdownHud.Create(canvas.transform);
+        countdownHud.SetTime(remainingSeconds, levelDurationSeconds);
+        GameObject starPanel = new GameObject("Star Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        starPanel.transform.SetParent(canvas.transform, false);
+        RectTransform starRect = starPanel.GetComponent<RectTransform>();
+        starRect.anchorMin = starRect.anchorMax = new Vector2(0f, 1f);
+        starRect.pivot = new Vector2(0f, 1f);
+        starRect.anchoredPosition = new Vector2(28f, -28f);
+        starRect.sizeDelta = new Vector2(240f, 72f);
+        Image starBackground = starPanel.GetComponent<Image>();
+        starBackground.color = new Color(0.12f, 0.055f, 0.015f, 0.88f);
+        starBackground.raycastTarget = false;
+        starCountText = NewText(starPanel.transform, 34, TextAnchor.MiddleCenter);
+        starCountText.gameObject.name = "Star Count Text";
+        starCountText.color = new Color(1f, 0.85f, 0.3f);
+        starCountText.raycastTarget = false;
+
         GameObject panel = new GameObject("Lap Counter", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         panel.transform.SetParent(canvas.transform, false);
         RectTransform rect = panel.GetComponent<RectTransform>();
@@ -334,15 +423,12 @@ private void CreateLapDisplay()
         panel.GetComponent<Image>().color = new Color(0.12f, 0.055f, 0.015f, 0.78f);
         lapText = NewText(panel.transform, 34, TextAnchor.MiddleCenter);
 
-        GameObject routePanel = new GameObject("Next Checkpoint", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        routePanel.transform.SetParent(canvas.transform, false);
-        RectTransform routeRect = routePanel.GetComponent<RectTransform>();
-        routeRect.anchorMin = routeRect.anchorMax = new Vector2(0.5f, 1f);
-        routeRect.pivot = new Vector2(0.5f, 1f);
-        routeRect.anchoredPosition = new Vector2(0f, -108f);
-        routeRect.sizeDelta = new Vector2(360f, 58f);
-        routePanel.GetComponent<Image>().color = new Color(0.68f, 0.25f, 0.02f, 0.84f);
-        routeText = NewText(routePanel.transform, 25, TextAnchor.MiddleCenter);
+    }
+
+    private void UpdateStarCount()
+    {
+        if (starCountText != null)
+            starCountText.text = "⭐ " + collectedStars + "/" + totalStars;
     }
 
     private void UpdateLapText()
@@ -350,50 +436,27 @@ private void CreateLapDisplay()
         if (lapText != null) lapText.text = "LAP  " + Mathf.Min(playerLaps + 1, targetLaps) + " / " + targetLaps;
     }
 
-private void CreateRouteMarker()
+    private void CreateRouteMarker(Transform waypoint)
     {
-        if (route.Count == 0) return;
-
-        routeMarker = new GameObject(
-            "Current Race Checkpoint Star",
-            typeof(MeshFilter),
-            typeof(MeshRenderer));
-
-        routeMarker.GetComponent<MeshFilter>().sharedMesh = CreateStarMesh();
-        routeMarker.transform.localScale = Vector3.one * 0.68f;
-
-        MeshRenderer markerRenderer = routeMarker.GetComponent<MeshRenderer>();
-        Shader markerShader = Shader.Find("Universal Render Pipeline/Lit");
-        if (markerShader == null) markerShader = Shader.Find("Standard");
-        if (markerShader == null) markerShader = Shader.Find("Universal Render Pipeline/Unlit");
-        if (markerShader != null)
+        Material material = Resources.Load<Material>("Materials/CheckpointStar");
+        if (material == null)
         {
-            Material markerMaterial = new Material(markerShader);
-            Color gold = new Color(1f, 0.62f, 0.035f, 1f);
-            markerMaterial.color = gold;
-            if (markerMaterial.HasProperty("_BaseColor")) markerMaterial.SetColor("_BaseColor", gold);
-            if (markerMaterial.HasProperty("_Metallic")) markerMaterial.SetFloat("_Metallic", 0.22f);
-            if (markerMaterial.HasProperty("_Smoothness")) markerMaterial.SetFloat("_Smoothness", 0.58f);
-            if (markerMaterial.HasProperty("_EmissionColor"))
-            {
-                markerMaterial.SetColor("_EmissionColor", new Color(0.28f, 0.08f, 0.005f));
-                markerMaterial.EnableKeyword("_EMISSION");
-            }
-            markerRenderer.material = markerMaterial;
+            Debug.LogError("Checkpoint star material is missing: Resources/Materials/CheckpointStar", this);
+            return;
         }
-        markerRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        markerRenderer.receiveShadows = false;
 
-        GameObject lightObject = new GameObject("Star Light", typeof(Light));
-        lightObject.transform.SetParent(routeMarker.transform, false);
-        Light markerLight = lightObject.GetComponent<Light>();
-        markerLight.type = LightType.Point;
-        markerLight.color = new Color(1f, 0.50f, 0.06f);
-        markerLight.range = 3.5f;
-        markerLight.intensity = 1.4f;
-        markerLight.shadows = LightShadows.None;
+        GameObject marker = new GameObject("Current Race Checkpoint Star");
+        // Keep generated markers owned by this race, with world scale independent of it.
+        marker.transform.SetParent(transform, true);
+        marker.transform.localScale = new Vector3(
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x)),
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.y)),
+            starScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.z)));
+        routeMarker = marker.AddComponent<CheckpointStarPickup>();
+        routeMarker.Initialize(waypoint, CreateStarMesh(), material, starHoverHeight,
+            starBobHeight, starIdleRotationSpeed, starCollectDuration,
+            starCollectRise, starCollectRotationSpeed);
     }
-
 private static Mesh CreateStarMesh()
     {
         const int pointCount = 10;
@@ -458,34 +521,8 @@ private void UpdateRouteGuidance()
                 : "NEXT CHECKPOINT  " + (targetIndex + 1).ToString("00") + " / " + route.Count.ToString("00");
         }
 
-        if (routeMarker != null)
-        {
-            routeMarker.transform.position = target.position + Vector3.up * 0.7f;
-            if (Time.time >= routeMarkerRevealTime) routeMarker.SetActive(true);
-        }
+        if (routeMarker == null) CreateRouteMarker(target);
     }
-
-private void AnimateRouteMarker()
-    {
-        if (routeMarker == null || route.Count == 0) return;
-
-        if (!routeMarker.activeSelf)
-        {
-            if (Time.time < routeMarkerRevealTime) return;
-            routeMarker.SetActive(true);
-        }
-
-        int targetIndex = Mathf.Clamp(playerNextWaypoint, 0, route.Count - 1);
-        Transform target = route[targetIndex];
-        if (target == null) return;
-
-        float hover = 0.7f + Mathf.Sin(Time.time * 3f) * 0.1f;
-        routeMarker.transform.position = target.position + Vector3.up * hover;
-        routeMarker.transform.Rotate(0f, 120f * Time.deltaTime, 0f, Space.World);
-    }
-
-
-
 
 private void ShowResults(List<ResultEntry> results)
     {
@@ -538,11 +575,39 @@ private void ShowResults(List<ResultEntry> results)
         menuButton.onClick.AddListener(ReturnToMainMenu);
 
         Button nextButton = NewResultButton(board.transform, "Next Level Button", nextLabel, new Vector2(330f, -440f));
+        nextButton.interactable = CanAdvance;
+        if (!CanAdvance)
+        {
+            // Use neutral gray directly; tinting the gold button would leave it brown.
+            nextButton.GetComponent<Image>().color = new Color(0.42f, 0.42f, 0.42f, 1f);
+            ColorBlock disabledColors = nextButton.colors;
+            disabledColors.disabledColor = Color.white;
+            nextButton.colors = disabledColors;
+            nextButton.GetComponent<Outline>().effectColor = new Color(0.22f, 0.22f, 0.22f, 1f);
+            nextButton.GetComponentInChildren<Text>().color = new Color(0.78f, 0.78f, 0.78f, 1f);
+        }
         nextButton.onClick.AddListener(LoadNextLevel);
+
+        Image unlockPanel = new GameObject("Star Unlock Result", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+        unlockPanel.transform.SetParent(board.transform, false);
+        unlockPanel.rectTransform.anchorMin = unlockPanel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        unlockPanel.rectTransform.anchoredPosition = new Vector2(0f, -350f);
+        unlockPanel.rectTransform.sizeDelta = new Vector2(980f, 54f);
+        unlockPanel.color = new Color(0.12f, 0.055f, 0.015f, 0.94f);
+        unlockPanel.raycastTarget = false;
+        Text unlockText = NewText(unlockPanel.transform, 26, TextAnchor.MiddleCenter);
+        unlockText.rectTransform.offsetMin = new Vector2(12f, 5f);
+        unlockText.rectTransform.offsetMax = new Vector2(-12f, -5f);
+        unlockText.color = new Color(1f, 0.85f, 0.3f);
+        unlockText.raycastTarget = false;
+        unlockText.text = "STARS " + collectedStars + "/" + totalStars + (CanAdvance
+            ? "  -  80% GOAL MET"
+            : "  -  NEED " + Mathf.Max(0, RequiredStarsToAdvance - collectedStars) + " MORE TO UNLOCK");
     }
 
 private void LoadNextLevel()
     {
+        if (!CanAdvance) return;
         Time.timeScale = 1f;
         string currentScene = SceneManager.GetActiveScene().name;
 
@@ -677,9 +742,24 @@ private static Canvas NewCanvas(string name, int order)
 
 public sealed class GamePauseMenu : MonoBehaviour
 {
+    // Pause UI layout controls. Change these values to fine-tune all three gameplay scenes.
+    private static readonly Vector2 SettingsButtonMin = new Vector2(0.805f, 0.865f);
+    private static readonly Vector2 SettingsButtonMax = new Vector2(0.985f, 0.975f);
+    private static readonly Vector2 BoardSize = new Vector2(960f, 640f);
+    private static readonly Vector2 BackButtonMin = new Vector2(0.12f, 0.10f);
+    private static readonly Vector2 BackButtonMax = new Vector2(0.47f, 0.25f);
+    private static readonly Vector2 BackButtonOffset = new Vector2(200f, 236f);
+    private static readonly Vector2 MainMenuButtonMin = new Vector2(0.53f, 0.10f);
+    private static readonly Vector2 MainMenuButtonMax = new Vector2(0.88f, 0.25f);
+    private static readonly Vector2 MainMenuButtonOffset = new Vector2(-185f, 123f);
+
     private GameObject pausePanel;
     private float previousTimeScale = 1f;
     private bool paused;
+    public bool IsPaused => paused;
+    public static bool IsAnyPaused { get; private set; }
+
+    public void SetResumeTimeScale(float value) => previousTimeScale = value;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterForScenes()
@@ -700,7 +780,8 @@ public sealed class GamePauseMenu : MonoBehaviour
         EnsureEventSystem();
         Canvas canvas = NewPauseCanvas();
 
-        Button settings = NewButton(canvas.transform, "Settings Button", "⚙  SETTINGS", new Vector2(0.84f, 0.88f), new Vector2(0.98f, 0.97f), 27);
+        Button settings = NewSpriteButton(canvas.transform, "Settings Button", "UI/Pause/settings-button",
+            SettingsButtonMin, SettingsButtonMax);
         settings.onClick.AddListener(Open);
 
         pausePanel = new GameObject("Pause Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -714,24 +795,35 @@ public sealed class GamePauseMenu : MonoBehaviour
         board.transform.SetParent(pausePanel.transform, false);
         RectTransform boardRect = board.GetComponent<RectTransform>();
         boardRect.anchorMin = boardRect.anchorMax = new Vector2(0.5f, 0.5f);
-        boardRect.sizeDelta = new Vector2(620f, 520f);
-        board.GetComponent<Image>().color = new Color(0.91f, 0.56f, 0.18f, 0.99f);
+        boardRect.sizeDelta = BoardSize;
+        Image boardImage = board.GetComponent<Image>();
+        boardImage.sprite = Resources.Load<Sprite>("UI/Pause/settings-panel");
+        boardImage.color = Color.white;
 
-        Text title = PauseText(board.transform, "PAUSED", new Vector2(0.08f, 0.69f), new Vector2(0.92f, 0.93f), 56);
-        title.color = new Color(0.22f, 0.065f, 0.012f);
-
-        Button resume = NewButton(board.transform, "Resume", "▶  RESUME", new Vector2(0.18f, 0.40f), new Vector2(0.82f, 0.59f), 32);
+        Button resume = NewSpriteButton(board.transform, "Back", "UI/Pause/back-button",
+            BackButtonMin, BackButtonMax);
+        SetUniformOffset(resume.GetComponent<RectTransform>(), BackButtonOffset);
         resume.onClick.AddListener(Resume);
-        Button mainMenu = NewButton(board.transform, "Main Menu", "⌂  MAIN MENU", new Vector2(0.18f, 0.15f), new Vector2(0.82f, 0.34f), 30);
+        Button mainMenu = NewSpriteButton(board.transform, "Main Menu", "UI/Pause/main-menu-button",
+            MainMenuButtonMin, MainMenuButtonMax);
+        SetUniformOffset(mainMenu.GetComponent<RectTransform>(), MainMenuButtonOffset);
         mainMenu.onClick.AddListener(ReturnToMainMenu);
 
         pausePanel.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+        if (paused) Resume();
+        else Open();
     }
 
     private void Open()
     {
         if (paused) return;
         paused = true;
+        IsAnyPaused = true;
         previousTimeScale = Time.timeScale;
         Time.timeScale = 0f;
         pausePanel.SetActive(true);
@@ -743,6 +835,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     {
         if (!paused) return;
         paused = false;
+        IsAnyPaused = false;
         pausePanel.SetActive(false);
         Time.timeScale = previousTimeScale;
         if (SceneManager.GetActiveScene().name == "Kitchen_Adventure" ||
@@ -757,6 +850,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     private void ReturnToMainMenu()
     {
         paused = false;
+        IsAnyPaused = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenuScene");
     }
@@ -764,6 +858,7 @@ public sealed class GamePauseMenu : MonoBehaviour
     private void OnDestroy()
     {
         if (paused) Time.timeScale = 1f;
+        IsAnyPaused = false;
     }
 
     private static void EnsureEventSystem()
@@ -812,6 +907,37 @@ public sealed class GamePauseMenu : MonoBehaviour
         Text text = PauseText(go.transform, label, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f), size);
         text.color = new Color(0.25f, 0.075f, 0.02f, 1f);
         return button;
+    }
+
+    private static Button NewSpriteButton(Transform parent, string name, string spritePath, Vector2 min, Vector2 max)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = min;
+        rect.anchorMax = max;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+
+        Image image = go.GetComponent<Image>();
+        image.sprite = Resources.Load<Sprite>(spritePath);
+        image.color = Color.white;
+        image.preserveAspect = false;
+
+        Button button = go.GetComponent<Button>();
+        button.targetGraphic = image;
+        ColorBlock colors = button.colors;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.94f, 0.72f, 1f);
+        colors.pressedColor = new Color(0.82f, 0.82f, 0.82f, 1f);
+        colors.selectedColor = colors.highlightedColor;
+        button.colors = colors;
+        return button;
+    }
+
+    private static void SetUniformOffset(RectTransform rect, Vector2 offset)
+    {
+        rect.offsetMin = offset;
+        rect.offsetMax = offset;
     }
 
     private static Text PauseText(Transform parent, string value, Vector2 min, Vector2 max, int size)

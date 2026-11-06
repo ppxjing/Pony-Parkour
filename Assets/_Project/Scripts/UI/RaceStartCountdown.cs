@@ -18,6 +18,8 @@ public sealed class RaceStartCountdown : MonoBehaviour
     private Image countdownImage;
     private bool released;
 
+    public bool IsCountingDown => !released;
+
     private void Awake()
     {
         previousTimeScale = Time.timeScale;
@@ -93,7 +95,13 @@ public sealed class RaceStartCountdown : MonoBehaviour
     {
         if (released) return;
         released = true;
-        Time.timeScale = previousTimeScale <= 0f ? 1f : previousTimeScale;
+        float raceTimeScale = previousTimeScale <= 0f ? 1f : previousTimeScale;
+        GamePauseMenu pauseMenu = FindFirstObjectByType<GamePauseMenu>();
+        // A settings menu opened during 3-2-1 must keep both the race and its timer paused.
+        if (pauseMenu != null && pauseMenu.IsPaused)
+            pauseMenu.SetResumeTimeScale(raceTimeScale);
+        else
+            Time.timeScale = raceTimeScale;
         Time.fixedDeltaTime = previousFixedDeltaTime;
     }
 

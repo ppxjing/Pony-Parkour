@@ -16,6 +16,19 @@ namespace Adventure.Player
         [SerializeField, Min(0)] private float moveSpeed = 5f;
         [SerializeField, Min(0.1f)] private float acceleration = 25f;
         [SerializeField, Min(0)] private float turnSpeed = 720f;
+        [Header("Sprint")]
+        [SerializeField, Min(1f)] private float sprintSpeedMultiplier = 2f;
+        [SerializeField, Min(0.05f)] private float sprintDuration = 1f;
+        [Tooltip("Cooldown begins after the sprint ends. Pausing also pauses this timer.")]
+        [SerializeField, Min(0f)] private float sprintCooldown = 3f;
+        [SerializeField] private ParticleSystem sprintEffectPrefab;
+        [Tooltip("Emission position relative to Visuals; negative Z places it behind the character.")]
+        [SerializeField] private Vector3 sprintEffectOffset = new Vector3(0f, 0.5f, -0.5f);
+        private ParticleSystem sprintEffect;
+        private float sprintRemaining, sprintCooldownRemaining;
+        public bool IsSprinting => sprintRemaining > 0f;
+        public float SprintRemaining => sprintRemaining;
+        public float SprintCooldownRemaining => sprintCooldownRemaining;
         [Header("Jump and gravity")]
         [SerializeField, Min(0)] private float jumpHeight = 1.4f;
         [SerializeField] private float gravity = -25f;
@@ -45,7 +58,11 @@ namespace Adventure.Player
         private Vector3 horizontalVelocity, spawnPosition;
         
         private float obstacleRespawnCooldownUntil;
-        public bool IsObstacleStunned => false;
+        private float slipRemaining, slipDuration, slipSpeed, slipSpinSpeed;
+        private Vector3 slipDirection;
+        private Quaternion slipFacing;
+        public bool IsSlipping => slipRemaining > 0f;
+        public bool IsObstacleStunned => IsSlipping;
 private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpRequested = float.NegativeInfinity;
         public bool IsGrounded => controller != null && controller.isGrounded;
         public Vector3 FootPosition => controller.bounds.center - Vector3.up * controller.bounds.extents.y;
@@ -65,17 +82,20 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
             if (dt <= 0f) return;
             FollowSupport(dt);
             if (!isActiveAndEnabled) return;
-            Vector2 stick = Time.time < racerControlLockUntil ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
+            UpdateSprint(dt);
+            if (input.SprintPressed) TryStartSprint();
+            Vector2 stick = (IsSlipping || Time.time < racerControlLockUntil) ? Vector2.zero : Vector2.ClampMagnitude(input.Move, 1f);
             Vector3 forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
-            Vector3 desired = (forward * stick.y + right * stick.x) * moveSpeed;
-            horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, desired, acceleration * dt);
+            float speedMultiplier = IsSprinting ? sprintSpeedMultiplier : 1f;
+            Vector3 desired = (forward * stick.y + right * stick.x) * (moveSpeed * speedMultiplier);
+            horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, desired, acceleration * speedMultiplier * dt);
             if (desired.sqrMagnitude > 0.001f)
                 visuals.rotation = Quaternion.RotateTowards(visuals.rotation, Quaternion.LookRotation(desired), turnSpeed * dt);
 
             if (controller.isGrounded && verticalVelocity <= 0f)
             { lastGrounded = Time.time; verticalVelocity = -2f; }
-            if (Time.time >= racerControlLockUntil && input.JumpPressed) jumpRequested = Time.time;
+            if (!IsSlipping && Time.time >= racerControlLockUntil && input.JumpPressed) jumpRequested = Time.time;
             if (Time.time - jumpRequested <= jumpBufferTime && Time.time - lastGrounded <= coyoteTime)
             {
                 if (standingTurntable != null)
@@ -87,7 +107,8 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
                 jumpRequested = lastGrounded = float.NegativeInfinity;
             }
             verticalVelocity = Mathf.Max(verticalVelocity + gravity * dt, -terminalSpeed);
-            externalHorizontalVelocity = Vector3.MoveTowards(externalHorizontalVelocity, Vector3.zero,
+            if (IsSlipping) UpdateSlip(dt);
+            else externalHorizontalVelocity = Vector3.MoveTowards(externalHorizontalVelocity, Vector3.zero,
                 (controller.isGrounded && verticalVelocity <= 0f ? 25f : 1f) * dt);
             var previousTurntable = standingTurntable;
             var previousRoller = standingRoller;
@@ -116,6 +137,77 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
                 else Respawn();
             }
         }
+        public bool TryStartSprint()
+        {
+            if (!isActiveAndEnabled || input == null || !input.isActiveAndEnabled ||
+                controller == null || !controller.enabled || Time.timeScale <= 0f ||
+                IsSlipping || Time.time < racerControlLockUntil || IsSprinting || sprintCooldownRemaining > 0f)
+                return false;
+
+            sprintRemaining = Mathf.Max(0.05f, sprintDuration);
+            if (sprintEffect == null && sprintEffectPrefab != null)
+            {
+                // Keep the effect outside Visuals so character swapping does not hide it.
+                sprintEffect = Instantiate(sprintEffectPrefab, transform);
+                sprintEffect.name = "Sprint Puff Effect";
+            }
+            if (sprintEffect != null)
+            {
+                UpdateSprintEffectPose();
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                sprintEffect.Play(true);
+            }
+            return true;
+        }
+
+        private void UpdateSprint(float dt)
+        {
+            if (IsSprinting)
+            {
+                if (!input.isActiveAndEnabled || Time.time < racerControlLockUntil)
+                {
+                    EndSprint();
+                    return;
+                }
+                float activeTime = Mathf.Min(dt, sprintRemaining);
+                sprintRemaining = Mathf.Max(0f, sprintRemaining - dt);
+                if (sprintRemaining <= 0f)
+                {
+                    EndSprint();
+                    sprintCooldownRemaining = Mathf.Max(0f, sprintCooldownRemaining - (dt - activeTime));
+                }
+            }
+            else
+                sprintCooldownRemaining = Mathf.Max(0f, sprintCooldownRemaining - dt);
+        }
+
+        private void EndSprint()
+        {
+            sprintRemaining = 0f;
+            sprintCooldownRemaining = Mathf.Max(0f, sprintCooldown);
+            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, moveSpeed);
+            if (sprintEffect != null)
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+
+        private void ResetSprint()
+        {
+            sprintRemaining = sprintCooldownRemaining = 0f;
+            if (sprintEffect != null)
+                sprintEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        private void LateUpdate()
+        {
+            if (sprintEffect != null) UpdateSprintEffectPose();
+        }
+
+        private void UpdateSprintEffectPose()
+        {
+            sprintEffect.transform.position = visuals.TransformPoint(sprintEffectOffset);
+            sprintEffect.transform.rotation = Quaternion.LookRotation(-visuals.forward, Vector3.up);
+        }
+
         private void FollowSupport(float dt)
         {
             Transform support = SupportTransform;
@@ -171,6 +263,14 @@ private float verticalVelocity, lastGrounded = float.NegativeInfinity, jumpReque
 
             
 if (!isActiveAndEnabled) return;
+            var bumper = hit.collider.GetComponentInParent<CompressibleBumper>();
+            if (bumper != null) bumper.TryBump(this, hit.normal);
+            var banana = hit.collider.GetComponentInParent<BananaSlip>();
+            if (banana != null) banana.TrySlip(this, hit.normal);
+            var prop = hit.collider.GetComponentInParent<PushableProp>();
+            if (prop != null) prop.TryPush(this, hit.point, hit.moveDirection);
+            var bottle = hit.collider.GetComponentInParent<BeachPushableBottle>();
+            if (bottle != null) bottle.TryPush(this, hit.point, hit.moveDirection);
             if (verticalVelocity <= 0f && Time.time >= detachUntil && Vector3.Dot(hit.normal, Vector3.up) > 0.5f)
             {
                 var platform = hit.collider.GetComponentInParent<SeesawPlatform>();
@@ -202,12 +302,52 @@ if (!isActiveAndEnabled) return;
         public bool TryReceiveRacerImpact(Vector3 velocity, float controlLockTime, float cooldown)
         {
             if (!CanReceiveRacerImpact) return false;
+            CancelSlip();
+            if (IsSprinting) EndSprint();
             horizontalVelocity = Vector3.zero;
             LaunchFromSupport(velocity);
             racerControlLockUntil = Time.time + Mathf.Max(0f, controlLockTime);
             racerImpactCooldownUntil = Time.time + Mathf.Max(0f, cooldown);
             return true;
         }
+        public bool TryStartSlip(float speed, float duration, float spinSpeed)
+        {
+            if (!isActiveAndEnabled || !controller.enabled || input == null || !input.isActiveAndEnabled ||
+                IsSlipping || Time.timeScale <= 0f || Time.time < racerControlLockUntil) return false;
+            if (IsSprinting) EndSprint();
+            slipDirection = Vector3.ProjectOnPlane(visuals.forward, Vector3.up).normalized;
+            if (slipDirection.sqrMagnitude < 0.001f) slipDirection = transform.forward;
+            slipFacing = visuals.rotation;
+            slipSpeed = Mathf.Max(0f, speed);
+            slipDuration = slipRemaining = Mathf.Max(0.05f, duration);
+            slipSpinSpeed = spinSpeed;
+            horizontalVelocity = Vector3.zero;
+            externalHorizontalVelocity = slipDirection * slipSpeed;
+            lastGrounded = jumpRequested = float.NegativeInfinity;
+            ClearSupport();
+            return true;
+        }
+
+        private void UpdateSlip(float dt)
+        {
+            float previous = slipRemaining / slipDuration;
+            slipRemaining = Mathf.Max(0f, slipRemaining - dt);
+            float remaining = slipRemaining / slipDuration;
+            // Integrate a quadratic slowdown; distance is speed * duration / 3 on clear ground.
+            float average = (previous * previous * previous - remaining * remaining * remaining)
+                * slipDuration / (3f * dt);
+            externalHorizontalVelocity = slipDirection * (slipSpeed * average);
+            float elapsed = slipDuration - slipRemaining;
+            float angle = slipSpinSpeed * (elapsed - elapsed * elapsed / (2f * slipDuration));
+            visuals.rotation = Quaternion.AngleAxis(angle, Vector3.up) * slipFacing;
+        }
+
+        private void CancelSlip()
+        {
+            if (IsSlipping && visuals != null) visuals.rotation = slipFacing;
+            slipRemaining = 0f;
+        }
+
         public bool TryBounce(float height)
         {
             if (!isActiveAndEnabled || controller == null || !controller.enabled || verticalVelocity > 0f || height <= 0f)
@@ -220,6 +360,8 @@ if (!isActiveAndEnabled) return;
         }
 private void OnDisable()
         {
+            CancelSlip();
+            ResetSprint();
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;
             detachUntil = 0f;
@@ -263,6 +405,8 @@ private void OnDisable()
         }
         public void TeleportAndReset(Vector3 position, Quaternion rotation)
         {
+            CancelSlip();
+            ResetSprint();
             racerControlLockUntil = racerImpactCooldownUntil = 0f;
             ClearSupport();
             externalHorizontalVelocity = Vector3.zero;

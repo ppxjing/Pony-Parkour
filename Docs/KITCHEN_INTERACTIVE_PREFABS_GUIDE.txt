@@ -1,0 +1,62 @@
+厨房交互预制体
+
+场景：Assets/_Project/Scenes/Kitchen_Adventure.unity
+预制体：Assets/_prefab/厨房/
+- PF_Bread_Bumper.prefab：面包压缩膨胀弹开。
+- PF_Banana_Slip.prefab：踩到香蕉后旋转滑行并减速。
+- PF_Knife_Rotating.prefab：刀柄末端为支点的旋转刀具，玩家和 AI 接触死亡。
+当前场景接入 2 个 Bread、1 组 Banana、11 把 Knife，保留初始模型世界位置、旋转和缩放。
+刀具已从盘子组合中取出，独立放在 Kitchen_RotatingKnives 下。相关盘子组合在场景中解包以保留其他物体，第三方原预制体没有修改。
+开始修改时的未保存场景副本：Logs/KitchenPrefabWork/Kitchen-before-interactions.unity。
+
+面包参数（Compressible Bumper）
+与沙滩球共用一套动画和弹开逻辑：缩小 -> 快速膨胀 -> 弹开接触者 -> 恢复原大小。
+Horizontal Speed = 7：基准大小下水平弹开初速度。
+Upward Speed = 4：基准大小下向上初速度。
+Reference Diameter = 1.4：面包的基准尺寸。实际速度按静止模型最长尺寸与基准尺寸的比值缩放，计入父级缩放，旋转摆放和动画膨胀不改变这个倍率。
+Shrunken Scale = 0.75，Shrink Seconds = 0.12：缩小比例和耗时。
+Inflated Scale = 1.18，Inflate Seconds = 0.08：膨胀比例和耗时。
+Recover Seconds = 0.3：恢复原大小耗时。
+Control Lock Seconds = 0.25，Hit Cooldown = 0.6：玩家短暂控制锁定与再次触发冷却。
+使用原面包 MeshCollider，不增加包围整块面包的球形碰撞体。
+
+香蕉参数（Banana Slip）
+Initial Speed = 8：滑行初始速度。
+Duration = 2：滑行持续时间。默认速度按二次曲线降到零，空旷平地理论滑行距离约 Initial Speed × Duration / 3，即 5.33 米。
+Spin Degrees Per Second = 720：初始自转速度，随后逐渐减速；负数反向。
+Cooldown = 2.5：同一香蕉再次触发的冷却。
+Minimum Up Normal = 0.45：必须是朝上的接触面才算踩中，侧面碰撞不会触发。
+方向取踩中时玩家模型的朝向，之后沿此方向直线移动，模型绕竖直轴打转。
+滑行期间禁止 WASD、跳跃、Shift 冲刺；摄像机仍可观察。运动通过原 CharacterController，仍受墙体和重力影响。
+死亡、复活、禁用玩家会清理滑行状态；其他弹开机关可打断滑行。
+
+刀具参数（根节点 Rotating Hammer，复用原有旋转组件）
+Degrees Per Second = 90：旋转速度；负值反转，0 停转。
+Local Axis = (0,1,0)：绕本地 Y 轴旋转，可改成 X/Z 轴。
+Start Angle = 0：初始转角。
+Start Delay = 0：开始旋转前等待秒数。
+根节点原点位于刀柄末端，Knife 子模型保持相对偏移；移动、旋转、缩放根节点即可调整摆放。
+Knife Contact 为贴合整把刀外包尺寸的细长 BoxCollider Trigger，包含刀身和刀柄；KnifeDamage 只接受真实角色碰撞体，忽略 AI 的额外探测传感器。
+原刀具 MeshCollider 提供实体碰撞，旋转使用运动学 Rigidbody。
+死亡复用现有布娃娃、延迟复活、输入和摄像机恢复流程。
+
+文件管理
+Assets/_Project/Scripts/Obstacles/CompressibleBumper.cs：沙滩球与面包共用的压缩膨胀弹开逻辑。
+Assets/_Project/Scripts/Obstacles/Beach/BeachBumperBall.cs：保留旧脚本引用和序列化参数的沙滩球组件。
+Assets/_Project/Scripts/Obstacles/Kitchen/：BananaSlip.cs、KnifeDamage.cs。
+Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：真实碰撞转发与滑行状态。
+Assets/_Project/Scripts/AI/RacerCollisionBody.cs：AI 对共用弹开组件的接触支持。
+Assets/_Project/Scenes/Kitchen_Adventure/LightingData.asset：场景自己的光照数据副本，避免改写第三方 Demo 数据。
+
+验收
+1. 打开 Kitchen_Adventure 并 Play，等待开局倒计时。
+2. 玩家碰面包，观察先缩小再膨胀并弹开；让 AI 接触面包侧面，同样会弹开。
+3. 玩家从上方踩到香蕉，确认失控向前滑行并旋转，约 2 秒后停止；过程中 WASD、空格和 Shift 不会打断滑行。
+4. 观察 Kitchen_RotatingKnives：刀柄末端不位移，刀绕末端旋转；碰到玩家或 AI 后出现布娃娃死亡，随后复活恢复控制或巡逻。
+5. 停止 Play，确认所有物体回到编辑时的摆放；在 Project 中拖入三个预制体可复用。
+
+运行验证记录
+面包玩家真实接触后 launches=1；AI 胶囊与面包边缘接触后 launches=1 且进入物理击飞。
+香蕉真实落地接触触发一次，0.2 秒速度约 6.48、1 秒约 2、2.3 秒为 0，位移约 5.38 米；滑行中冲刺被拒绝，结束后恢复。
+刀具 0.25 秒转约 21.4 度，支点位移为 0；玩家和 AI 均触发死亡、玩家输入关闭、AI 刚体进入动态；2.6 秒后恢复。
+沙滩球在共享逻辑提取后实际接触和膨胀弹开仍正常。

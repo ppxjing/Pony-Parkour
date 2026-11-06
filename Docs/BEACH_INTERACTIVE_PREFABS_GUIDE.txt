@@ -1,0 +1,70 @@
+沙滩交互预制体
+
+场景：Assets/_Project/Scenes/Beach.unity
+预制体目录：Assets/_prefab/沙滩/
+已接入当前场景的 25 个球、6 个风车、4 个瓶子，共 35 个实例，保留原有摆放。
+场景修改前副本：Logs/BeachPrefabWork/Beach-before-interactions.unity（包含开始任务时编辑器中尚未保存的摆放）。
+
+预制体：
+- PF_K_Ball_01/02/03/05/06/07_Bumper.prefab：6 款 K_Ball。
+- PF_Croquet_Ball_01/02/03_Bumper.prefab：3 款 Croquet_Ball。
+- PF_Wind_Turbine_Grp_Rotating.prefab：旋转风叶，立杆固定。
+- PF_Bottle_Physics.prefab：有重力和碰撞、可被玩家撞飞翻滚的瓶子。
+这些是项目自有的预制体变体，复用 ThirdParty 的模型和材质，不修改第三方原预制体。
+
+调整方法：
+在 Project 中双击上述预制体，在 Inspector 修改组件；统一影响未覆盖该参数的场景实例。
+若只想调整一个实例，直接在 Hierarchy 中选中该物体修改。物体位置、旋转和缩放仍可正常编辑。
+
+弹球：Beach Bumper Ball 组件
+玩家和 AI 实际接触时，球先缩小，再快速膨胀，到膨胀峰值时弹开接触者，最后恢复大小。
+- Horizontal Speed = 7：基准直径下的水平弹开初速度。
+- Upward Speed = 4：基准直径下的向上初速度。
+- Reference Diameter = 0.5：基准世界直径（米）。实际初速度 = 上述速度 × 球的静止世界直径 / 基准直径。
+  世界直径取 SphereCollider.radius × 2 × Transform 最大绝对世界缩放，计入父物体缩放；动画缩放不参与计算。
+  因此同一种球缩放为 0.5 / 1 / 2 倍时，弹开初速度也是 0.5 / 1 / 2 倍。飞行距离还受重力、阻力和障碍物影响。
+- Shrunken Scale = 0.75：先缩小到原大小的 75%。
+- Shrink Seconds = 0.12：缩小耗时。
+- Inflated Scale = 1.18：快速膨胀到原大小的 118%。
+- Inflate Seconds = 0.08：从缩小状态到膨胀峰值的耗时。
+- Recover Seconds = 0.3：恢复原大小耗时。默认完整动画约 0.5 秒，接触约 0.2 秒后弹开。
+- Control Lock Seconds = 0.25：玩家被弹开后短暂禁止主动移动的时间。
+- Hit Cooldown = 0.6：弹开后的重复触碰冷却，避免连续叠加推力。
+同一次压缩可记录多个不同接触者，每个角色仅弹开一次。AI 接触传感器的额外余量不会提前触发，必须碰到实际胶囊体。
+弹球固定在场景里，不会主动跳动，不会直接杀死角色。AI 被弹开后沿用重力下落和落地恢复巡逻逻辑。
+
+风车：根节点 Beach Windmill 组件
+- Degrees Per Second = 90：每秒旋转角度，0 可停止。
+- Reverse Direction：反向旋转。
+- Local Axis = (1,0,0)：当前模型绕本地 X 轴转，不要误设成 Y/Z。
+- Blades：已绑定 Wind_Turbine_Wing 的运动学 Rigidbody。
+只旋转风叶，保留风叶原本的非凸网格碰撞，避免整个风叶间隙变成一整块隐形碰撞体。
+
+瓶子：Beach Pushable Bottle 组件
+- Push Impulse = 2.2：水平推力冲量。
+- Lift Impulse = 0.9：向上冲量。
+- Tumble Impulse = 0.25：翻滚冲量。
+- Minimum Player Speed = 0.5：玩家达到此速度才主动施加撞击力。
+- Push Cooldown = 0.25：连续施力间隔。
+- Max Push Speed = 12：瓶子已达到此速度后不再叠加推力。
+Rigidbody 组件还可调：Mass（默认 0.65）、Linear Damping（0.1）、Angular Damping（0.2）。
+瓶子受重力影响，Play 后会从原摆放落下、倾倒或滚动，这是物理物体的预期行为。
+瓶子原始模型过密，使用简化瓶形凸碰撞体（72 顶点、140 三角面），避免 Unity 原始凸网格超过多边形限制。
+
+文件管理：
+- Assets/_Project/Scripts/Obstacles/Beach/：BeachBumperBall、BeachWindmill、BeachPushableBottle。
+- Assets/_Project/Meshes/Beach/Bottle_Collision.asset：瓶子专用简化碰撞网格。
+- Assets/_Project/Scenes/Beach/LightingData.asset：沙滩场景自己的光照数据副本，避免保存新实例时改写第三方 Demo 的共享数据。
+- Assets/_Project/Scripts/Player/ThirdPersonMotor.cs：将实际 CharacterController 接触交给球/瓶子组件处理。
+- Assets/_Project/Scripts/AI/RacerCollisionBody.cs：检查 AI 真实碰撞并接收球的弹开速度，复用落地恢复巡逻。
+- 所有交互预制体均包含 Camera Obstruction Ignore，延续机关不挤压玩家摄像机弹簧臂的规则。
+
+验收：
+1. 打开 Beach，Play 并等待 3、2、1。
+2. 走到任意 K_Ball 或 Croquet_Ball：接触后先缩小、再膨胀，约 0.2 秒后弹开、0.5 秒恢复大小。让 AI 途经球的位置，确认 AI 同样触发并在落地后继续巡逻。复制同一种球，分别设置均匀 Scale 为 0.5、1、2，确认球越大弹得越强。
+3. 观察 6 个风车：只有风叶绕轴转，立杆不动。勾选 Reverse Direction 检查反向。
+4. 走向瓶子：瓶子被撞动、离地翻滚，随后按重力落下；停止 Play 后恢复编辑时摆放。
+5. 暂停游戏：风叶、膨胀动画和物理均暂停；继续后恢复。
+6. 从 Assets/_prefab/沙滩 拖入新的预制体，同样可直接使用。
+
+运行验证：9 款球此前全部通过真实 CharacterController.Move 接触测试。本次新动画实测压缩阶段缩放 0.785 且未弹开，膨胀阶段缩放 1.179 时弹开一次，结束恢复 1；同款球 Scale 为 0.5/1/2 时水平速度约 4.12/8.25/16.50；AI 仅传感器余量重叠时不触发，实际胶囊接触后压缩膨胀并弹开，之后重新处于 NavMesh 上并继续巡逻。风叶约转 60 度时立杆位移 0；瓶子真实接触产生推力和翻滚；Unity Console 无脚本错误。
