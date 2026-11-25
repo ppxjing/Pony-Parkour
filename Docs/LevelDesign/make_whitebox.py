@@ -111,9 +111,15 @@ def marker(d, x, z, text, kind):
     if text:
         d.text((px + 18, py - 10), text, font=f_s, fill=(30, 30, 30))
 
+def tag(d, xy, text, fg=(40, 40, 40), font=None):
+    font = font or f_s
+    b = d.multiline_textbbox(xy, text, font=font)
+    d.rectangle([b[0] - 3, b[1] - 2, b[2] + 3, b[3] + 2], fill=(255, 255, 255, 215))
+    d.multiline_text(xy, text, font=font, fill=fg)
+
 def region(d, box, col, label):
     d.rectangle([P(box[0], box[3]), P(box[2], box[1])], fill=col + (55,), outline=col + (200,), width=3)
-    d.text(P(box[0] + 0.6, box[3] - 0.4), label, font=f_m, fill=col)
+    if label: tag(d, P(box[0] + 0.6, box[3] - 0.4), label, fg=col, font=f_m)
 
 def panel(im, d, title, sub, lines, assets, risks):
     x = MAPW + 20
@@ -231,5 +237,79 @@ def scheme_c():
           ["场地小,50 只羊 + 放大的主播可能太挤,要测羊的体型。", "放弃了床和书桌,场景不够有名气。", "封墙长度约 50m,要用资产补齐,工作量不小。"])
     im.save(os.path.join(OUT, "SheepArena_Whitebox_C_PortraitArena.png"))
 
-scheme_a(); scheme_b(); scheme_c()
+
+# ---------------------------------------------------------------- Scheme A2
+def scheme_a2():
+    import random
+    global FURN
+    FURN = [(n, x0, z0, x1, z1, t) if n != "床 Bed_Grp" else ("床(二层大平台)", -0.2, -7.1, 18.0, 1.5, 3.6)
+            for (n, x0, z0, x1, z1, t) in FURN]
+    im, d = base()
+    cleared = [(-3.8, 9.2, 4.8, 16.8), (3.5, 5.5, 5.4, 11.3), (-5.0, 12.7, -2.0, 16.0), (-9.5, 12.4, -6.4, 14.3),
+               (-10.8, 15.4, -7.5, 21.6), (-14.6, 3.8, -10.3, 11.3), (-7.5, 16.5, -2.0, 21.7),
+               (-11.4, 9.2, -4.9, 12.7), (-10.4, -12.3, -2.5, -1.1), (-17.0, -3.2, -7.8, 4.9)]
+    for (x0, z0, x1, z1) in cleared:
+        d.rectangle([P(x0, z1), P(x1, z0)], fill=(236, 230, 214))
+        d.rectangle([P(x0, z1), P(x1, z0)], outline=(150, 150, 150), width=1)
+    # main battle zone
+    region(d, (-14, 2, 18, 25), (30, 140, 200), "主战区(开阔)")
+    region(d, (-14, -10, -1, 2), (30, 140, 200), "")
+    # scattered toys
+    keep = [(5.5, 13.3, 9.3, 17.2), (-14.4, 13.9, -10.9, 17.5), (2.5, 16.3, 8.2, 23.1), (7.5, 2.4, 13.4, 13.2),
+            (5.7, 2.6, 7.6, 10.7), (-0.2, -7.1, 18.0, 1.5)]
+    rnd = random.Random(11)
+    cols = [(230, 90, 90), (90, 160, 230), (240, 190, 60), (110, 200, 120), (190, 110, 220)]
+    placed = 0
+    while placed < 46:
+        x = rnd.uniform(-13.5, 17.5); z = rnd.uniform(-9.5, 24.5)
+        if z < 2 and x > -1: continue
+        if z > 22.8 or (z > 19 and x < -9) : continue
+        if any(a - 0.8 < x < c + 0.8 and b - 0.8 < z < e + 0.8 for (a, b, c, e) in keep): continue
+        w = rnd.uniform(0.7, 1.4)
+        d.rectangle([P(x - w / 2, z + w / 2), P(x + w / 2, z - w / 2)], fill=rnd.choice(cols), outline=(70, 70, 70))
+        placed += 1
+    tag(d, P(-9, 24.2), "散落的小玩具:把现有 PF_Cube_Toys / PF_Pen 物理小件打散", fg=(20, 80, 130))
+    d.text(P(-13.6, -9.4), "已清空的大件堆(虚线格):\n挪到房间四周当掩体", font=f_s, fill=(110, 110, 110))
+    # second level
+    region(d, (0, -7.1, 18, 1.5), (200, 120, 0), "二层 · 床顶大平台 18×8.6m")
+    region(d, (-12.5, -18.6, -4.7, -11.8), (150, 80, 180), "")
+    region(d, (-1.6, -18.5, 5.0, -13.3), (150, 80, 180), "")
+    d.text(P(-12.2, -12.4), "书桌B", font=f_s, fill=(100, 40, 130))
+    d.text(P(-1.3, -13.9), "书桌A", font=f_s, fill=(100, 40, 130))
+    # existing / new connections
+    d.line([P(4.9, -4.3), P(4.9, -14.0)], fill=(150, 80, 180), width=10)
+    d.text(P(5.2, -9.5), "既有木板天桥\n(书桌A↔床)", font=f_s, fill=(100, 40, 130))
+    d.line([P(-1.1, -17.1), P(-7.9, -17.1)], fill=(150, 80, 180), width=10)
+    tag(d, P(-9.5, -20.6), "既有尺子桥(书桌A↔书桌B)", fg=(100, 40, 130))
+    # access points up to level 2
+    def up(x, z, n, txt, dx=16, dy=-10):
+        px, py = P(x, z)
+        d.polygon([(px, py - 15), (px + 14, py + 11), (px - 14, py + 11)], fill=(40, 170, 80), outline="white")
+        d.text((px, py + 3), n, font=f_s, fill="white", anchor="mm")
+        tag(d, (px + dx, py + dy), txt, fg=(20, 90, 40))
+    up(6.6, 5.0, "1", "既有坡道(北面上床)", dx=-150, dy=-30)
+    up(10.5, 3.2, "2", "既有弹床 → 直接弹上床", dx=20, dy=-26)
+    up(-3.0, -3.5, "3", "新增坡:复制现有木板", dx=-170, dy=-34)
+    up(-14.2, -8.6, "4", "椅子/凳子阶梯→书桌B", dx=-10, dy=-52)
+    # ground loop around bed + level-2 loop
+    arrow(d, [(-8, -4), (-6, 16), (10, 21), (20.2, 12), (20.2, -10), (9, -10.8), (-2, -10.8), (-8, -4)], col=(40, 90, 220))
+    arrow(d, [(12, -3), (4.9, -5.5), (4.9, -12.5), (-1, -16.3), (-8, -16.3), (-12.5, -11.5), (-12.5, -8), (-8, -5.5), (-3.5, -3.5), (6, -3.5)], col=(150, 80, 180), w=4)
+    marker(d, 13, -2.8, "", "counter"); tag(d, P(10.0, -5.2), "反击点:床上大炮", fg=(200, 30, 30))
+    marker(d, -6, 7, "主播出生", "spawn")
+    marker(d, 17, 22.5, "", "box"); marker(d, -21, 22.5, "", "box"); marker(d, -23.5, 10, "", "box"); marker(d, 17.5, -17.5, "", "box")
+    panel(im, d, "方案 A2 · 开阔中央战区 + 二层平台", "在 A 的环线上改:中间清空做主战区,床和书桌连成二层",
+          ["主战区 ≈ 900m²:房间中部和北部全部清空,只留零散小玩具和几堆掩体,是整张图最大最开阔的地方。",
+           "二层 ≈ 240m²:床顶(18×8.6m)是次级大平台;两张书桌和床靠现有木板、尺子连成一圈。",
+           "4 条上二层的通道(绿三角):既有坡道、弹床、新增中央坡、椅凳阶梯,不用的羊也能追上去。",
+           "反击点大炮放在床上:主播冲上二层有收益,也有风险(负极时被追上去会无路可退)。",
+           "A 的两个环都保留:地面绕床一圈(蓝),二层绕桌绕床一圈(紫);四角玩具箱出羊。"],
+          ["Bed_Grp(床顶当次级平台)", "Board_03_Long(既有木板天桥,可复制出新坡)", "Mesure_Long(尺子桥)", "Road_03_Bend_03 坡道 + 弹床", "Chair / Stool 阶梯", "Cardboard_Box 当玩具箱/掩体", "PF_Cube_Toys / PF_Pen 当散落玩具"],
+          ["床实际只有 18×8.6m、约 3.6m 高(之前图里画成 18×20、5.6m,画错了,这版已按实际尺寸改正)。", "既有坡道能否真的走上床顶,要进场景试走确认,不通的话改成新增坡。", "放大 2 倍后的主播(1.4m 宽)通过木板天桥和尺子桥是否太窄,要测。"])
+    im.save(os.path.join(OUT, "SheepArena_Whitebox_A2_OpenCenter.png"))
+
+import sys
+if 'a2' in sys.argv:
+    scheme_a2()
+else:
+    scheme_a(); scheme_b(); scheme_c()
 print("done")
